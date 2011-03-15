@@ -1,0 +1,85 @@
+parallel (20110205-1) unstable; urgency=low
+
+  * New upstream release.
+  * Change the versioning of the package.
+  * Remove build-dependency on dh-autoreconf.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Tue, 15 Mar 2011 03:41:31 -0300
+
+parallel (20101222-1~ppa0) maverick; urgency=low
+
+  * New upstream release.
+  * debian/{compat,control}:
+    + use debhelper compatbility version 8.
+  * debian/watch:
+    + remove useless lines.
+  * debian/links:
+    + make sem a symlink to parallel.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Thu, 23 Dec 2010 02:18:34 -0200
+
+parallel (20101202-1~ppa0) maverick; urgency=low
+
+  * New upstream release.
+  * debian/patches:
+    + Remove, with everything applied upstream.
+  * debian/rules:
+    + Ship upstream's NEWS file as the upstream changelog.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Sat, 04 Dec 2010 01:48:04 -0200
+
+parallel (20100922-4~ppa0) maverick; urgency=low
+
+  * Change package to be non-native.
+  * Move to format "3.0 (quilt)".
+  * debian/compat:
+    + update to 7.
+  * debian/rules:
+    + don't configure the package in the clean target.
+    + create a configure (and configure-stamp) target.
+  * debian/control:
+    + update debhelper dependency to >= 7.
+    + add dh-autoreconf to build-dependency.
+    + indicate that the package conforms to Policy 3.9.1.
+    + set myself as maintainer and Ole as uploader.
+  * debian/rules:
+    + use dh(7) style file with autoreconf add-on.
+  * debian/doc-base:
+    + properly register the documentation with doc-base.
+  * debian/patches:
+    + include some patches to fix spelling errors detected by lintian.
+  * debian/dirs:
+    + remove, not needed.
+  * upload to my ppa.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Mon, 25 Oct 2010 03:44:37 -0200
+
+parallel (20100922-3) unstable; urgency=low
+
+  * New upstream version - 3rd try
+
+ -- Ole Tange <ole@tange.dk>  Tue, 21 Sep 2010 22:15:05 +0200
+
+parallel (20100922-2) unstable; urgency=low
+
+  * New upstream version
+
+ -- Ole Tange <ole@tange.dk>  Tue, 21 Sep 2010 22:13:53 +0200
+
+parallel (20100922-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Ole Tange <ole@tange.dk>  Tue, 21 Sep 2010 22:12:22 +0200
+
+parallel (20100906-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Ole Tange <ole@tange.dk>  Fri, 04 Jun 2010 02:00:06 +0200
+
+parallel (20090803-1) unstable; urgency=low
+
+  * Initial release (Closes: #518696)
+
+ -- Ole Tange <ole@tange.dk>  Mon, 03 Aug 2009 17:11:56 +0200
