@@ -1,242 +1,30 @@
 #!/usr/bin/perl -w
 
-=head1 NAME
-
-niceload - slow down a program when the load average is above a certain limit
-
-=head1 SYNOPSIS
-
-B<niceload> [-v] [-n nice] [-l load] [-t time] [-s time|-f factor] command
-
-B<niceload> [-v] [-n nice] [-l load] [-t time] [-s time|-f factor] -p=PID
-
-=head1 DESCRIPTION
-
-GNU B<niceload> will run a program when the load average is below a
-certain limit. When the limit is reached the program will be suspended
-for some time. Then resumed again for some time.  Then the load load
-average is checked again and we start over.
-
-If the load is 3.00 then the default settings will run a program
-like this:
-
-run 1 second, suspend (3.00-1.00) seconds, run 1 second, suspend
-(3.00-1.00) seconds, run 1 second, ...
-
-=head1 OPTIONS
-
-=over 9
-
-=item B<-n> I<niceness>
-
-Sets niceness. See B<nice>(1).
-
-=item B<-l> I<maxload>
-
-Max load. The maximal load average before suspending command. Default
-is 1.00.
-
-=item B<-t> I<SEC>
-
-Recheck load time. Sleep SEC seconds before checking load
-again. Default is 1 second.
-
-=item B<-s> I<SEC>
-
-Suspend time. Suspend the command this many seconds when the max load
-average is reached.
-
-=item B<-f> I<FACTOR>
-
-Suspend time factor. Dynamically set B<-s> as max load average over limit * factor. Default is 1.
-
-=item B<-p> I<PID>
-
-Process ID of process to suspend.
-
-=item B<-v>
-
-Verbose. Print some extra output on what is happening. Use B<-v> until
-you know what your are doing.
-
-=back
-
-=head1 EXAMPLE: See niceload in action
-
-In terminal 1 run: top
-
-In terminal 2 run:
-
-B<niceload perl -e '$|=1;do{$l==$r or print "."; $l=$r}until(($r=time-$^T)>>B<50)'>
-
-This will print a '.' every second for 50 seconds and eat a lot of
-CPU. When the load rises to 1.0 the process is suspended.
-
-
-=head1 EXAMPLE: Run updatedb
-
-Running updatedb can often starve the system for disk I/O and thus result in a high load.
-
-Run updatedb but suspend updatedb if the load is above 2.00:
-
-B<niceload -l=2 updatedb>
-
-
-=head1 EXAMPLE: Run rsync
-
-rsync can just like updatedb starve the system for disk I/O and thus result in a high load.
-
-Run rsync but keep load below 3.4. If load reaches 7 sleep for
-(7-3.4)*12 seconds:
-
-B<niceload -l=3.4 -f=12 rsync -Ha /home/ /backup/home/>
-
-
-=head1 ENVIRONMENT VARIABLES
-
-None. In future versions $NICELOAD will be able to contain default settings.
-
-=head1 EXIT STATUS
-
-Exit status should be the same as the command being run (untested).
-
-=head1 REPORTING BUGS
-
-Report bugs to <bug-parallel@gnu.org>.
-
-=head1 AUTHOR
-
-Copyright (C) 2004-11-19 Ole Tange, http://ole.tange.dk
-
-Copyright (C) 2005,2006,2006,2008,2009,2010 Ole Tange, http://ole.tange.dk
-
-Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
-Software Foundation, Inc.
-
-=head1 LICENSE
-
-Copyright (C) 2010 Free Software Foundation, Inc.
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 3 of the License, or
-at your option any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-=head2 Documentation license I
-
-Permission is granted to copy, distribute and/or modify this documentation
-under the terms of the GNU Free Documentation License, Version 1.3 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the file fdl.txt.
-
-=head2 Documentation license II
-
-You are free:
-
-=over 9
-
-=item B<to Share>
-
-to copy, distribute and transmit the work
-
-=item B<to Remix>
-
-to adapt the work
-
-=back
-
-Under the following conditions:
-
-=over 9
-
-=item B<Attribution>
-
-You must attribute the work in the manner specified by the author or
-licensor (but not in any way that suggests that they endorse you or
-your use of the work).
-
-=item B<Share Alike>
-
-If you alter, transform, or build upon this work, you may distribute
-the resulting work only under the same, similar or a compatible
-license.
-
-=back
-
-With the understanding that:
-
-=over 9
-
-=item B<Waiver>
-
-Any of the above conditions can be waived if you get permission from
-the copyright holder.
-
-=item B<Public Domain>
-
-Where the work or any of its elements is in the public domain under
-applicable law, that status is in no way affected by the license.
-
-=item B<Other Rights>
-
-In no way are any of the following rights affected by the license:
-
-=over 2
-
-=item *
-
-Your fair dealing or fair use rights, or other applicable
-copyright exceptions and limitations;
-
-=item *
-
-The author's moral rights;
-
-=item *
-
-Rights other persons may have either in the work itself or in
-how the work is used, such as publicity or privacy rights.
-
-=back
-
-=back
-
-=over 9
-
-=item B<Notice>
-
-For any reuse or distribution, you must make clear to others the
-license terms of this work.
-
-=back
-
-A copy of the full license is included in the file as cc-by-sa.txt.
-
-=head1 DEPENDENCIES
-
-GNU B<niceload> uses Perl, and the Perl modules POSIX, and
-Getopt::Long.
-
-=head1 SEE ALSO
-
-B<parallel>(1), B<nice>(1)
-
-
-=cut
+# Copyright (C) 2004,2005,2006,2006,2008,2009,2010 Ole Tange,
+# http://ole.tange.dk
+#
+# Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
+# Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses/>
+# or write to the Free Software Foundation, Inc., 51 Franklin St,
+# Fifth Floor, Boston, MA 02110-1301 USA
 
 use strict;
 use Getopt::Long;
 $Global::progname="niceload";
-$Global::version = 20110205;
+$Global::version = 20110822;
 Getopt::Long::Configure("bundling","require_order");
 get_options_from_array(\@ARGV) || die_usage();
 if($::opt_version) {
@@ -252,51 +40,50 @@ if($::opt_factor and $::opt_suspend) {
     help();
     exit;
 }
-
-my $nice       = $::opt_nice || 0; # -n=0 Nice level (Default: 0)
-my $max_load   = $::opt_load || 1; # -l=1 Max acceptable load average (Default: 1)
-my $check_time = $::opt_recheck || 1; # -t=1 Seconds between checking load average (Default: 1)
-my $wait_factor;
-my $wait_time;
-if($::opt_suspend) {
-    # --suspend=sec Seconds to suspend process when load average is too high
-    $wait_time = $::opt_suspend; 
-} else {
-    # --factor=1 compute wait_time dynamically as (load - limit) * factor
-    $wait_factor=$::opt_factor || 1; 
+if(not (defined $::opt_start_io or defined $::opt_run_io
+	or defined $::opt_start_load or defined $::opt_run_load
+	or defined $::opt_start_mem or defined $::opt_run_mem
+	or defined $::opt_start_noswap or defined $::opt_run_noswap
+	or defined $::opt_io or defined $::opt_load
+	or defined $::opt_mem or defined $::opt_noswap)) {
+    # Default is --runload=1
+    $::opt_run_load = 1;
 }
-my $processid  = $::opt_pid;      # Control this PID (Default: control the command)
-my $verbose = $::opt_verbose || $::opt_debug;
-my @program = @ARGV;
-$SIG{CHLD} = \&REAPER;
 
-if($processid) {
-    $Child::fork = $processid;
-    $::opt_verbose and print STDERR "Control $processid\n";
-    init_signal_handling_attached_child();
-    my $child_pgrp = getpgrp $Child::fork;
-    suspend_resume($max_load,$check_time,$wait_time,$wait_factor,$child_pgrp);
-} elsif(@ARGV) {
-    if($Child::fork = fork) {
-	sleep 1; # Give child time to setpgrp(0,0);
-	init_signal_handling_my_child();
-	my $child_pgrp = getpgrp $Child::fork;
-	suspend_resume($max_load,$check_time,$wait_time,$wait_factor,$child_pgrp);
-    } else {
-	setpgrp(0,0);
-	debug("Child pid: $$, pgrp: ",getpgrp $$,"\n");
-	if($nice) {
-	    unshift(@program,"nice","-n",$nice);
-	}
-	debug("@program\n");
-	system(@program);
-	debug("Child exit\n");
-	exit;
+if(not defined $::opt_start_io) { $::opt_start_io = $::opt_io; }
+if(not defined $::opt_run_io) { $::opt_run_io = $::opt_io; }
+if(not defined $::opt_start_load) { $::opt_start_load = $::opt_load; }
+if(not defined $::opt_run_load) { $::opt_run_load = $::opt_load; }
+if(not defined $::opt_start_mem) { $::opt_start_mem = $::opt_mem; }
+if(not defined $::opt_run_mem) { $::opt_run_mem = $::opt_mem; }
+if(not defined $::opt_start_noswap) { $::opt_start_noswap = $::opt_noswap; }
+if(not defined $::opt_run_noswap) { $::opt_run_noswap = $::opt_noswap; }
+
+my $limit = Limit->new();
+my $process = Process->new($::opt_nice,@ARGV);
+if(not $::opt_pid) {
+    # Wait until limit is below start_limit and run_limit
+    while($limit->over_start_limit()
+	  or
+	  ($limit->hard() and $limit->over_run_limit())) {
+	$limit->sleep_for_recheck();
     }
-} else {
-    help();
-    exit;
 }
+$process->start();
+while($process->is_alive()) {
+    if($limit->over_run_limit()) {
+	$process->suspend();
+	$limit->sleep_for_recheck();
+	if(not $limit->hard()) {
+	    $process->resume();
+	    $limit->sleep_while_running();
+	}
+    } else {
+	$process->resume();
+	$limit->sleep_while_running();
+    }
+}
+
 
 sub get_options_from_array {
     # Run GetOptions on @array
@@ -315,13 +102,32 @@ sub get_options_from_array {
     }
     my @retval = GetOptions
 	("debug|D" => \$::opt_debug,
-	 "load|l=s" => \$::opt_load,
 	 "factor|f=s" => \$::opt_factor,
+	 "hard|H" => \$::opt_hard,
+	 "soft|S" => \$::opt_soft,
+
+	 "si|sio|startio|start-io=s" => \$::opt_start_io,
+	 "ri|rio|runio|run-io=s" => \$::opt_run_io,
+	 "io|I=s" => \$::opt_io,
+
+	 "sl|startload|start-load=s" => \$::opt_start_load,
+	 "rl|runload|run-load=s" => \$::opt_run_load,
+	 "load|L|l=s" => \$::opt_load,
+
+	 "sm|startmem|start-mem=s" => \$::opt_start_mem,
+	 "rm|runmem|run-mem=s" => \$::opt_run_mem,
+	 "mem|M=s" => \$::opt_mem,
+
+	 "sn|startnoswap|start-noswap|start-no-swap" => \$::opt_start_noswap,
+	 "rn|runnoswap|run-noswap|run-no-swap" => \$::opt_run_noswap,
+	 "noswap|N" => \$::opt_noswap,
+
+	 "nice|n=i" => \$::opt_nice,
+	 "process|pid|p=s" => \$::opt_pid,
 	 "suspend|s=s" => \$::opt_suspend,
 	 "recheck|t=s" => \$::opt_recheck,
-	 "nice|n=i" => \$::opt_nice,
+	 "quote|q" => \$::opt_quote,
 	 "help|h" => \$::opt_help,
-	 "process|pid|p=s" => \$::opt_pid,
 	 "verbose|v" => \$::opt_verbose,
 	 "version|V" => \$::opt_version,
 	);
@@ -332,19 +138,44 @@ sub get_options_from_array {
     return @retval;
 }
 
+
 sub die_usage {
     help();
     exit 1;
 }
 
+
 sub help {
     print q{
 Usage:
-   niceload [-v] [-n=niceness] [-l=loadavg] [-t=recheck_sec] [-s=suspend_sec|-f=factor] command
-   niceload [-v] [-n=niceness] [-l=loadavg] [-t=recheck_sec] [-s=suspend_sec|-f=factor] command
+   niceload [-v] [-n niceness] [-L loadavg] [-I io] [-N] [-M mem]
+            [-s suspend_sec|-f factor] [-H] [-S]
+            command or -p pid
 };
 }
 
+
+sub die_bug {
+    my $bugid = shift;
+    print STDERR
+	("$Global::progname: This should not happen. You have found a bug.\n",
+	 "Please contact <parallel\@gnu.org> and include:\n",
+	 "* The version number: $Global::version\n",
+	 "* The bugid: $bugid\n",
+	 "* The command line being run\n",
+	 "* The files being read (put the files on a webserver if they are big)\n",
+	 "\n",
+	 "If you get the error on smaller/fewer files, please include those instead.\n");
+    exit(255);
+}
+
+
+sub usleep {
+    # Sleep this many milliseconds.
+    my $secs = shift;
+    ::debug("Sleeping ",$secs," millisecs\n");
+    select(undef, undef, undef, $secs/1000);
+}
 
 
 sub debug {
@@ -353,12 +184,37 @@ sub debug {
     }
 }
 
+
+sub my_dump {
+    # Returns:
+    #   ascii expression of object if Data::Dump(er) is installed
+    #   error code otherwise
+    my @dump_this = (@_);
+    eval "use Data::Dump qw(dump);";
+    if ($@) {
+        # Data::Dump not installed
+        eval "use Data::Dumper;";
+        if ($@) {
+            my $err =  "Neither Data::Dump nor Data::Dumper is installed\n".
+                "Not dumping output\n";
+            print STDERR $err;
+            return $err;
+        } else {
+            return Dumper(@dump_this);
+        }
+    } else {
+        eval "use Data::Dump qw(dump);";
+        return (Data::Dump::dump(@dump_this));
+    }
+}
+
+
 sub version {
     # Returns: N/A
     print join("\n",
 	       "GNU $Global::progname $Global::version",
 	       "Copyright (C) 2004,2005,2006,2007,2008,2009 Ole Tange",
-	       "Copyright (C) 2010 Ole Tange and Free Software Foundation, Inc.",
+	       "Copyright (C) 2010,2011 Ole Tange and Free Software Foundation, Inc.",
 	       "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>",
 	       "This is free software: you are free to change and redistribute it.",
 	       "GNU $Global::progname comes with no warranty.",
@@ -367,21 +223,84 @@ sub version {
 	);
 }
 
-sub init_signal_handling_attached_child {
-    $SIG{INT}=\&sigint_attached_child;
+
+sub multiply_binary_prefix {
+    # Evalualte numbers with binary prefix
+    # 13G = 13*1024*1024*1024 = 13958643712
+    my $s = shift;
+    $s =~ s/Ki?/*1024/gi;
+    $s =~ s/Mi?/*1024*1024/gi;
+    $s =~ s/Gi?/*1024*1024*1024/gi;
+    $s =~ s/Ti?/*1024*1024*1024*1024/gi;
+    $s =~ s/Pi?/*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Ei?/*1024*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Zi?/*1024*1024*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Yi?/*1024*1024*1024*1024*1024*1024*1024*1024/gi;
+    $s =~ s/Xi?/*1024*1024*1024*1024*1024*1024*1024*1024*1024/gi;
+    $s = eval $s;
+    return $s;
 }
 
-sub sigint_attached_child {
-    # Let the attached child continue when detaching
-    kill_child_CONT();
-    exit;
+
+sub max {
+    # Returns:
+    #   Maximum value of array
+    my $max;
+    for (@_) {
+        # Skip undefs
+        defined $_ or next;
+        defined $max or do { $max = $_; next; }; # Set $_ to the first non-undef
+        $max = ($max > $_) ? $max : $_;
+    }
+    return $max;
 }
 
-sub init_signal_handling_my_child {
-    $SIG{INT}=\&kill_child_INT;
-    $SIG{TSTP}=\&kill_child_TSTP;
-    $SIG{CONT}=\&kill_child_CONT;
+
+package Process;
+
+sub new {
+    my $class = shift;
+    my $nice = shift;
+    my @ARGV = @_;
+    if($nice) {
+	unshift(@ARGV, "nice", "-n", $nice);
+    }
+    return bless {
+	'running' => 0, # Is the process running now?
+	'command' => [@ARGV],
+    }, ref($class) || $class;
 }
+
+
+sub start {
+    # Start the program
+    my $self = shift;
+    ::debug("Starting @{$self->{'command'}}\n");
+    $self->{'running'} = 1;
+    if($self->{'pid'} = fork) {
+	# set signal handler to kill children if parent is killed
+	push @{$self->{'pids'}}, $self->{'pid'};
+	$Global::process = $self;
+	$SIG{CHLD} = \&REAPER;
+	$SIG{INT}=\&kill_child_INT;
+	$SIG{TSTP}=\&kill_child_TSTP;
+	$SIG{CONT}=\&kill_child_CONT;
+ 	sleep 1; # Give child time to setpgrp(0,0);
+ 	$self->{'pgrp'} = getpgrp $self->{'pid'};
+    } else {
+ 	setpgrp(0,0);
+ 	::debug("Child pid: $$, pgrp: ",getpgrp $$,"\n");
+ 	::debug("@{$self->{'command'}}\n");
+	if($::opt_quote) {
+	    system(@{$self->{'command'}});
+	} else {
+	    system("@{$self->{'command'}}");
+	}
+ 	::debug("Child exit\n");
+ 	exit;
+    }
+}
+
 
 use POSIX ":sys_wait_h";
 
@@ -393,54 +312,233 @@ sub REAPER {
     $SIG{CHLD} = \&REAPER;                  # install *after* calling waitpid
 }
 
+
 sub kill_child_CONT {
-    debug("SIGCONT received. Killing $Child::fork\n");
-    kill CONT => -getpgrp($Child::fork);
+    my $self = $Global::process;
+    ::debug("SIGCONT received. Killing $self->{'pid'}\n");
+    kill CONT => -getpgrp($self->{'pid'});
 }
+
 
 sub kill_child_TSTP {
-    debug("SIGTSTP received. Killing $Child::fork and self\n");
-    kill TSTP => -getpgrp($Child::fork);
+    my $self = $Global::process;
+    ::debug("SIGTSTP received. Killing $self->{'pid'} and self ($$)\n");
+    kill TSTP => -getpgrp($self->{'pid'});
     kill STOP => -$$;
+    kill STOP => $$;
 }
 
+
 sub kill_child_INT {
-    debug("SIGINT received. Killing $Child::fork Exit\n");
-    kill INT => -getpgrp($Child::fork);
+    my $self = $Global::process;
+    ::debug("SIGINT received. Killing $self->{'pid'} Exit\n");
+    kill INT => -getpgrp($self->{'pid'});
     exit;
 }
 
-sub suspend_resume {
-    my ($max_load,$check_time,$wait_time,$wait_factor,@pids) = @_;
-    debug("suspend_resume these @pids\n");
-    resume_pids(@pids);
-    while (pids_exist(@pids)) {
-	if ( loadavg() > $max_load ) {
-	    if($wait_factor) {
-		$wait_time = (loadavg()-$max_load) * $wait_factor;
-	    }
-	    $::opt_verbose and print STDERR "suspending for $wait_time seconds\n";
-	    suspend_pids(@pids);
-	    sleep 1; # for some reason this statement is skipped
-	    sleep $wait_time;
-	    resume_pids(@pids);
-	}
-	$::opt_verbose and print STDERR "running for $check_time second(s)\n";
-	sleep($check_time);
+
+sub resume {
+    my $self = shift;
+    ::debug("Resume @{$self->{'pids'}}\n");
+    if(not $self->{'running'}) {
+	# - = PID group
+	map { kill "CONT", -$_ } @{$self->{'pids'}};
+	$self->{'running'} = 1;
     }
 }
-    
-sub pids_exist {
-    my (@pids) = @_;
-    my ($exists) = 0;
-    for my $pid (@pids) {
-	if(-e "/proc/".$pid)  { $exists++ }
-	#if(kill 0 => $Child::fork) { $exists++ }
+
+
+sub suspend {
+    my $self = shift;
+    ::debug("Suspend @{$self->{'pids'}}\n");
+    if($self->{'running'}) {
+	# - = PID group
+	map { kill "STOP", -$_ } @{$self->{'pids'}};
+	$self->{'running'} = 0;
     }
+}
+
+
+sub is_alive {
+    # The process is dead if none of the pids exist
+    my $self = shift;
+    my ($exists) = 0;
+    for my $pid (@{$self->{'pids'}}) {
+	if(kill 0 => $pid) { $exists++ }
+    }
+    ::debug("is_alive: $exists\n");
     return $exists;
 }
 
-sub loadavg {
+
+package Limit;
+
+sub new {
+    my $class = shift;
+    my %limits = @_;
+    my $hard = $::opt_soft ? 0 : $::opt_hard;
+    my $runio = $::opt_run_io ? ::multiply_binary_prefix($::opt_run_io) : 0;
+    my $startio = $::opt_start_io ? ::multiply_binary_prefix($::opt_start_io) : 0;
+    my $runload = $::opt_run_load ? ::multiply_binary_prefix($::opt_run_load) : 0;
+    my $startload = $::opt_start_load ? ::multiply_binary_prefix($::opt_start_load) : 0;
+    my $runmem = $::opt_run_mem ? ::multiply_binary_prefix($::opt_run_mem) : 0;
+    my $startmem = $::opt_start_mem ? ::multiply_binary_prefix($::opt_start_mem) : 0;
+    my $runnoswap = $::opt_run_noswap ? ::multiply_binary_prefix($::opt_run_noswap) : 0;
+    my $startnoswap = $::opt_start_noswap ? ::multiply_binary_prefix($::opt_start_noswap) : 0;
+
+    return bless {
+	'hard' => $hard,
+	'recheck' => 1, # Default
+	'runtime' => 1, # Default
+	'runio' => $runio,
+	'startio' => $startio,
+	'runload' => $runload,
+	'startload' => $startload,
+	'runmem' => $runmem,
+	'startmem' => $startmem,
+	'runnoswap' => $runnoswap,
+	'startnoswap' => $startnoswap,
+	'factor' => $::opt_factor || 1,
+	'recheck' => $::opt_recheck || 1,
+	'runtime' => $::opt_recheck || 1,
+	'over_run_limit' => 1,
+	'over_start_limit' => 1,
+	'verbose' => $::opt_verbose,
+    }, ref($class) || $class;
+}
+
+
+sub over_run_limit {
+    my $self = shift;
+    my $status = 0;
+    if($self->{'runmem'}) {
+	# mem should be between 0-10ish
+	# 100% available => 0 (1-1)
+	# 50% available => 1 (2-1)
+	# 10% available => 9 (10-1)
+	my $mem = $self->mem_status();
+	::debug("Run memory: $self->{'runmem'}/$mem\n");
+	$status += (::max(1,$self->{'runmem'}/$mem)-1);
+    }
+    if($self->{'runload'}) {
+	# load should be between 0-10ish
+	# 0 load => 0
+	my $load = $self->load_status();
+	$status += ::max(0,$load - $self->{'runload'});
+    }
+    if($self->{'runnoswap'}) {
+	# swap should be between 0-10ish
+	# swap in or swap out or no swap = 0
+	# else log(swapin*swapout)
+	my $swap = $self->swap_status();
+	$status += log(::max(1, $swap - $self->{'runnoswap'}));
+    }
+    if($self->{'runio'}) {
+	my $io = $self->io_status();
+	$status += ::max(0,$io - $self->{'runio'});
+    }
+    $self->{'over_run_limit'} = $status;
+    if(not $::opt_recheck) {
+	$self->{'recheck'} = $self->{'factor'} * $self->{'over_run_limit'};
+    }
+    ::debug("over_run_limit: $status\n");
+    return $self->{'over_run_limit'};
+}
+
+sub over_start_limit {
+    my $self = shift;
+    my $status = 0;
+    if($self->{'startmem'}) {
+	# mem should be between 0-10ish
+	# 100% available => 0 (1-1)
+	# 50% available => 1 (2-1)
+	# 10% available => 9 (10-1)
+	my $mem = $self->mem_status();
+	::debug("Start memory: $self->{'startmem'}/$mem\n");
+	$status += (::max(1,$self->{'startmem'}/$mem)-1);
+    }
+    if($self->{'startload'}) {
+	# load should be between 0-10ish
+	# 0 load => 0
+	my $load = $self->load_status();
+	$status += ::max(0,$load - $self->{'startload'});
+    }
+    if($self->{'startnoswap'}) {
+	# swap should be between 0-10ish
+	# swap in or swap out or no swap = 0
+	# else log(swapin*swapout)
+	my $swap = $self->swap_status();
+	$status += log(::max(1, $swap - $self->{'startnoswap'}));
+    }
+    if($self->{'startio'}) {
+	my $io = $self->io_status();
+	$status += ::max(0,$io - $self->{'startio'});
+    }
+    $self->{'over_start_limit'} = $status;
+    if(not $::opt_recheck) {
+	$self->{'recheck'} = $self->{'factor'} * $self->{'over_start_limit'};
+    }
+    ::debug("over_start_limit: $status\n");
+    return $self->{'over_start_limit'};
+}
+
+
+sub hard {
+    my $self = shift;
+    return $self->{'hard'};
+}
+
+
+sub verbose {
+    my $self = shift;
+    return $self->{'verbose'};
+}
+
+
+sub sleep_for_recheck {
+    my $self = shift;
+    if($self->{'recheck'} < 0.5) {
+	# Never sleep less than 0.5 sec
+	$self->{'recheck'} = 0.5;
+    }
+    if($self->verbose()) {
+	$self->{'recheck'} = int($self->{'recheck'}*100)/100;
+	print "Sleeping $self->{'recheck'}s\n";
+    }
+    ::debug("recheck in $self->{'recheck'}s\n");
+    ::usleep(1); # For some reason this gets interrupted
+    ::usleep(1000*$self->{'recheck'});
+}
+
+
+sub sleep_while_running {
+    my $self = shift;
+    ::debug("check in $self->{'runtime'}s\n");
+    if($self->verbose()) {
+	$self->{'runtime'} = int($self->{'runtime'}*100)/100;
+	print "Running $self->{'runtime'}s\n";
+    }
+    ::usleep(1); # For some reason this gets interrupted
+    ::usleep(1000*$self->{'runtime'});
+}
+
+
+sub load_status {
+    # Returns:
+    #   loadavg
+    my $self = shift;
+    # Cache for some seconds
+    if(not defined $self->{'load_status'} or
+       $self->{'load_status_cache_time'}+$self->{'recheck'} < time) {
+	$self->{'load_status'} = load_status_linux();
+	$self->{'load_status_cache_time'} = time;
+    }
+    ::debug("load_status: $self->{'load_status'}\n");
+    return $self->{'load_status'};
+}
+
+
+sub load_status_linux {
     my ($loadavg);
     if(open(IN,"/proc/loadavg")) {
 	# Linux specific (but fast)
@@ -448,7 +546,7 @@ sub loadavg {
 	if($upString =~ m/^(\d+\.\d+)/) {
 	    $loadavg = $1;
 	} else {
-	    die;
+	    ::die_bug("proc_loadavg");
 	}
 	close IN;
     } elsif (open(IN,"uptime|")) {
@@ -456,28 +554,89 @@ sub loadavg {
 	if($upString =~ m/average.\s*(\d+\.\d+)/) {
 	    $loadavg = $1;
 	} else {
-	    die;
+	    ::die_bug("uptime");
 	}	
 	close IN;
     }
     return $loadavg;
 }
 
-sub suspend_pids {
-    my @pids = @_;
-    signal_pids("STOP",@pids);
-}
 
-sub resume_pids {
-    my @pids = @_;
-    signal_pids("CONT",@pids);
-}
-
-sub signal_pids {
-    my ($signal,@pids) = @_;
-
-    # local $SIG{$signal} = 'IGNORE';
-    for my $pid (@pids) {
-	kill $signal => -$pid; # stop PID group
+sub swap_status {
+    # Returns:
+    #   (swap in)*(swap out) kb
+    my $self = shift;
+    # Cache for some seconds
+    if(not defined $self->{'swap_status'} or
+       $self->{'swap_status_cache_time'}+$self->{'recheck'} < time) {
+	my $status = swap_status_linux();
+	$self->{'swap_status'} = ::max($status,0);
+	$self->{'swap_status_cache_time'} = time;
     }
+    ::debug("swap_status: $self->{'swap_status'}\n");
+    return $self->{'swap_status'};
+}
+
+
+sub swap_status_linux {
+    my $swap_activity;
+    $swap_activity = "vmstat 1 2 | tail -n1 | awk '{print \$7*\$8}'";
+    # Run swap_activity measuring.
+    return qx{ $swap_activity };
+}
+
+
+sub mem_status {
+    # Returns:
+    #   number of bytes (free+cache)
+    my $self = shift;
+    # Cache for one second
+    if(not defined $self->{'mem_status'} or
+       $self->{'mem_status_cache_time'}+$self->{'recheck'} < time) {
+	$self->{'mem_status'} = mem_status_linux();
+	$self->{'mem_status_cache_time'} = time;
+    }
+    ::debug("mem_status: $self->{'mem_status'}\n");
+    return $self->{'mem_status'};
+}
+
+
+sub mem_status_linux {
+    #              total       used       free     shared    buffers     cached
+    # Mem:       3366496    2901664     464832          0     179228    1850692
+    # -/+ buffers/cache:     871744    2494752
+    # Swap:      6445476    1396860    5048616
+    my @free = `free`;
+    my $free = (split(/\s+/,$free[2]))[3];
+    return $free*1024;
+}
+
+
+sub io_status {
+    # Returns:
+    #   max percent for all devices
+    my $self = shift;
+    # Cache for one second
+    if(not defined $self->{'io_status'} or
+       $self->{'io_status_cache_time'}+$self->{'recheck'} < time) {
+	$self->{'io_status'} = io_status_linux();
+	$self->{'io_status_cache_time'} = time;
+    }
+    ::debug("io_status: $self->{'io_status'}\n");
+    return $self->{'io_status'};
+}
+
+
+sub io_status_linux {
+    # Device: rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+    # sda       0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
+    my @iostat_out = `LANG=C iostat -x 1 2`;
+    # throw away all execpt the last Device:-section
+    my @iostat;
+    for(reverse @iostat_out) {
+	/Device:/ and last;
+	push @iostat, (split(/\s+/,$_))[13];
+    }
+    my $io = ::max(@iostat);
+    return $io/10;
 }

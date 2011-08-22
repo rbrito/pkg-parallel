@@ -1,3 +1,248 @@
+20110822
+
+* --timeout implemented so that slow commands can be killed
+
+* CPU detection improved for Mac OSX. Thanks to Wayne E. Seguin.
+
+* Example of a parallel webcrawler in the man page.
+
+* Backup up PostgreSQL with GNU Parallel. Thanks to Stephane Wirtel.
+  http://wirtel.be/2011/07/15/rsync_parallel/
+
+* Blog post in Japanese.
+  http://dminor11th.blogspot.com/2011/08/gnu-parallel.html
+
+* Blog post about optimizing JPEGs. Thanks to Thomas Jost.
+  http://schnouki.net/2011/07/22/optimizing-jpeg-pictures/
+
+* Bug fixes and man page updates.
+
+
+20110722
+
+* niceload: --hard will suspend a program if a limit is reached - as
+  opposed to just slowing the program down.
+
+* niceload: --soft will slow the program down - as opposed to
+  suspending the program completely.
+
+* niceload: --run-io will slow down a program if disk io goes above a
+  certain limit.
+
+* niceload: --run-load will slow down a program if loadaverage goes
+  above a certain limit.
+
+* niceload: --run-mem will slow down a program if free memory goes
+  below a certain limit.
+
+* niceload: --run-noswap will slow down a program if the computer is
+  swapping.
+
+* niceload: --start-io, --start-load, --start-mem, --start-noswap will
+  defer starting a program until the system is below the limit.
+
+* --io, --load, --mem, and --noswap sets both --run-* and --start-*.
+
+* niceload got a major rewrite and is now object oriented.
+
+* GNU Parallel was presented at Nordic Perl Workshop 2011.
+  http://conferences.yapceurope.org/npw2011/talk/3416
+
+* Blog post about zcat and GNU Parallel. Thanks to Dr. John.
+  http://drjohnstechtalk.com/blog/2011/06/gnu-parallel-really-helps-with-zcat/
+
+* 2 blog posts in Japanese. Thanks to Negima.
+  http://d.hatena.ne.jp/negima1976/20110607/1307412660
+  http://d.hatena.ne.jp/negima1976/20110628/1309252494
+
+* Blog post for bioinformatics. Thanks to Chris Miller.
+  http://chrisamiller.com/science/2010/05/26/use-parallel-for-easy-multi-processor-execution/
+
+* Bug fixes and man page updates.
+
+
+20110622
+
+* --onall will run all the jobs on all the computers. This is useful
+  for systemadinistrators having multiple servers.
+
+* --nonall runs like --onall but reads no arguments from stdin
+  (standard input), so is possible to do:
+  parallel --nonall -S computer1,computer2 uptime
+
+* Context replace now works with multiple input sources:
+  parallel -X echo {1}-{2} ::: 1 2 3 ::: a b c
+
+* --noswap do not start a job on a server that is swapping.
+
+* Article: Parallel processing without Hadoop!
+  http://www.solutionhacker.com/parallel-processing-without-hadoop/
+
+* Article in Linux Magazine (Spanish). Thanks to Ben Martin.
+  http://www.linux-magazine.es/issue/67/
+
+* First blog post in Korean. Thanks to 민병국.
+  http://blog.daum.net/_blog/BlogTypeView.do?blogid=02RQ3&articleno=13380895&admin=#
+
+* Blog post in Japanese. Thanks to Naoya Nakazawa.
+  http://www.sssg.org/blogs/naoya/archives/2003
+
+* Blog post in English. Thanks to Dagon.
+  http://hekate.homeip.net/2011/05/29/
+
+* Bug fixes and man page updates.
+
+
+20110522
+
+* Multiple ::: can be put on the command line and will be treated
+  similar to contents from multiple -a's.
+
+* ::: and :::: can now be mixed on the command line. Use {1} .. {n} to
+  refer to inputs from the different input sources.
+
+* --xapply is now needed to get xapply's behaviour of reading one line
+  from each of the input sources.
+
+* Multiple input sources will cause all combinations of arguments from
+  the sources to be generated. E.g. 'parallel echo {1}+{2} ::: 1 2 :::
+  a b c' will print 1+a 1+b 1+c 2+a 2+b 2+c. This can often replace
+  nested loops.
+
+* Implemented {//} for the input line with the basename removed (dirname).
+
+* New video showing the new ::: and :::: input sources.
+  http://tinyogg.com/watch/iOdhU/ http://www.youtube.com/watch?v=fOX1EyHkQwc
+
+* GNU Parallel now has a logo.
+  http://www.gnu.org/software/parallel/logo.png
+
+* Article about GNU SQL in USENIX Magazine ;login: (print)
+  http://www.usenix.org/publications/login/2011-04/
+
+* Using GNU Parallel with EC2. Thanks to Kevin Wu.
+  http://blog.kevinformatics.com/post/4970574713/interested-in-your-experience-using-gnu-parallel-in
+
+* Review with idea for {..} and {...} in Japanese. Thanks to ichii386.
+  http://d.hatena.ne.jp/ichii386/20110426
+
+* Upgrade GNU Parallel using Macports. Thanks to Phil Hollenback.
+  http://www.hollenback.net/index.php/MacportsParallel
+
+* Robert from Echo One discusses using processes instead of threads:
+  http://rrees.wordpress.com/2011/04/25/many-cores-many-threads/
+
+* How to run GNU Parallel on a SLURM cluster. Thanks to Kevin Stock.
+  http://www.kevinstock.org/2011/04/using-the-ri-cluster/
+
+* Short article about using GNU Parallel with lame:
+  http://loopkid.net/articles/2011/04/30/accelerate-lame-mp3-conversion
+
+* Using GNU Parallel to run tail -f in Japanese. Thanks to Clouder.
+  http://blog.clouder.jp/archives/001140.html
+
+* BBC Research & Development uses GNU Parallel:
+  http://www.bbc.co.uk/blogs/researchanddevelopment/2010/11/prototyping-weeknotes-41-26112.shtml
+
+* Short article about using GNU Parallel on RHEL. Thanks to Rishi Deshpande.
+  http://nuclear-imaging.info/site_content/2011/05/11/gnu-parallel/
+
+* Using GNU Parallel for FLAC->MP3 conversion. Thanks to Derek Marcotte.
+  http://derek.chezmarcotte.ca/?p=286
+
+* Bug fixes and man page updates.
+
+
+20110422
+
+* {#} now works an alias for $PARALLEL_PID.
+
+* --eta now estimates way more accurately.
+
+* CPU detection code for AIX thanks to Christian Netrwal.
+
+* --joblog contains exitcode.
+
+* Thanks to Ævar Arnfjörð Bjarmason for reading my code.
+
+* GNU Parallel was presented at:
+  - LUGA, Augsburg, 2011-03-26, http://www.luga.de/Aktionen/LIT-2011/Programm
+  - OSAA.dk, Aarhus, 2011-04-12
+
+* Blog entry in Japanese. Thanks to Riywo.
+  http://blog.riywo.com/2011/04/19/022802
+
+* Example of how to use GNU Parallel on PBS clusters. Thanks to Andrew
+  J Dolgert: http://web0.tc.cornell.edu/wiki/index.php?title=Gnu_Parallel
+
+* First example of using GNU Parallel in Hebrew. Thanks to omry.
+  http://nd.gd/jk
+
+* Intro video got past 10000 hits.
+  http://www.youtube.com/watch?v=OpaiGYxkSuQ
+
+* Bug fixes and man page updates.
+
+
+20110322
+
+* --tollef to be switch compatible with Tollef's parallel. This will
+  cause -l to mean --load, and the argument separator will be --
+  instead of :::
+
+* --gnu will force GNU Parallel to behave like GNU Parallel even if
+  --tollef is set.
+
+* Site wide config file: /etc/parallel/config
+
+  This should solve the issue with some packagers renaming GNU
+  Parallel to gparallel to avoid the naming conflict.
+
+  By putting --tollef in the site wide config file you can deinstall
+  Tollef's parallel and install GNU Parallel instead without any
+  change for users or scripts. This is useful for packagers that
+  currently rename GNU Parallel or simply do not distribute GNU
+  Parallel because the command name conflicts with Tollef's parallel.
+
+* -L 0 -n 0, and -N 0 implemented. They will read one argument,
+  but insert 0 arguments on the command line. Useful if you just want
+  to run the same command with the same arguments a number of times.
+
+* GNU Parallel is now in Fink. Thanks to Jesse Alama.
+  http://pdb.finkproject.org/pdb/package.php/parallel
+
+* Opscode Cookbook for Chef. Thanks to Joshua Timberman.
+  https://github.com/opscode/cookbooks/tree/master/gnu_parallel
+
+* Man page examples translated into Japanese. Thanks to Koshigoe.
+  http://w.koshigoe.jp/study/?%5Bsystem%5D+GNU+parallel+%BB%C8%CD%D1%CE%E3#l13
+
+* GNU Parallel will be presented at:
+  - LUGA, Augsburg, 2011-03-26, http://www.luga.de/Aktionen/LIT-2011/Programm
+  - OSAA.dk, Aarhus, 2011-04-12
+
+* Video of presentation from FSCONS 2010-11-07. The presenter was
+  _really_ hoarse that day (Something to do with loads of alcohol the
+  night before). http://vimeo.com/20838834
+
+* Review with examples in German. Thanks to M. Nieberg.
+  http://kenntwas.de/2011/linux/gnu-parallel/
+
+* A review of the --pipe option in German. Thanks to Mathias Huber.
+  http://www.linux-magazin.de/NEWS/GNU-Parallel-20110205-stueckelt-Daten
+
+* A small example of grepping maillogs. Thanks to François Maillet.
+  http://www.francoismaillet.com/blog/?p=399
+
+* Using GNU Parallel instead of xargs. Thanks to James Cuff.
+  http://blog.jcuff.net/2011/02/on-train-ride-in.html
+
+* Using GNU Parallel from 0install (German). Thanks to AdaMin.
+  http://forum.ubuntuusers.de/topic/gnu-parallel-mit-zero-install-kurzinfo-kein-wi/
+
+* Bug fixes and man page updates.
+
+
 20110205
 
 * --pipe splits piped data into blocks. Each block is piped to a
@@ -30,6 +275,9 @@
   these files.
 
 * -N if used with --pipe sets the number of records to read.
+
+* New video showing --pipe at
+  http://www.youtube.com/watch?v=1ntxT-47VPA
 
 * GNU Parallel was presented at FOSDEM.
 

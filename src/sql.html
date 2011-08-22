@@ -80,7 +80,8 @@ you will get that database's interactive shell.</p>
 
 <dd>
 <p>A DBURL has the following syntax:
-[sql:]vendor://[[user][:password]@][host][:port]/[database][?sqlquery]</p>
+[sql:]vendor://
+[[user][:password]@][host][:port]/[database][?sqlquery]</p>
 <p>See the section DBURL below.</p>
 </dd>
 <dt><strong><a name="commands" class="item"><em>commands</em></a></strong></dt>
@@ -88,19 +89,21 @@ you will get that database's interactive shell.</p>
 <dd>
 <p>The SQL commands to run. Each argument will have a newline
 appended.</p>
-<p>Example: &quot;SELECT 1+2;&quot; &quot;SELECT 'SQL';&quot;</p>
+<p>Example: &quot;SELECT * FROM foo;&quot; &quot;SELECT * FROM bar;&quot;</p>
 <p>If the arguments contain '\n' or '\x0a' this will be replaced with a
 newline:</p>
-<p>Example: &quot;SELECT 1+2;\n SELECT 'SQL';&quot;</p>
+<p>Example: &quot;SELECT * FROM foo;\n SELECT * FROM bar;&quot;</p>
 <p>If no commands are given SQL is read from the keyboard or STDIN.</p>
-<p>Example: echo 'SELECT 1+2;' | sql mysql:///</p>
+<p>Example: echo 'SELECT * FROM foo;' | sql mysql:///</p>
 </dd>
 <dt><strong><a name="db_size" class="item"><strong>--db-size</strong></a></strong></dt>
 
 <dt><strong><a name="dbsize" class="item"><strong>--dbsize</strong></a></strong></dt>
 
 <dd>
-<p>Size of database. Show the size of the database on disk.</p>
+<p>Size of database. Show the size of the database on disk. For Oracle
+this requires access to read the table <em>dba_data_files</em> - the user
+<em>system</em> has that.</p>
 </dd>
 <dt><strong><a name="help" class="item"><strong>--help</strong></a></strong></dt>
 
@@ -147,8 +150,8 @@ still prints number of rows found.</p>
 <dd>
 <p>The string following -p will be given to the database connection
 program as arguments. Multiple -p's will be joined with
-space. Example:</p>
-<p><em>-p &quot;-U username&quot;</em> can also be written <em>-p -U -p username</em>.</p>
+space. Example: pass '-U' and the user name to the program:</p>
+<p><em>-p &quot;-U scott&quot;</em> can also be written <em>-p -U -p scott</em>.</p>
 </dd>
 <dt><strong><a name="r" class="item"><strong>-r</strong></a></strong></dt>
 
@@ -197,7 +200,7 @@ when called with <strong>--shebang</strong>).</p>
 <pre>
   #!/usr/bin/sql -Y mysql:///</pre>
 <pre>
-  select * from users;</pre>
+  SELECT * FROM foo;</pre>
 <p>For this to work <strong>--shebang</strong> or <strong>-Y</strong> must be set as the first option.</p>
 </dd>
 </dl>
@@ -206,17 +209,19 @@ when called with <strong>--shebang</strong>).</p>
 <hr />
 <h1><a name="dburl">DBURL</a></h1>
 <p>A DBURL has the following syntax:
-[sql:]vendor://[user[:password]@][host][:port]/[database][?sqlquery]</p>
+[sql:]vendor://
+[[user][:password]@][host][:port]/[database][?sqlquery]</p>
 <p>To quote special characters use %-encoding specified in
 <a href="http://tools.ietf.org/html/rfc3986#section-2.1">http://tools.ietf.org/html/rfc3986#section-2.1</a> (E.g. a password
 containing '/' would contain '%2F').</p>
 <p>Examples:
- <a href="mysql://user:pa55w0rd@mysqlserver/database">mysql://user:pa55w0rd@mysqlserver/database</a>
- sql:oracle://scott:tiger@oracleserver/xe
- <a href="postgresql://user:pa55w0rd@pg.example.com/db">postgresql://user:pa55w0rd@pg.example.com/db</a>
+ <a href="mysql://scott:tiger@my.example.com/mydb">mysql://scott:tiger@my.example.com/mydb</a>
+ <a href="mailto:sql:oracle://scott:tiger@ora.example.com/xe">sql:oracle://scott:tiger@ora.example.com/xe</a>
+ <a href="postgresql://scott:tiger@pg.example.com/pgdb">postgresql://scott:tiger@pg.example.com/pgdb</a>
  pg:///
- sql:sqlite2:////tmp/db.sqlite?select * from foo;
- sqlite3:///../db.sqlite3?select%20*%20from%20foo;</p>
+ <a href="postgresqlssl://scott@pg.example.com:3333/pgdb">postgresqlssl://scott@pg.example.com:3333/pgdb</a>
+ sql:sqlite2:////tmp/db.sqlite?SELECT * FROM foo;
+ sqlite3:///../db.sqlite3?SELECT%20*%20FROM%20foo;</p>
 <p>Currently supported vendors: MySQL (mysql), MySQL with SSL (mysqls,
 mysqlssl), Oracle (oracle, ora), PostgreSQL (postgresql, pg, pgsql,
 postgres), PostgreSQL with SSL (postgresqlssl, pgs, pgsqlssl,
@@ -227,8 +232,8 @@ sqlite2), SQLite3 (sqlite3).</p>
 ~/.sql/aliases should only be readable by the user.</p>
 <p>Example of aliases:</p>
 <pre>
- :myalias1 pg://user:pa55w0rd@pg.example.com/db
- :myalias2 ora://scott:tiger@ora1.example.com/xe
+ :myalias1 pg://scott:tiger@pg.example.com/pgdb
+ :myalias2 ora://scott:tiger@ora.example.com/xe
  # Short form of mysql://`whoami`:nopassword@localhost:3306/`whoami`
  :myalias3 mysql:///
  # Short form of mysql://`whoami`:nopassword@localhost:33333/mydb
@@ -236,9 +241,9 @@ sqlite2), SQLite3 (sqlite3).</p>
  # Alias for an alias
  :m      :myalias4
  # the sortest alias possible
- :       sqlite2:////tmp/mydefault.sqlite
+ :       sqlite2:////tmp/db.sqlite
  # Including an SQL query
- :query  sqlite:////tmp/file.sqlite?SELECT * FROM foo;</pre>
+ :query  sqlite:////tmp/db.sqlite?SELECT * FROM foo;</pre>
 <p>
 </p>
 <hr />
@@ -247,25 +252,25 @@ sqlite2), SQLite3 (sqlite3).</p>
 </p>
 <h2><a name="get_an_interactive_prompt">Get an interactive prompt</a></h2>
 <p>The most basic use of GNU <strong>sql</strong> is to get an interactive prompt:</p>
-<p><strong>sql sql:oracle://scott:tiger@oracleserver/xe</strong></p>
+<p><strong>sql <a href="mailto:sql:oracle://scott:tiger@ora.example.com/xe">sql:oracle://scott:tiger@ora.example.com/xe</a></strong></p>
 <p>If you have setup an alias you can do:</p>
 <p><strong>sql :myora</strong></p>
 <p>
 </p>
 <h2><a name="run_a_query">Run a query</a></h2>
 <p>To run a query directly from the command line:</p>
-<p><strong>sql :myalias &quot;DELETE FROM users WHERE name LIKE '%tange%';&quot;</strong></p>
+<p><strong>sql :myalias &quot;SELECT * FROM foo;&quot;</strong></p>
 <p>Oracle requires newlines after each statement. This can be done like
 this:</p>
-<p><strong>sql :myora &quot;SELECT 1 FROM dual;&quot; &quot;SELECT 2 FROM dual;&quot;</strong></p>
+<p><strong>sql :myora &quot;SELECT * FROM foo;&quot; &quot;SELECT * FROM bar;&quot;</strong></p>
 <p>Or this:</p>
-<p><strong>sql :myora &quot;SELECT 1 FROM dual;\nSELECT 2 FROM dual;&quot;</strong></p>
+<p><strong>sql :myora &quot;SELECT * FROM foo;\nSELECT * FROM bar;&quot;</strong></p>
 <p>
 </p>
 <h2><a name="copy_a_postgresql_database">Copy a PostgreSQL database</a></h2>
 <p>To copy a PostgreSQL database use pg_dump to generate the dump and GNU
 <strong>sql</strong> to import it:</p>
-<p><strong>pg_dump my_database | sql <a href="pg://user:pass@pgserver/my_new_db">pg://user:pass@pgserver/my_new_db</a></strong></p>
+<p><strong>pg_dump pg_database | sql <a href="pg://scott:tiger@pg.example.com/pgdb">pg://scott:tiger@pg.example.com/pgdb</a></strong></p>
 <p>
 </p>
 <h2><a name="empty_all_tables_in_a_mysql_database">Empty all tables in a MySQL database</a></h2>
@@ -284,20 +289,20 @@ this:</p>
 <p>you can combine the sqlfile with the DBURL to make a
 UNIX-script. Create a script called <em>demosql</em>:</p>
 <p><strong>#!/usr/bin/sql -Y mysql:///</strong></p>
-<p><strong>SELECT * FROM users;</strong></p>
+<p><strong>SELECT * FROM foo;</strong></p>
 <p>Then do:</p>
-<p><strong>chmod 755 demosql; ./demosql</strong></p>
+<p><strong>chmod +x demosql; ./demosql</strong></p>
 <p>
 </p>
 <h2><a name="use___colsep_to_process_multiple_columns">Use --colsep to process multiple columns</a></h2>
 <p>Use GNU <strong>parallel</strong>'s <strong>--colsep</strong> to separate columns:</p>
-<p><strong>sql -s '\t' :mydburl 'SELECT * FROM bar;' | parallel --colsep '\t' do_stuff {4} {1}</strong></p>
+<p><strong>sql -s '\t' :myalias 'SELECT * FROM foo;' | parallel --colsep '\t' do_stuff {4} {1}</strong></p>
 <p>
 </p>
 <h2><a name="retry_if_the_connection_fails">Retry if the connection fails</a></h2>
 <p>If the access to the database fails occationally <strong>--retries</strong> can help
 make sure the query succeeds:</p>
-<p><strong>sql --retries 5 :myalias 'SELECT * FROM really_big_table;'</strong></p>
+<p><strong>sql --retries 5 :myalias 'SELECT * FROM really_big_foo;'</strong></p>
 <p>
 </p>
 <h2><a name="get_info_about_the_running_database_system">Get info about the running database system</a></h2>
