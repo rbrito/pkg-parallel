@@ -14,9 +14,9 @@ sql.1: sql Makefile
 	pod2man --release='$(PACKAGE_VERSION)' --center='$(PACKAGE_NAME)' \
 		--section=1 $(srcdir)/sql > $(srcdir)/sql.1
 
-niceload.1: niceload Makefile
+niceload.1: niceload.pod Makefile
 	pod2man --release='$(PACKAGE_VERSION)' --center='$(PACKAGE_NAME)' \
-		--section=1 $(srcdir)/niceload > $(srcdir)/niceload.1
+		--section=1 $(srcdir)/niceload.pod > $(srcdir)/niceload.1
 
 parallel.html: parallel Makefile sem
 	./sem --fg --id pod2html pod2html $(srcdir)/parallel.pod > $(srcdir)/parallel.html
@@ -30,8 +30,8 @@ sql.html: sql Makefile sem
 	./sem --fg --id pod2html pod2html $(srcdir)/sql > $(srcdir)/sql.html
 	./sem --fg --id pod2html rm -f $(srcdir)/pod2htm*
 
-niceload.html: niceload Makefile sem
-	./sem --fg --id pod2html pod2html $(srcdir)/niceload > $(srcdir)/niceload.html
+niceload.html: niceload.pod Makefile sem
+	./sem --fg --id pod2html pod2html $(srcdir)/niceload.pod > $(srcdir)/niceload.html
 	./sem --fg --id pod2html rm -f $(srcdir)/pod2htm*
 
 sem: parallel
@@ -41,4 +41,4 @@ DISTCLEANFILES = parallel.html sem.html sql.html niceload.html
 EXTRA_DIST = parallel sem sql niceload \
 	parallel.1 sem.1 sql.1 niceload.1 \
 	parallel.html sem.html sql.html niceload.html \
-	sem.pod parallel.pod
+	sem.pod parallel.pod niceload.pod

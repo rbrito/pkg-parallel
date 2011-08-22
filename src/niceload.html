@@ -23,6 +23,7 @@
 	<li><a href="#example__see_niceload_in_action">EXAMPLE: See niceload in action</a></li>
 	<li><a href="#example__run_updatedb">EXAMPLE: Run updatedb</a></li>
 	<li><a href="#example__run_rsync">EXAMPLE: Run rsync</a></li>
+	<li><a href="#example__ensure_enough_disk_cache">EXAMPLE: Ensure enough disk cache</a></li>
 	<li><a href="#environment_variables">ENVIRONMENT VARIABLES</a></li>
 	<li><a href="#exit_status">EXIT STATUS</a></li>
 	<li><a href="#reporting_bugs">REPORTING BUGS</a></li>
@@ -50,16 +51,19 @@
 </p>
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
-<p><strong>niceload</strong> [-v] [-n nice] [-l load] [-t time] [-s time|-f factor] command</p>
-<p><strong>niceload</strong> [-v] [-n nice] [-l load] [-t time] [-s time|-f factor] -p=PID</p>
+<p><strong>niceload</strong> [-v] [-h] [-n nice] [-I io] [-L load] [-M mem] [-N]
+[-t time] [-s time|-f factor] ( command | -p PID )</p>
 <p>
 </p>
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
-<p>GNU <strong>niceload</strong> will run a program when the load average is below a
-certain limit. When the limit is reached the program will be suspended
-for some time. Then resumed again for some time.  Then the load load
-average is checked again and we start over.</p>
+<p>GNU <strong>niceload</strong> will slow down a program when the load average (or
+other system activity) is above a certain limit. When the limit is
+reached the program will be suspended for some time. Then resumed
+again for some time.  Then the load average is checked again and we
+start over.</p>
+<p>Instead of load average <strong>niceload</strong> can also look at disk I/O, amount
+of free memory, or swapping activity.</p>
 <p>If the load is 3.00 then the default settings will run a program
 like this:</p>
 <p>run 1 second, suspend (3.00-1.00) seconds, run 1 second, suspend
@@ -69,40 +73,145 @@ like this:</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="n_niceness" class="item"><strong>-n</strong> <em>niceness</em></a></strong></dt>
+<dt><strong><a name="factor" class="item"><strong>-f</strong> <em>FACTOR</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>--factor</strong> <em>FACTOR</em> (beta testing)</strong></dt>
+
+<dd>
+<p>Suspend time factor. Dynamically set <strong>-s</strong> as amount over limit *
+factor. Default is 1.</p>
+</dd>
+<dt><strong><a name="h" class="item"><strong>-H</strong> (beta testing)</a></strong></dt>
+
+<dt><strong><a name="hard" class="item"><strong>--hard</strong> (beta testing)</a></strong></dt>
+
+<dd>
+<p>Hard limit. <strong>--hard</strong> will suspend the process until the system is
+under the limits. The default is <strong>--soft</strong>.</p>
+</dd>
+<dt><strong><a name="iolimit" class="item"><strong>--io</strong> <em>iolimit</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>-I</strong> <em>iolimit</em> (beta testing)</strong></dt>
+
+<dd>
+<p>Limit for I/O. The amount of disk I/O will be computed as a value 0 -
+10, where 0 is no I/O and 10 is at least one disk is 100% satuated.</p>
+<p><strong>--io</strong> will set both <strong>--start-io</strong> and <strong>run-io</strong>.</p>
+</dd>
+<dt><strong><a name="loadlimit" class="item"><strong>--load</strong> <em>loadlimit</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>-L</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+
+<dd>
+<p>Limit for load average.</p>
+<p><strong>--load</strong> will set both <strong>--start-load</strong> and <strong>run-load</strong>.</p>
+</dd>
+<dt><strong><a name="memlimit" class="item"><strong>--mem</strong> <em>memlimit</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>-M</strong> <em>memlimit</em> (beta testing)</strong></dt>
+
+<dd>
+<p>Limit for free memory. This is the amount of bytes available as free
++ cache. This limit is treated opposite other limits: If the system
+is above the limit the program will run, if it is below the limit the
+program will stop</p>
+<p><em>memlimit</em> can be postfixed with K, M, G, T, or P which would
+multiply the size with 1024, 1048576, 1073741824, or 1099511627776
+respectively.</p>
+<p><strong>--mem</strong> will set both <strong>--start-mem</strong> and <strong>run-mem</strong>.</p>
+</dd>
+<dt><strong><a name="noswap" class="item"><strong>--noswap</strong> (beta testing)</a></strong></dt>
+
+<dt><strong><a name="n" class="item"><strong>-N</strong> (beta testing)</a></strong></dt>
+
+<dd>
+<p>No swapping. If the system is swapping both in and out it is a good
+indication that the system is memory stressed.</p>
+<p><strong>--noswap</strong> is over limit if the system is swapping both in and out.</p>
+<p><strong>--noswap</strong> will set both <strong>--start-noswap</strong> and <strong>run-noswap</strong>.</p>
+</dd>
+<dt><strong><a name="niceness" class="item"><strong>-n</strong> <em>niceness</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>--nice</strong> <em>niceness</em> (beta testing)</strong></dt>
 
 <dd>
 <p>Sets niceness. See <strong>nice</strong>(1).</p>
 </dd>
-<dt><strong><a name="l_maxload" class="item"><strong>-l</strong> <em>maxload</em></a></strong></dt>
+<dt><strong><a name="pid" class="item"><strong>-p</strong> <em>PID</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>--pid</strong> <em>PID</em> (beta testing)</strong></dt>
 
 <dd>
-<p>Max load. The maximal load average before suspending command. Default
-is 1.00.</p>
+<p>Process ID of process to suspend.</p>
 </dd>
-<dt><strong><a name="t_sec" class="item"><strong>-t</strong> <em>SEC</em></a></strong></dt>
+<dt><strong><a name="quote" class="item"><strong>--quote</strong> (beta testing)</a></strong></dt>
+
+<dt><strong><a name="q" class="item"><strong>-q</strong> (beta testing)</a></strong></dt>
 
 <dd>
-<p>Recheck load time. Sleep SEC seconds before checking load
-again. Default is 1 second.</p>
+<p>Quote the command line. Useful if the command contains chars like *,
+$, &gt;, and &quot; that should not be interpreted by the shell.</p>
 </dd>
-<dt><strong><a name="s_sec" class="item"><strong>-s</strong> <em>SEC</em></a></strong></dt>
+<dt><strong><strong>--run-io</strong> <em>iolimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--ri</strong> <em>iolimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--run-load</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--rl</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--run-mem</strong> <em>memlimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--rm</strong> <em>memlimit</em> (beta testing)</strong></dt>
+
+<dd>
+<p>Run limit. The running program will be slowed down if the system is
+above the limit. See: <strong>--io</strong>, <strong>--load</strong>, <strong>--mem</strong>, <strong>--noswap</strong>.</p>
+</dd>
+<dt><strong><strong>--start-io</strong> <em>iolimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--si</strong> <em>iolimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--start-load</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--sl</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--start-mem</strong> <em>memlimit</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>--sm</strong> <em>memlimit</em> (beta testing)</strong></dt>
+
+<dd>
+<p>Start limit. The program will not start until the system is below the
+limit. See: <strong>--io</strong>, <strong>--load</strong>, <strong>--mem</strong>, <strong>--noswap</strong>.</p>
+</dd>
+<dt><strong><a name="soft" class="item"><strong>--soft</strong> (beta testing)</a></strong></dt>
+
+<dt><strong><a name="s" class="item"><strong>-S</strong> (beta testing)</a></strong></dt>
+
+<dd>
+<p>Soft limit. <strong>niceload</strong> will suspend a process for a while and then
+let it run for a second thus only slowing down a process while the
+system is over one of the given limits. This is the default.</p>
+</dd>
+<dt><strong><a name="sec" class="item"><strong>--suspend</strong> <em>SEC</em> (beta testing)</a></strong></dt>
+
+<dt><strong><strong>-s</strong> <em>SEC</em> (beta testing)</strong></dt>
 
 <dd>
 <p>Suspend time. Suspend the command this many seconds when the max load
 average is reached.</p>
 </dd>
-<dt><strong><a name="f_factor" class="item"><strong>-f</strong> <em>FACTOR</em></a></strong></dt>
+<dt><strong><strong>--recheck</strong> <em>SEC</em> (beta testing)</strong></dt>
+
+<dt><strong><strong>-t</strong> <em>SEC</em> (beta testing)</strong></dt>
 
 <dd>
-<p>Suspend time factor. Dynamically set <strong>-s</strong> as max load average over limit * factor. Default is 1.</p>
+<p>Recheck load time. Sleep SEC seconds before checking load
+again. Default is 1 second.</p>
 </dd>
-<dt><strong><a name="p_pid" class="item"><strong>-p</strong> <em>PID</em></a></strong></dt>
+<dt><strong><a name="verbose" class="item"><strong>--verbose</strong> (beta testing)</a></strong></dt>
 
-<dd>
-<p>Process ID of process to suspend.</p>
-</dd>
-<dt><strong><a name="v" class="item"><strong>-v</strong></a></strong></dt>
+<dt><strong><a name="v" class="item"><strong>-v</strong> (beta testing)</a></strong></dt>
 
 <dd>
 <p>Verbose. Print some extra output on what is happening. Use <strong>-v</strong> until
@@ -124,7 +233,7 @@ CPU. When the load rises to 1.0 the process is suspended.</p>
 <h1><a name="example__run_updatedb">EXAMPLE: Run updatedb</a></h1>
 <p>Running updatedb can often starve the system for disk I/O and thus result in a high load.</p>
 <p>Run updatedb but suspend updatedb if the load is above 2.00:</p>
-<p><strong>niceload -l=2 updatedb</strong></p>
+<p><strong>niceload -L 2 updatedb</strong></p>
 <p>
 </p>
 <hr />
@@ -132,7 +241,19 @@ CPU. When the load rises to 1.0 the process is suspended.</p>
 <p>rsync can just like updatedb starve the system for disk I/O and thus result in a high load.</p>
 <p>Run rsync but keep load below 3.4. If load reaches 7 sleep for
 (7-3.4)*12 seconds:</p>
-<p><strong>niceload -l=3.4 -f=12 rsync -Ha /home/ /backup/home/</strong></p>
+<p><strong>niceload -L 3.4 -f 12 rsync -Ha /home/ /backup/home/</strong></p>
+<p>
+</p>
+<hr />
+<h1><a name="example__ensure_enough_disk_cache">EXAMPLE: Ensure enough disk cache</a></h1>
+<p>Assume the program <strong>foo</strong> uses 2 GB files intensively. <strong>foo</strong> will run
+fast if the files are in disk cache and be slow as a crawl if they are
+not in the cache.</p>
+<p>To ensure 2 GB are reserved for disk cache run:</p>
+<p><strong>niceload --hard --run-mem 2g foo</strong></p>
+<p>This will not guarantee that the 2 GB memory will be used for the
+files for <strong>foo</strong>, but it will stop <strong>foo</strong> if the memory for disk cache
+is too low.</p>
 <p>
 </p>
 <hr />
@@ -264,7 +385,7 @@ Getopt::Long.</p>
 </p>
 <hr />
 <h1><a name="see_also">SEE ALSO</a></h1>
-<p><strong>parallel</strong>(1), <strong>nice</strong>(1)</p>
+<p><strong>parallel</strong>(1), <strong>nice</strong>(1), <strong>uptime</strong>(1)</p>
 
 </body>
 
