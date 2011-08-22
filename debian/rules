@@ -2,9 +2,5 @@
 %:
 	dh $@
 
-override_dh_clean:
-	rm -f src/sem
-	dh_clean
-
 override_dh_installchangelogs:
 	dh_installchangelogs NEWS
