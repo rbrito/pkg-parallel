@@ -1,3 +1,13 @@
+parallel (20110822-1) unstable; urgency=low
+
+  * [9c200ac] Imported Upstream version 20110822
+  * [9fe80a9] debian/control: Update standards-version to 3.9.2.
+  * [e8d1af7] debian/gbp.conf: Add standard configuration.
+  * [2678318] Add README.source to describe how the package is usually made.
+  * [0dcd276] debian/rules: Don't special-case the clean process anymore.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Mon, 22 Aug 2011 12:41:32 -0300
+
 parallel (20110205-1) unstable; urgency=low
 
   * New upstream release.
