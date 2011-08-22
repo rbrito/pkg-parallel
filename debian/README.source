@@ -1,0 +1,20 @@
+Debian packaging for parallel
+-----------------------------
+
+A quick summary of how one can update the Debian packaging of parallel is
+to, assuming that one already has the appropriate build-dependencies,
+`devscripts`, `pristine-tar`, and `git-buildpackage` installed:
+
+    git clone git+ssh://git.debian.org/git/collab-maint/parallel.git
+    cd parallel
+    git branch upstream origin/upstream
+    git branch pristine-tar origin/pristine-tar
+    git-import-orig --uscan --pristine-tar
+    [ Make here some adaptations, like updating debian/patches, if needed ]
+    git-buildpackage --git-pristine-tar
+
+These are the important steps and may need to be changed according to
+deviations, say, in the release process of upstream releases (e.g., if
+upstream changes the location where the tarballs reside).
+
+ -- Rogério Brito <rbrito@ime.usp.br>, Mon, 22 Aug 2011 12:28:46 -0300
