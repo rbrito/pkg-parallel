@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PARALLEL 1"
-.TH PARALLEL 1 "2011-08-22" "20110822" "parallel"
+.TH PARALLEL 1 "2012-02-20" "20120222" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -143,13 +143,13 @@ parallel \- build and execute shell command lines from standard input in paralle
 \&\fB#!/usr/bin/parallel\fR \-\-shebang [options] [\fIcommand\fR [arguments]]
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
-\&\s-1GNU\s0 \fBparallel\fR is a shell tool for executing jobs in parallel using one
-or more computers. A job is can be a single command or a small script
-that has to be run for each of the lines in the input. The typical
-input is a list of files, a list of hosts, a list of users, a list of
-URLs, or a list of tables. A job can also be a command that reads from
-a pipe. \s-1GNU\s0 \fBparallel\fR can then split the input and pipe it into
-commands in parallel.
+\&\s-1GNU\s0 \fBparallel\fR is a shell tool for executing jobs in parallel using
+one or more computers. A job is can be a single command or a small
+script that has to be run for each of the lines in the input. The
+typical input is a list of files, a list of hosts, a list of users, a
+list of URLs, or a list of tables. A job can also be a command that
+reads from a pipe. \s-1GNU\s0 \fBparallel\fR can then split the input into
+blocks and pipe a block into each command in parallel.
 .PP
 If you use xargs and tee today you will find \s-1GNU\s0 \fBparallel\fR very easy to
 use as \s-1GNU\s0 \fBparallel\fR is written to have the same options as xargs. If
@@ -174,9 +174,7 @@ after the list of options. That will give you an idea of what \s-1GNU\s0
 You can also watch the intro video for a quick introduction:
 http://tinyogg.com/watch/TORaR/ http://tinyogg.com/watch/hfxKj/ and
 http://tinyogg.com/watch/YQuXd/ or
-http://www.youtube.com/watch?v=OpaiGYxkSuQ
-http://www.youtube.com/watch?v=1ntxT\-47VPA and
-http://www.youtube.com/watch?v=fOX1EyHkQwc
+http://www.youtube.com/playlist?list=PL284C9FF2488BC6D1
 .SH "OPTIONS"
 .IX Header "OPTIONS"
 .IP "\fIcommand\fR" 9
@@ -188,11 +186,12 @@ with the input.
 If \fIcommand\fR is given, \s-1GNU\s0 \fBparallel\fR will behave similar to \fBxargs\fR. If
 \&\fIcommand\fR is not given \s-1GNU\s0 \fBparallel\fR will behave similar to \fBcat | sh\fR.
 .Sp
-The \fIcommand\fR must be an executable, a script or a composed command: an
-alias or a function will not work (see why
+The \fIcommand\fR must be an executable, a script, a composed command, or
+a function. If it is a function you need to \fBexport \-f\fR the function
+first. An alias will, however, not work (see why
 http://www.perlmonks.org/index.pl?node_id=484296).
-.IP "\fB{}\fR (beta testing)" 9
-.IX Item "{} (beta testing)"
+.IP "\fB{}\fR" 9
+.IX Item "{}"
 Input line. This replacement string will be replaced by a full line
 read from the input source. The input source is normally stdin
 (standard input), but can also be given with \fB\-a\fR, \fB:::\fR, or
@@ -202,8 +201,8 @@ The replacement string \fB{}\fR can be changed with \fB\-I\fR.
 .Sp
 If the command line contains no replacement strings then \fB{}\fR will be
 appended to the command line.
-.IP "\fB{.}\fR (beta testing)" 9
-.IX Item "{.} (beta testing)"
+.IP "\fB{.}\fR" 9
+.IX Item "{.}"
 Input line without extension. This replacement string will be replaced
 by the input with the extension removed. If the input line contains
 \&\fB.\fR after the last \fB/\fR the last \fB.\fR till the end of the string will
@@ -213,11 +212,11 @@ remaining. E.g. \fIfoo.jpg\fR becomes \fIfoo\fR, \fIsubdir/foo.jpg\fR becomes
 \&\fIsub.dir/bar\fR remains \fIsub.dir/bar\fR. If the input line does not
 contain \fB.\fR it will remain unchanged.
 .Sp
-The replacement string \fB{.}\fR can be changed with \fB\-U\fR.
+The replacement string \fB{.}\fR can be changed with \fB\-\-er\fR.
 .Sp
 To understand replacement strings see \fB{}\fR.
-.IP "\fB{/}\fR (beta testing)" 9
-.IX Item "{/} (beta testing)"
+.IP "\fB{/}\fR" 9
+.IX Item "{/}"
 Basename of input line. This replacement string will be replaced by
 the input with the directory part removed.
 .Sp
@@ -225,8 +224,8 @@ The replacement string \fB{/}\fR can be changed with
 \&\fB\-\-basenamereplace\fR.
 .Sp
 To understand replacement strings see \fB{}\fR.
-.IP "\fB{//}\fR (beta testing)" 9
-.IX Item "{//} (beta testing)"
+.IP "\fB{//}\fR" 9
+.IX Item "{//}"
 Dirname of input line. This replacement string will be replaced by the
 dir of the input line. See \fBdirname\fR(1).
 .Sp
@@ -234,8 +233,8 @@ The replacement string \fB{//}\fR can be changed with
 \&\fB\-\-dirnamereplace\fR.
 .Sp
 To understand replacement strings see \fB{}\fR.
-.IP "\fB{/.}\fR (beta testing)" 9
-.IX Item "{/.} (beta testing)"
+.IP "\fB{/.}\fR" 9
+.IX Item "{/.}"
 Basename of input line without extension. This replacement string will
 be replaced by the input with the directory and extension part
 removed. It is a combination of \fB{/}\fR and \fB{.}\fR.
@@ -244,8 +243,8 @@ The replacement string \fB{/.}\fR can be changed with
 \&\fB\-\-basenameextensionreplace\fR.
 .Sp
 To understand replacement strings see \fB{}\fR.
-.IP "\fB{#}\fR (beta testing)" 9
-.IX Item "{#} (beta testing)"
+.IP "\fB{#}\fR" 9
+.IX Item "{#}"
 Sequence number of the job to run. This replacement string will be
 replaced by the sequence number of the job being run. It contains the
 same number as \f(CW$PARALLEL_SEQ\fR.
@@ -253,16 +252,16 @@ same number as \f(CW$PARALLEL_SEQ\fR.
 The replacement string \fB{#}\fR can be changed with \fB\-\-seqreplace\fR.
 .Sp
 To understand replacement strings see \fB{}\fR.
-.IP "\fB{\fR\fIn\fR\fB}\fR (beta testing)" 9
-.IX Item "{n} (beta testing)"
+.IP "\fB{\fR\fIn\fR\fB}\fR" 9
+.IX Item "{n}"
 Argument from input source \fIn\fR or the \fIn\fR'th argument. This
 positional replacement string will be replaced by the input from input
 source \fIn\fR (when used with \fB\-a\fR or \fB::::\fR) or with the \fIn\fR'th
 argument (when used with \fB\-N\fR).
 .Sp
 To understand replacement strings see \fB{}\fR.
-.IP "\fB{\fR\fIn\fR.\fB}\fR (beta testing)" 9
-.IX Item "{n.} (beta testing)"
+.IP "\fB{\fR\fIn\fR.\fB}\fR" 9
+.IX Item "{n.}"
 Argument from input source \fIn\fR or the \fIn\fR'th argument without
 extension. It is a combination of \fB{\fR\fIn\fR\fB}\fR and \fB{.}\fR.
 .Sp
@@ -272,8 +271,8 @@ input source \fIn\fR (when used with \fB\-a\fR or \fB::::\fR) or with the
 extension removed.
 .Sp
 To understand positional replacement strings see \fB{\fR\fIn\fR\fB}\fR.
-.IP "\fB{\fR\fIn\fR/\fB}\fR (beta testing)" 9
-.IX Item "{n/} (beta testing)"
+.IP "\fB{\fR\fIn\fR/\fB}\fR" 9
+.IX Item "{n/}"
 Basename of argument from input source \fIn\fR or the \fIn\fR'th argument.
 It is a combination of \fB{\fR\fIn\fR\fB}\fR and \fB{/}\fR.
 .Sp
@@ -283,8 +282,8 @@ input source \fIn\fR (when used with \fB\-a\fR or \fB::::\fR) or with the
 directory (if any) removed.
 .Sp
 To understand positional replacement strings see \fB{\fR\fIn\fR\fB}\fR.
-.IP "\fB{\fR\fIn\fR/.\fB}\fR (beta testing)" 9
-.IX Item "{n/.} (beta testing)"
+.IP "\fB{\fR\fIn\fR/.\fB}\fR" 9
+.IX Item "{n/.}"
 Basename of argument from input source \fIn\fR or the \fIn\fR'th argument
 without extension.  It is a combination of \fB{\fR\fIn\fR\fB}\fR, \fB{/}\fR, and
 \&\fB{.}\fR.
@@ -339,7 +338,7 @@ Another way to write \fB\-a\fR \fIargfile1\fR \fB\-a\fR \fIargfile2\fR ...
 .Sp
 \&\fB:::\fR and \fB::::\fR can be mixed.
 .Sp
-See \fB\-a\fR and \fB:::\fR.
+See \fB\-a\fR, \fB:::\fR and \fB\-\-xapply\fR.
 .IP "\fB\-\-null\fR" 9
 .IX Item "--null"
 .PD 0
@@ -387,13 +386,13 @@ See also: \fB:::\fR.
 .IP "\fB\-\-basefile\fR \fIfile\fR" 9
 .IX Item "--basefile file"
 .PD 0
-.IP "\fB\-B\fR \fIfile\fR" 9
-.IX Item "-B file"
+.IP "\fB\-\-bf\fR \fIfile\fR" 9
+.IX Item "--bf file"
 .PD
 \&\fIfile\fR will be transferred to each sshlogin before a jobs is
 started. It will be removed if \fB\-\-cleanup\fR is active. The file may be
 a script to run or some common base data needed for the jobs.
-Multiple \fB\-B\fR can be specified to transfer more basefiles. The
+Multiple \fB\-\-bf\fR can be specified to transfer more basefiles. The
 \&\fIfile\fR will be transferred the same way as \fB\-\-transfer\fR.
 .IP "\fB\-\-basenamereplace\fR \fIreplace-str\fR" 9
 .IX Item "--basenamereplace replace-str"
@@ -419,6 +418,9 @@ completion of the command before exiting. This is the default if
 See also: \fB\-\-fg\fR, \fBman sem\fR
 .Sp
 Implies \fB\-\-semaphore\fR.
+.IP "\fB\-\-bibtex\fR" 9
+.IX Item "--bibtex"
+Print the BibTeX entry for \s-1GNU\s0 \fBparallel\fR.
 .IP "\fB\-\-block\fR \fIsize\fR" 9
 .IX Item "--block size"
 .PD 0
@@ -536,24 +538,15 @@ Behave like \s-1GNU\s0 \fBparallel\fR. If \fB\-\-tollef\fR and \fB\-\-gnu\fR are
 \&\fB\-\-gnu\fR takes precedence.
 .IP "\fB\-\-group\fR" 9
 .IX Item "--group"
-.PD 0
-.IP "\fB\-g\fR" 9
-.IX Item "-g"
-.PD
-Group output.  Output from each jobs is grouped together and is only
-printed when the command is finished. stderr (standard error) first
-followed by stdout (standard output).  \fB\-g\fR is the default. Can be
-reversed with \fB\-u\fR.
-.Sp
 Group output. Output from each jobs is grouped together and is only
 printed when the command is finished. stderr (standard error) first
 followed by stdout (standard output). This takes some \s-1CPU\s0 time. In
-rare situations \s-1GNU\s0 Parallel takes up lots of \s-1CPU\s0 time and if it is
-acceptable that the output from different commands are mixed together,
-then disabling grouping with \fB\-u\fR can speedup \s-1GNU\s0 Parallel by a
-factor of 10.
+rare situations \s-1GNU\s0 \fBparallel\fR takes up lots of \s-1CPU\s0 time and if it is
+acceptable that the outputs from different commands are mixed
+together, then disabling grouping with \fB\-u\fR can speedup \s-1GNU\s0
+\&\fBparallel\fR by a factor of 10.
 .Sp
-\&\fB\-g\fR is the default. Can be reversed with \fB\-u\fR.
+\&\fB\-\-group\fR is the default. Can be reversed with \fB\-u\fR.
 .IP "\fB\-\-help\fR" 9
 .IX Item "--help"
 .PD 0
@@ -564,8 +557,8 @@ Print a summary of the options to \s-1GNU\s0 \fBparallel\fR and exit.
 .IP "\fB\-\-halt\-on\-error\fR <0|1|2>" 9
 .IX Item "--halt-on-error <0|1|2>"
 .PD 0
-.IP "\fB\-H\fR <0|1|2>" 9
-.IX Item "-H <0|1|2>"
+.IP "\fB\-\-halt\fR <0|1|2>" 9
+.IX Item "--halt <0|1|2>"
 .RS 9
 .IP "0" 3
 .PD
@@ -583,6 +576,15 @@ status will be the exit status from the failing job.
 .RE
 .RS 9
 .RE
+.IP "\fB\-\-header\fR \fIregexp\fR (beta  testing)" 9
+.IX Item "--header regexp (beta  testing)"
+Use upto regexp as header. For normal usage the matched header
+(typically the first line: \fB\-\-header '\en'\fR) will be split using
+\&\fB\-\-colsep\fR (which will default to '\et') and column names can be used
+as replacement variables: \fB{column name}\fR. For \fB\-\-pipe\fR the matched
+header will be prepended to each output.
+.Sp
+\&\fB\-\-header :\fR is an alias for \fB\-\-header '\en'\fR.
 .IP "\fB\-I\fR \fIreplace-str\fR" 9
 .IX Item "-I replace-str"
 Use the replacement string \fIreplace-str\fR instead of {}.
@@ -606,6 +608,8 @@ and command run.
 To convert the times into \s-1ISO\-8601\s0 strict do:
 .Sp
 \&\fBperl \-a \-F\*(L"\et\*(R" \-ne 'chomp($F[2]=`date \-d \e@$F[2] +%FT%T`); print join(\*(L"\et\*(R",@F)'\fR
+.Sp
+See also \fB\-\-resume\fR.
 .IP "\fB\-\-jobs\fR \fIN\fR" 9
 .IX Item "--jobs N"
 .PD 0
@@ -684,8 +688,9 @@ jobs while \s-1GNU\s0 \fBparallel\fR is running.
 .IP "\fB\-k\fR" 9
 .IX Item "-k"
 .PD
-Keep sequence of output same as the order of input. Try this to see
-the difference:
+Keep sequence of output same as the order of input. Normally the
+output of a job will be printed as soon as the job completes. Try this
+to see the difference:
 .Sp
 .Vb 2
 \&  parallel \-j4 sleep {}\e; echo {} ::: 2 1 4 3
@@ -715,8 +720,8 @@ The \fB\-l\fR option is deprecated since the \s-1POSIX\s0 standard specifies
 \&\fB\-l 0\fR is an alias for \fB\-l 1\fR.
 .Sp
 Implies \fB\-X\fR unless \fB\-m\fR is set.
-.IP "\fB\-\-load\fR \fImax-load\fR (alpha testing)" 9
-.IX Item "--load max-load (alpha testing)"
+.IP "\fB\-\-load\fR \fImax-load\fR" 9
+.IX Item "--load max-load"
 Do not start new jobs on a given computer unless the load is less than
 \&\fImax-load\fR. \fImax-load\fR uses the same syntax as \fB\-\-jobs\fR, so \fI100%\fR
 for one per \s-1CPU\s0 is a valid setting. Only difference is 0 which
@@ -768,8 +773,8 @@ Print the version \s-1GNU\s0 \fBparallel\fR and exit.  If the current version of
 .Sp
 This is useful for scripts that depend on features only available from
 a certain version of \s-1GNU\s0 \fBparallel\fR.
-.IP "\fB\-\-nonall\fR (alpha testing)" 9
-.IX Item "--nonall (alpha testing)"
+.IP "\fB\-\-nonall\fR" 9
+.IX Item "--nonall"
 \&\fB\-\-onall\fR with no arguments. Run the command on all computers given
 with \fB\-\-sshlogin\fR but take no arguments. \s-1GNU\s0 \fBparallel\fR will log
 into \fB\-\-jobs\fR number of computers in parallel and run the job on the
@@ -777,8 +782,8 @@ computer. \fB\-j\fR adjusts how many computers to log into in parallel.
 .Sp
 This is useful for running the same command (e.g. uptime) on a list of
 servers.
-.IP "\fB\-\-onall\fR (alpha testing)" 9
-.IX Item "--onall (alpha testing)"
+.IP "\fB\-\-onall\fR" 9
+.IX Item "--onall"
 Run all the jobs on all computers given with \fB\-\-sshlogin\fR. \s-1GNU\s0
 \&\fBparallel\fR will log into \fB\-\-jobs\fR number of computers in parallel
 and run one job at a time on the computer. The order of the jobs will
@@ -870,7 +875,7 @@ line.
 .Sp
 This will set the owner of the homedir to the user:
 .Sp
-\&\fBtr ':' '\e012' < /etc/passwd | parallel \-N7 chown {1} {6}\fR
+\&\fBtr ':' '\en' < /etc/passwd | parallel \-N7 chown {1} {6}\fR
 .Sp
 Implies \fB\-X\fR unless \fB\-m\fR or \fB\-\-pipe\fR is set.
 .Sp
@@ -918,6 +923,9 @@ on remote computers. See the section \s-1PROFILE\s0 \s-1FILES\s0 for examples.
 .Sp
 \&\fIprofilename\fR corresponds to the file ~/.parallel/\fIprofilename\fR.
 .Sp
+You can give multiple profiles by repeating \fB\-\-profile\fR. If parts of
+the profiles conflict, the later ones will be used.
+.Sp
 Default: config
 .IP "\fB\-\-quote\fR" 9
 .IX Item "--quote"
@@ -936,6 +944,8 @@ default.
 .IX Item "-r"
 .PD
 If the stdin (standard input) only contains whitespace, do not run the command.
+.Sp
+If used with \fB\-\-pipe\fR this is slow.
 .IP "\fB\-\-recstart\fR \fIstartstring\fR" 9
 .IX Item "--recstart startstring"
 .PD 0
@@ -946,8 +956,8 @@ If \fB\-\-recstart\fR is given \fIstartstring\fR will be used to split at record
 .Sp
 If \fB\-\-recend\fR is given \fIendstring\fR will be used to split at record end.
 .Sp
-If both \fB\-\-recstart\fR and \fB\-\-recend\fR are given the string
-\&\fIstartstring\fR\fIendstring\fR will have to match to find a split
+If both \fB\-\-recstart\fR and \fB\-\-recend\fR are given the combined string
+\&\fIendstring\fR\fIstartstring\fR will have to match to find a split
 position. This is useful if either \fIstartstring\fR or \fIendstring\fR
 match in the middle of a record.
 .Sp
@@ -974,10 +984,19 @@ Remove the text matched by \fB\-\-recstart\fR and \fB\-\-recend\fR before piping
 it to the command.
 .Sp
 Only used with \fB\-\-pipe\fR.
+.IP "\fB\-\-resume\fR (beta testing)" 9
+.IX Item "--resume (beta testing)"
+Resumes from the last unfinished job. By reading \fB\-\-joblog\fR \s-1GNU\s0
+\&\fBparallel\fR will figure out the last unfinished job and continue from
+there. As \s-1GNU\s0 \fBparallel\fR only looks at the sequence numbers in
+\&\fB\-\-joblog\fR then the input, the command, and \fB\-\-joblog\fR all have to
+remain unchanged; otherwise \s-1GNU\s0 \fBparallel\fR may run wrong commands.
+.Sp
+See also: \fB\-\-joblog\fR.
 .IP "\fB\-\-retries\fR \fIn\fR" 9
 .IX Item "--retries n"
 If a job fails, retry it on another computer. Do this \fIn\fR times. If
-there are fewer than \fIn\fR computers in \fB\-\-sshlogin\fR \s-1GNU\s0 parallel will
+there are fewer than \fIn\fR computers in \fB\-\-sshlogin\fR \s-1GNU\s0 \fBparallel\fR will
 re-use the computers. This is useful if some jobs fail for no apparent
 reason (such as network failure).
 .IP "\fB\-\-return\fR \fIfilename\fR" 9
@@ -1084,6 +1103,10 @@ See also: \fBman sem\fR
 .IX Item "--seqreplace replace-str"
 Use the replacement string \fIreplace-str\fR instead of \fB{#}\fR for
 job sequence number.
+.IP "\fB\-\-shellquote\fR" 9
+.IX Item "--shellquote"
+Does not run the command but quotes it. Useful for making quoted
+composed commands for \s-1GNU\s0 \fBparallel\fR.
 .IP "\fB\-\-skip\-first\-line\fR" 9
 .IX Item "--skip-first-line"
 Do not use the first line of input (used by \s-1GNU\s0 \fBparallel\fR itself
@@ -1128,8 +1151,12 @@ The remote host must have \s-1GNU\s0 \fBparallel\fR installed.
 .Sp
 \&\fB\-\-sshlogin\fR is often used with \fB\-\-transfer\fR, \fB\-\-return\fR,
 \&\fB\-\-cleanup\fR, and \fB\-\-trc\fR.
-.IP "\fB\-\-sshloginfile\fR \fIfilename\fR" 9
-.IX Item "--sshloginfile filename"
+.IP "\fB\-\-sshloginfile\fR \fIfilename\fR (beta testing)" 9
+.IX Item "--sshloginfile filename (beta testing)"
+.PD 0
+.IP "\fB\-\-slf\fR \fIfilename\fR (beta testing)" 9
+.IX Item "--slf filename (beta testing)"
+.PD
 File with sshlogins. The file consists of sshlogins on separate
 lines. Empty lines and lines starting with '#' are ignored. Example:
 .Sp
@@ -1153,8 +1180,13 @@ lines. Empty lines and lines starting with '#' are ignored. Example:
 .Sp
 When using a different ssh program the last argument must be the hostname.
 .Sp
+Multiple \fB\-\-sshloginfile\fR are allowed.
+.Sp
 The sshloginfile '..' is special, it read sshlogins from
 ~/.parallel/sshloginfile
+.Sp
+The sshloginfile '.' is special, it read sshlogins from
+/etc/parallel/sshloginfile
 .Sp
 The sshloginfile '\-' is special, too, it read sshlogins from stdin
 (standard input).
@@ -1175,23 +1207,26 @@ Silent.  The job to be run will not be printed. This is the default.
 Can be reversed with \fB\-v\fR.
 .IP "\fB\-\-tty\fR" 9
 .IX Item "--tty"
-.PD 0
-.IP "\fB\-T\fR" 9
-.IX Item "-T"
-.PD
 Open terminal tty. If \s-1GNU\s0 \fBparallel\fR is used for starting an
 interactive program then this option may be needed. It will start only
 one job at a time (i.e. \fB\-j1\fR), not buffer the output (i.e. \fB\-u\fR),
 and it will open a tty for the job. When the job is done, the next job
 will get the tty.
+.IP "\fB\-\-tag\fR" 9
+.IX Item "--tag"
+Tag lines with arguments. Each output line will be prepended with the
+arguments and \s-1TAB\s0 (\et). When combined with \fB\-\-onall\fR or \fB\-\-nonall\fR
+the lines will be prepended with the sshlogin instead.
+.Sp
+\&\fB\-\-tag\fR is ignored when using \fB\-u\fR.
 .IP "\fB\-\-tmpdir\fR \fIdirname\fR" 9
 .IX Item "--tmpdir dirname"
 Directory for temporary files. \s-1GNU\s0 \fBparallel\fR normally buffers output
 into temporary files in /tmp. By setting \fB\-\-tmpdir\fR you can use a
 different dir for the files. Setting \fB\-\-tmpdir\fR is equivalent to
 setting \f(CW$TMPDIR\fR.
-.IP "\fB\-\-timeout\fR \fIsec\fR (alpha testing)" 9
-.IX Item "--timeout sec (alpha testing)"
+.IP "\fB\-\-timeout\fR \fIsec\fR" 9
+.IX Item "--timeout sec"
 Time out for command. If the command runs for longer than \fIsec\fR
 seconds it will get killed with \s-1SIGTERM\s0, followed by \s-1SIGTERM\s0 200 ms
 later, followed by \s-1SIGKILL\s0 200 ms later.
@@ -1273,12 +1308,12 @@ a bc \*(R" \-> \*(L"a bc\*(R". This is the default if \fB\-\-colsep\fR is used.
 .PD
 Ungroup output.  Output is printed as soon as possible. This may cause
 output from different commands to be mixed. \s-1GNU\s0 \fBparallel\fR runs
-faster with \fB\-u\fR. Can be reversed with \fB\-g\fR.
+faster with \fB\-u\fR. Can be reversed with \fB\-\-group\fR.
 .IP "\fB\-\-extensionreplace\fR \fIreplace-str\fR" 9
 .IX Item "--extensionreplace replace-str"
 .PD 0
-.IP "\fB\-U\fR \fIreplace-str\fR" 9
-.IX Item "-U replace-str"
+.IP "\fB\-\-er\fR \fIreplace-str\fR" 9
+.IX Item "--er replace-str"
 .PD
 Use the replacement string \fIreplace-str\fR instead of {.} for input line without extension.
 .IP "\fB\-\-use\-cpus\-instead\-of\-cores\fR" 9
@@ -1304,17 +1339,25 @@ Use \fB\-v\fR \fB\-v\fR to print the wrapping ssh command when running remotely.
 .IX Item "-V"
 .PD
 Print the version \s-1GNU\s0 \fBparallel\fR and exit.
-.IP "\fB\-\-workdir\fR \fImydir\fR" 9
-.IX Item "--workdir mydir"
+.IP "\fB\-\-workdir\fR \fImydir\fR (alpha testing)" 9
+.IX Item "--workdir mydir (alpha testing)"
 .PD 0
-.IP "\fB\-W\fR \fImydir\fR" 9
-.IX Item "-W mydir"
+.IP "\fB\-\-wd\fR \fImydir\fR (alpha testing)" 9
+.IX Item "--wd mydir (alpha testing)"
 .PD
 Files transferred using \fB\-\-transfer\fR and \fB\-\-return\fR will be relative
 to \fImydir\fR on remote computers, and the command will be executed in
-that dir. The special workdir \fB...\fR will create a workdir in
-\&\fB~/.parallel/tmp/\fR on the remote computers and will be removed if
-using \fB\-\-cleanup\fR.
+the dir \fImydir\fR.
+.Sp
+The special \fImydir\fR value \fB...\fR will create working dirs under
+\&\fB~/.parallel/tmp/\fR on the remote computers. If \fB\-\-cleanup\fR is given
+these dirs will be removed.
+.Sp
+The special \fImydir\fR value \fB.\fR uses the current working dir.  If the
+current working dir is beneath your home dir, the value \fB.\fR is
+treated as the relative path to your home dir. This means that if your
+home dir is different on remote computers (e.g. if your login is
+different) the relative path will still be relative to your home dir.
 .IP "\fB\-\-wait\fR" 9
 .IX Item "--wait"
 Wait for all commands to complete.
@@ -1349,11 +1392,12 @@ See also \fB\-m\fR.
 Exit if the size (see the \fB\-s\fR option) is exceeded.
 .IP "\fB\-\-xapply\fR" 9
 .IX Item "--xapply"
-Read multiple files like \fBxapply\fR. If multiple \fB\-a\fR are given, one
-line will be read from each of the files. The arguments can be
-accessed in the command as \fB{1}\fR .. \fB{\fR\fIn\fR\fB}\fR, so \fB{1}\fR will be a
-line from the first file, and \fB{6}\fR will refer to the line with the
-same line number from the 6th file.
+Read multiple input sources like \fBxapply\fR. If multiple input sources
+are given, one argument will be read from each of the input
+sources. The arguments can be accessed in the command as \fB{1}\fR
+\&.. \fB{\fR\fIn\fR\fB}\fR, so \fB{1}\fR will be a line from the first input source, and
+\&\fB{6}\fR will refer to the line with the same line number from the 6th
+input source.
 .Sp
 Compare these two:
 .Sp
@@ -1361,25 +1405,25 @@ Compare these two:
 \&  parallel echo {1} {2} ::: 1 2 3 ::: a b c
 \&  parallel \-\-xapply echo {1} {2} ::: 1 2 3 ::: a b c
 .Ve
+.Sp
+See also \fB\-\-header\fR.
 .IP "\fB\-\-shebang\fR" 9
 .IX Item "--shebang"
 .PD 0
 .IP "\fB\-\-hashbang\fR" 9
 .IX Item "--hashbang"
-.IP "\fB\-Y\fR" 9
-.IX Item "-Y"
 .PD
 \&\s-1GNU\s0 \fBParallel\fR can be called as a shebang (#!) command as the first line of a script. Like this:
 .Sp
 .Vb 1
-\&  #!/usr/bin/parallel \-Yr traceroute
+\&  #!/usr/bin/parallel \-\-shebang \-r traceroute
 \&
 \&  foss.org.my
 \&  debian.org
 \&  freenetproject.org
 .Ve
 .Sp
-For this to work \fB\-\-shebang\fR or \fB\-Y\fR must be set as the first option.
+For this to work \fB\-\-shebang\fR must be set as the first option.
 .SH "EXAMPLE: Working as xargs \-n1. Argument appending"
 .IX Header "EXAMPLE: Working as xargs -n1. Argument appending"
 \&\s-1GNU\s0 \fBparallel\fR can work similar to \fBxargs \-n1\fR.
@@ -1506,6 +1550,10 @@ Create a mirror directory with the same filenames except all files and
 symlinks are empty files.
 .PP
 \&\fBcp \-rs /the/source/dir mirror_dir; find mirror_dir \-type l | parallel \-m rm {} '&&' touch {}\fR
+.PP
+Find the files in a list that do no exist.
+.PP
+\&\fBcat file_list | parallel 'if [ ! \-e {} ] ; then echo {}; fi'\fR
 .SH "EXAMPLE: Removing file extension when processing files"
 .IX Header "EXAMPLE: Removing file extension when processing files"
 When processing files removing the file extension using \fB{.}\fR is
@@ -1533,7 +1581,7 @@ If you have directory with tar.gz files and want these extracted in
 the corresponding dir (e.g foo.tar.gz will be extracted in the dir
 foo) you can do:
 .PP
-\&\fBls *.tar.gz| parallel \-U {tar} 'echo {tar}|parallel \*(L"mkdir \-p {.} ; tar \-C {.} \-xf {.}.tar.gz\*(R"'\fR
+\&\fBls *.tar.gz| parallel \-\-er {tar} 'echo {tar}|parallel \*(L"mkdir \-p {.} ; tar \-C {.} \-xf {.}.tar.gz\*(R"'\fR
 .SH "EXAMPLE: Download 10 images for each of the past 30 days"
 .IX Header "EXAMPLE: Download 10 images for each of the past 30 days"
 Let us assume a website stores images like:
@@ -1549,10 +1597,14 @@ download images for the past 30 days:
 .PP
 \&\fB$(date \-d \*(L"today \-{1} days\*(R" +%Y%m%d)\fR will give the dates in
 \&\s-1YYYYMMDD\s0 with {1} days subtracted.
-.SH "EXAMPLE: Parallel web crawler/mirrorer"
-.IX Header "EXAMPLE: Parallel web crawler/mirrorer"
-This script below will crawl and mirror a \s-1URL\s0 in parallel (breadth
-first). Run like this:
+.SH "EXAMPLE: Breadth first parallel web crawler/mirrorer"
+.IX Header "EXAMPLE: Breadth first parallel web crawler/mirrorer"
+This script below will crawl and mirror a \s-1URL\s0 in parallel.  It
+downloads first pages that are 1 click down, then 2 clicks down, then
+3; instead of the normal depth first, where the first link link on
+each page is fetched first.
+.PP
+Run like this:
 .PP
 \&\fBPARALLEL=\-j100 ./parallel\-crawl http://gatt.org.yeslab.org/\fR
 .PP
@@ -1674,6 +1726,50 @@ Nested for-loops like this:
 can be written like this:
 .PP
 \&\fBparallel echo {1} {2} ::: M F ::: S M L \s-1XL\s0 \s-1XXL\s0 | sort\fR
+.SH "EXAMPLE: for-loops with column names"
+.IX Header "EXAMPLE: for-loops with column names"
+When doing multiple nested for-loops it can be easier to keep track of
+the loop variable if is is named instead of just having a number. Use
+\&\fB\-\-header :\fR to let the first argument be an named alias for the
+positional replacement string:
+.PP
+.Vb 1
+\&  parallel \-\-header : echo {gender} {size} ::: gender M F ::: size S M L XL XXL
+.Ve
+.PP
+This also works if the input file is a file with columns:
+.PP
+.Vb 1
+\&  cat addressbook.tsv | parallel \-\-colsep \*(Aq\et\*(Aq \-\-header : echo {Name} {E\-mail address}
+.Ve
+.SH "EXAMPLE: Using shell variables"
+.IX Header "EXAMPLE: Using shell variables"
+When using shell variables you need to quote them correctly as they
+may otherwise be split on spaces.
+.PP
+Notice the difference between:
+.PP
+.Vb 2
+\& V=("My brother\*(Aqs 12\e" records are worth <\e$\e$\e$>"\*(Aq!\*(Aq Foo Bar)
+\& parallel echo ::: ${V[@]} # This is probably not what you want
+.Ve
+.PP
+and:
+.PP
+.Vb 2
+\& V=("My brother\*(Aqs 12\e" records are worth <\e$\e$\e$>"\*(Aq!\*(Aq Foo Bar)
+\& parallel echo ::: "${V[@]}"
+.Ve
+.PP
+When using variables in the actual command that contains special
+characters (e.g. space) you can quote them using \fB'\*(L"$VAR\*(R"'\fR or using
+"'s and \fB\-q\fR:
+.PP
+.Vb 3
+\& V="Here  are  two "
+\& parallel echo "\*(Aq$V\*(Aq" ::: spaces
+\& parallel \-q echo "$V" ::: spaces
+.Ve
 .SH "EXAMPLE: Group output lines"
 .IX Header "EXAMPLE: Group output lines"
 When running jobs that output data, you often do not want the output
@@ -1689,6 +1785,17 @@ Compare the output of:
 to the output of:
 .PP
 \&\fBparallel \-u traceroute ::: foss.org.my debian.org freenetproject.org\fR
+.SH "EXAMPLE: Tag output lines"
+.IX Header "EXAMPLE: Tag output lines"
+\&\s-1GNU\s0 \fBparallel\fR groups the output lines, but it can be hard to see
+where the different jobs begin. \fB\-\-tag\fR prepends the argument to make
+that more visible:
+.PP
+\&\fBparallel \-\-tag traceroute ::: foss.org.my debian.org freenetproject.org\fR
+.PP
+Check the uptime of the servers in \fI~/.parallel/sshloginfile\fR:
+.PP
+\&\fBparallel \-\-tag \-S .. \-\-nonall uptime\fR
 .SH "EXAMPLE: Keep order of output same as order of input"
 .IX Header "EXAMPLE: Keep order of output same as order of input"
 Normally the output of a job will be printed as soon as it
@@ -1915,12 +2022,15 @@ Convert *.mp3 to *.ogg running one process per \s-1CPU\s0 core on local computer
 .IX Header "EXAMPLE: Running the same command on remote computers"
 To run the command \fBuptime\fR on remote computers you can do:
 .PP
-\&\fBparallel \-\-nonall \-S server1,server2 uptime\fR
+\&\fBparallel \-\-tag \-\-nonall \-S server1,server2 uptime\fR
 .PP
 \&\fB\-\-nonall\fR reads no arguments. If you have a list of jobs you want
 run on each computer you can do:
 .PP
-\&\fBparallel \-\-onall \-S server1,server2 echo ::: 1 2 3\fR
+\&\fBparallel \-\-tag \-\-onall \-S server1,server2 echo ::: 1 2 3\fR
+.PP
+Remove \fB\-\-tag\fR if you do not want the sshlogin added before the
+output.
 .PP
 If you have a lot of hosts use '\-j0' to access more hosts in parallel.
 .SH "EXAMPLE: Parallelizing rsync"
@@ -2085,11 +2195,11 @@ same time:
 .Ve
 .SH "EXAMPLE: Start editor with filenames from stdin (standard input)"
 .IX Header "EXAMPLE: Start editor with filenames from stdin (standard input)"
-You can use \s-1GNU\s0 Parallel to start interactive programs like emacs or vi:
+You can use \s-1GNU\s0 \fBparallel\fR to start interactive programs like emacs or vi:
 .PP
-\&\fBcat filelist | parallel \-T \-X emacs\fR
+\&\fBcat filelist | parallel \-\-tty \-X emacs\fR
 .PP
-\&\fBcat filelist | parallel \-T \-X vi\fR
+\&\fBcat filelist | parallel \-\-tty \-X vi\fR
 .PP
 If there are more files than will fit on a single command line, the
 editor will be started again with the remaining files.
@@ -2378,7 +2488,15 @@ variable \f(CW$PARALLEL\fR which takes precedence over the file
 .SH "PROFILE FILES"
 .IX Header "PROFILE FILES"
 If \fB\-\-profile\fR set, \s-1GNU\s0 \fBparallel\fR will read the profile from that file instead of
-~/.parallel/config.
+~/.parallel/config. You can have multiple \fB\-\-profiles\fR.
+.PP
+Example: Profile for running a command on every sshlogin in
+~/.ssh/sshlogins and prepend the output with the sshlogin:
+.PP
+.Vb 2
+\&  echo \-\-tag \-S .. \-\-nonall > ~/.parallel/n
+\&  parallel \-Jn uptime
+.Ve
 .PP
 Example: Profile for running every command with \fB\-j\-1\fR and \fBnice\fR
 .PP
@@ -3034,9 +3152,13 @@ A complete example that others can run that shows the problem. A
 combination of \fBseq\fR, \fBcat\fR, \fBecho\fR, and \fBsleep\fR can reproduce
 most errors. If you example requires large files, see if you can use
 make them by something like \fBseq 1000000\fR>\fBfile\fR.
+.PP
+If you suspect the error is dependent on your distribution, please see
+if you can reproduce the error on one of these distibutions:
+http://sourceforge.net/projects/virtualboximage/files/
 .SH "AUTHOR"
 .IX Header "AUTHOR"
-When using \s-1GNU\s0 Parallel for a publication please cite:
+When using \s-1GNU\s0 \fBparallel\fR for a publication please cite:
 .PP
 O. Tange (2011): \s-1GNU\s0 Parallel \- The Command-Line Power Tool, ;login:
 The \s-1USENIX\s0 Magazine, February 2011:42\-47.
@@ -3045,14 +3167,15 @@ Copyright (C) 2007\-10\-18 Ole Tange, http://ole.tange.dk
 .PP
 Copyright (C) 2008,2009,2010 Ole Tange, http://ole.tange.dk
 .PP
-Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 .PP
 Parts of the manual concerning \fBxargs\fR compatibility is inspired by
 the manual of \fBxargs\fR from \s-1GNU\s0 findutils 4.4.2.
 .SH "LICENSE"
 .IX Header "LICENSE"
-Copyright (C) 2007,2008,2009,2010,2011 Free Software Foundation, Inc.
+Copyright (C) 2007,2008,2009,2010,2011,2012 Free Software Foundation,
+Inc.
 .PP
 This program is free software; you can redistribute it and/or modify
 it under the terms of the \s-1GNU\s0 General Public License as published by

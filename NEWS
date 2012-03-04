@@ -1,3 +1,182 @@
+20120222
+
+* --workdir . will use the current working dir. If the current working
+  dir is beneath your home dir, the value . is treated as the relative
+  path to your home dir. This means that if your home dir is different
+  on remote computers (e.g. if your login is different) the relative
+  path will still be relative to your home dir.
+
+* A texinfo file is now generated from the POD file using pod2texi.
+
+* The bioinformatics article "Fast large-scale clustering of protein
+  structures using Gauss integrals" mentions GNU Parallel. They forgot
+  to add the reference. Please remember --bibtex if you use GNU
+  Parallel in an article.
+  http://bioinformatics.oxfordjournals.org/content/28/4/510.short
+
+* The first supporter received his merchandise. Did you order yours?
+  https://www.gnu.org/software/parallel/merchandise.html
+
+* How to use GNU Parallel with samtools.
+  http://zvfak.blogspot.com/2012/02/samtools-in-parallel.html
+
+* How to use GNU Parallel for vacuuming PostgreSQL tables.
+  http://blog.timmattison.com/archives/2012/01/24/mini-hack-parallel-vacuuming-in-postgresql/
+
+* Converting e-books with Calibre and GNU Parallel.
+  http://www.linkhal.de/blog/2012/01/converting-massive-e-book-collections-with-calibre-and-gnu-parrallel/
+
+* Using GNU Parallel for tailing logfiles from multiple servers.
+  http://silviud.blogspot.com/2012/02/shell-parallel-processing.html
+
+* Bug fixes and man page updates.
+
+
+20120122
+
+* --header : uses the first input line as column names and you can
+  then use {colname} as a replacement string in the command. This also
+  works with multiple :::'s.
+
+* --header <regexp> matches a header as a regular expression and
+  repeats the header for each block with --pipe.
+
+* --resume resumes from the last unfinished job. Useful if you stop
+  GNU Parallel and restart it later with the same arguments.
+
+* niceload now propagates exit status correctly.
+
+* Show your support for GNU Parallel. For a limited time you can get a
+  GNU Parallel T-shirt+mug+pen+100 postcards at 20 EUR. See
+  https://www.gnu.org/software/parallel/merchandise.html
+
+* Options -g -B -T -U -W -Y are retired as warned 6 months ago.
+
+* GNU Parallel referenced in article on Holographic Grid Cloud. Thanks
+  to Stefano Gallozzi. http://arxiv.org/pdf/1112.6128
+
+* Article in IEEE Software on GNU Parallel. Thanks to Diomidis
+  Spinellis.  http://www.spinellis.gr/blog/20110911/
+
+* An article on Narwhal which uses GNU Parallel. They forgot to add
+  the reference. Please remember --bibtex if you use GNU Parallel in
+  an article. 
+  http://bioinformatics.oxfordjournals.org/content/early/2011/11/08/bioinformatics.btr613.full.pdf
+
+* Blog post on using GNU Parallel to speed up BLAST queries:
+  http://blog.mckuhn.de/2012/01/embarrassingly-parallel-blast-search.html
+
+* Video showing Wake-on-LAN with GNU Parallel.
+  https://www.youtube.com/watch?v=0mB-yIyKFLQ
+
+* Using GNU Parallel with Solr.
+  http://sujitpal.blogspot.com/2011/12/solr-report-generation-with-python.html
+
+* First job ad including GNU Parallel:
+  http://seeker.dice.com/jobsearch/servlet/JobSearch?op=101&dockey=xml/7/6/76f858de083a094f74b1a5d3ba53ffc5@endecaindex
+
+* Bug fixes and man page updates.
+
+
+20111222
+
+* --timeout will now kill grandchildren.
+
+* Interview in Hacker Public Radio.
+  http://hackerpublicradio.org/eps.php?id=0860
+
+* Blog post in Chinese.
+  http://blog.sina.com.cn/s/blog_3f7652740100y0ju.html
+
+* Bug fixes and man page updates.
+
+
+20111122
+
+* GNU Parallel package for Fedora.
+  https://admin.fedoraproject.org/pkgdb/acls/name/parallel
+
+* Using GNU Parallel with Mozilla cross referencing.
+  https://blog.mozilla.com/it/2011/11/15/mxr-improvements/
+
+* Neat flash presentation of GNU Parallel.
+  http://prezi.com/0nq74b2elgtx/about-gnu-parallel/
+
+* How to create tar files of dirs in parallel.
+  https://joneslee85.wordpress.com/2011/11/22/shell-tips-how-to-recursively-archive-many-folders/
+
+* Article in Admin Network&Security by Ben Martin.
+  http://www.admin-magazine.com/HPC/Articles/GNU-Parallel
+
+* Blog post in Polish.
+  http://blog.tiger.com.pl/2011/01/05/gnu-parallel/
+
+* Blog post on using GNU Parallel of Mac OS X.
+  http://www.0xcb0.com/2011/10/19/running-parallel-bash-tasks-on-os-x/
+
+* Blog post in English about using zip with GNU Parallel.
+  http://nuclear-imaging.info/site_content/2011/05/11/gnu-parallel/
+
+* Blog post in English by researcher.
+  http://zandyware.wordpress.com/2011/10/15/gnu-parallell-make-best-use-of-your-multicore-computer/
+
+* Blog entry in Chinese.
+  http://blog.csdn.net/tossense/article/details/6889026
+
+* Blog entry in Japanese on managing many servers.
+  http://hiroakis.com/blog/2011/11/13/gnu-parallel/
+
+* GNU Parallel is now part of ppbs.
+  http://physiology.med.cornell.edu/faculty/mason/lab/ppbs/introduction/introduction.html
+
+* How to use GNU Parallel with MCX.
+  http://mcx.sourceforge.net/cgi-bin/index.cgi?MMC/Doc/MMCCluster
+
+* Bug fixes and man page updates.
+
+
+20111022
+
+* --tag prepends lines with the argument(s). If used with --(n)onall
+  the line will be prepended with the sshlogin instead.
+
+* --shellquote does not run the command but quotes it using \'s.
+  Useful for making quoted composed commands.
+
+* --profile can now be repeated merging multiple profiles.
+
+* --bibtex now gives the BibTeX entry.
+  Thanks to Aleksandr Levchuk for testing.
+
+* Makefile for simple .deb package.
+  cd packager/debian; make
+
+* sql: --list-databases lists the databases.
+
+* GNU Parallel officially in Fedora 16
+  http://www.spinics.net/lists/fedora-package-announce/msg67130.html
+
+* Blog post on recompression FLAC audio.
+  http://blog.oxplot.com/2011/08/reflac-flac-cleanser.html
+
+* The most complex use of ::: I have seen so far.
+  http://agentzlerich.blogspot.com/2011/09/following-up-on-previous-failures-ive.html
+
+* Example of using GNU Parallel with sudo.
+  http://loopkid.net/articles/2011/10/07/recursive-chmod-and-chown-on-files
+
+* Use wget and gnu parallel to download mp3s at rocket speed.
+  http://sdbrain.posterous.com/use-wget-and-gnu-parallel-to-download-mp3s-at
+
+* First CV referring to GNU Parallel.
+  http://www.peopleperhour.com/freelancers/stephen_/internet_researcher_and_protocol_develop/140602
+
+* Cartwright labs usage of GNU Parallel.
+  http://cartwrightlab.wikispaces.com/The+Most+Bang+for+Your+Buck
+
+* Bug fixes and man page updates.
+
+
 20110822
 
 * --timeout implemented so that slow commands can be killed
@@ -155,7 +334,7 @@
 
 20110422
 
-* {#} now works an alias for $PARALLEL_PID.
+* {#} now works as an alias for $PARALLEL_PID.
 
 * --eta now estimates way more accurately.
 

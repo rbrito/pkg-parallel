@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "NICELOAD 1"
-.TH NICELOAD 1 "2011-08-22" "20110822" "parallel"
+.TH NICELOAD 1 "2011-11-22" "20120222" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -153,46 +153,46 @@ run 1 second, suspend (3.00\-1.00) seconds, run 1 second, suspend
 (3.00\-1.00) seconds, run 1 second, ...
 .SH "OPTIONS"
 .IX Header "OPTIONS"
-.IP "\fB\-f\fR \fI\s-1FACTOR\s0\fR (beta testing)" 9
-.IX Item "-f FACTOR (beta testing)"
+.IP "\fB\-f\fR \fI\s-1FACTOR\s0\fR" 9
+.IX Item "-f FACTOR"
 .PD 0
-.IP "\fB\-\-factor\fR \fI\s-1FACTOR\s0\fR (beta testing)" 9
-.IX Item "--factor FACTOR (beta testing)"
+.IP "\fB\-\-factor\fR \fI\s-1FACTOR\s0\fR" 9
+.IX Item "--factor FACTOR"
 .PD
 Suspend time factor. Dynamically set \fB\-s\fR as amount over limit *
 factor. Default is 1.
-.IP "\fB\-H\fR (beta testing)" 9
-.IX Item "-H (beta testing)"
+.IP "\fB\-H\fR" 9
+.IX Item "-H"
 .PD 0
-.IP "\fB\-\-hard\fR (beta testing)" 9
-.IX Item "--hard (beta testing)"
+.IP "\fB\-\-hard\fR" 9
+.IX Item "--hard"
 .PD
 Hard limit. \fB\-\-hard\fR will suspend the process until the system is
 under the limits. The default is \fB\-\-soft\fR.
-.IP "\fB\-\-io\fR \fIiolimit\fR (beta testing)" 9
-.IX Item "--io iolimit (beta testing)"
+.IP "\fB\-\-io\fR \fIiolimit\fR" 9
+.IX Item "--io iolimit"
 .PD 0
-.IP "\fB\-I\fR \fIiolimit\fR (beta testing)" 9
-.IX Item "-I iolimit (beta testing)"
+.IP "\fB\-I\fR \fIiolimit\fR" 9
+.IX Item "-I iolimit"
 .PD
 Limit for I/O. The amount of disk I/O will be computed as a value 0 \-
 10, where 0 is no I/O and 10 is at least one disk is 100% satuated.
 .Sp
 \&\fB\-\-io\fR will set both \fB\-\-start\-io\fR and \fBrun-io\fR.
-.IP "\fB\-\-load\fR \fIloadlimit\fR (beta testing)" 9
-.IX Item "--load loadlimit (beta testing)"
+.IP "\fB\-\-load\fR \fIloadlimit\fR" 9
+.IX Item "--load loadlimit"
 .PD 0
-.IP "\fB\-L\fR \fIloadlimit\fR (beta testing)" 9
-.IX Item "-L loadlimit (beta testing)"
+.IP "\fB\-L\fR \fIloadlimit\fR" 9
+.IX Item "-L loadlimit"
 .PD
 Limit for load average.
 .Sp
 \&\fB\-\-load\fR will set both \fB\-\-start\-load\fR and \fBrun-load\fR.
-.IP "\fB\-\-mem\fR \fImemlimit\fR (beta testing)" 9
-.IX Item "--mem memlimit (beta testing)"
+.IP "\fB\-\-mem\fR \fImemlimit\fR" 9
+.IX Item "--mem memlimit"
 .PD 0
-.IP "\fB\-M\fR \fImemlimit\fR (beta testing)" 9
-.IX Item "-M memlimit (beta testing)"
+.IP "\fB\-M\fR \fImemlimit\fR" 9
+.IX Item "-M memlimit"
 .PD
 Limit for free memory. This is the amount of bytes available as free
 + cache. This limit is treated opposite other limits: If the system
@@ -204,11 +204,11 @@ multiply the size with 1024, 1048576, 1073741824, or 1099511627776
 respectively.
 .Sp
 \&\fB\-\-mem\fR will set both \fB\-\-start\-mem\fR and \fBrun-mem\fR.
-.IP "\fB\-\-noswap\fR (beta testing)" 9
-.IX Item "--noswap (beta testing)"
+.IP "\fB\-\-noswap\fR" 9
+.IX Item "--noswap"
 .PD 0
-.IP "\fB\-N\fR (beta testing)" 9
-.IX Item "-N (beta testing)"
+.IP "\fB\-N\fR" 9
+.IX Item "-N"
 .PD
 No swapping. If the system is swapping both in and out it is a good
 indication that the system is memory stressed.
@@ -216,90 +216,90 @@ indication that the system is memory stressed.
 \&\fB\-\-noswap\fR is over limit if the system is swapping both in and out.
 .Sp
 \&\fB\-\-noswap\fR will set both \fB\-\-start\-noswap\fR and \fBrun-noswap\fR.
-.IP "\fB\-n\fR \fIniceness\fR (beta testing)" 9
-.IX Item "-n niceness (beta testing)"
+.IP "\fB\-n\fR \fIniceness\fR" 9
+.IX Item "-n niceness"
 .PD 0
-.IP "\fB\-\-nice\fR \fIniceness\fR (beta testing)" 9
-.IX Item "--nice niceness (beta testing)"
+.IP "\fB\-\-nice\fR \fIniceness\fR" 9
+.IX Item "--nice niceness"
 .PD
 Sets niceness. See \fBnice\fR(1).
-.IP "\fB\-p\fR \fI\s-1PID\s0\fR (beta testing)" 9
-.IX Item "-p PID (beta testing)"
+.IP "\fB\-p\fR \fI\s-1PID\s0\fR" 9
+.IX Item "-p PID"
 .PD 0
-.IP "\fB\-\-pid\fR \fI\s-1PID\s0\fR (beta testing)" 9
-.IX Item "--pid PID (beta testing)"
+.IP "\fB\-\-pid\fR \fI\s-1PID\s0\fR" 9
+.IX Item "--pid PID"
 .PD
 Process \s-1ID\s0 of process to suspend.
-.IP "\fB\-\-quote\fR (beta testing)" 9
-.IX Item "--quote (beta testing)"
+.IP "\fB\-\-quote\fR" 9
+.IX Item "--quote"
 .PD 0
-.IP "\fB\-q\fR (beta testing)" 9
-.IX Item "-q (beta testing)"
+.IP "\fB\-q\fR" 9
+.IX Item "-q"
 .PD
 Quote the command line. Useful if the command contains chars like *,
 $, >, and " that should not be interpreted by the shell.
-.IP "\fB\-\-run\-io\fR \fIiolimit\fR (beta testing)" 9
-.IX Item "--run-io iolimit (beta testing)"
+.IP "\fB\-\-run\-io\fR \fIiolimit\fR" 9
+.IX Item "--run-io iolimit"
 .PD 0
-.IP "\fB\-\-ri\fR \fIiolimit\fR (beta testing)" 9
-.IX Item "--ri iolimit (beta testing)"
-.IP "\fB\-\-run\-load\fR \fIloadlimit\fR (beta testing)" 9
-.IX Item "--run-load loadlimit (beta testing)"
-.IP "\fB\-\-rl\fR \fIloadlimit\fR (beta testing)" 9
-.IX Item "--rl loadlimit (beta testing)"
-.IP "\fB\-\-run\-mem\fR \fImemlimit\fR (beta testing)" 9
-.IX Item "--run-mem memlimit (beta testing)"
-.IP "\fB\-\-rm\fR \fImemlimit\fR (beta testing)" 9
-.IX Item "--rm memlimit (beta testing)"
+.IP "\fB\-\-ri\fR \fIiolimit\fR" 9
+.IX Item "--ri iolimit"
+.IP "\fB\-\-run\-load\fR \fIloadlimit\fR" 9
+.IX Item "--run-load loadlimit"
+.IP "\fB\-\-rl\fR \fIloadlimit\fR" 9
+.IX Item "--rl loadlimit"
+.IP "\fB\-\-run\-mem\fR \fImemlimit\fR" 9
+.IX Item "--run-mem memlimit"
+.IP "\fB\-\-rm\fR \fImemlimit\fR" 9
+.IX Item "--rm memlimit"
 .PD
 Run limit. The running program will be slowed down if the system is
 above the limit. See: \fB\-\-io\fR, \fB\-\-load\fR, \fB\-\-mem\fR, \fB\-\-noswap\fR.
-.IP "\fB\-\-start\-io\fR \fIiolimit\fR (beta testing)" 9
-.IX Item "--start-io iolimit (beta testing)"
+.IP "\fB\-\-start\-io\fR \fIiolimit\fR" 9
+.IX Item "--start-io iolimit"
 .PD 0
-.IP "\fB\-\-si\fR \fIiolimit\fR (beta testing)" 9
-.IX Item "--si iolimit (beta testing)"
-.IP "\fB\-\-start\-load\fR \fIloadlimit\fR (beta testing)" 9
-.IX Item "--start-load loadlimit (beta testing)"
-.IP "\fB\-\-sl\fR \fIloadlimit\fR (beta testing)" 9
-.IX Item "--sl loadlimit (beta testing)"
-.IP "\fB\-\-start\-mem\fR \fImemlimit\fR (beta testing)" 9
-.IX Item "--start-mem memlimit (beta testing)"
-.IP "\fB\-\-sm\fR \fImemlimit\fR (beta testing)" 9
-.IX Item "--sm memlimit (beta testing)"
+.IP "\fB\-\-si\fR \fIiolimit\fR" 9
+.IX Item "--si iolimit"
+.IP "\fB\-\-start\-load\fR \fIloadlimit\fR" 9
+.IX Item "--start-load loadlimit"
+.IP "\fB\-\-sl\fR \fIloadlimit\fR" 9
+.IX Item "--sl loadlimit"
+.IP "\fB\-\-start\-mem\fR \fImemlimit\fR" 9
+.IX Item "--start-mem memlimit"
+.IP "\fB\-\-sm\fR \fImemlimit\fR" 9
+.IX Item "--sm memlimit"
 .PD
 Start limit. The program will not start until the system is below the
 limit. See: \fB\-\-io\fR, \fB\-\-load\fR, \fB\-\-mem\fR, \fB\-\-noswap\fR.
-.IP "\fB\-\-soft\fR (beta testing)" 9
-.IX Item "--soft (beta testing)"
+.IP "\fB\-\-soft\fR" 9
+.IX Item "--soft"
 .PD 0
-.IP "\fB\-S\fR (beta testing)" 9
-.IX Item "-S (beta testing)"
+.IP "\fB\-S\fR" 9
+.IX Item "-S"
 .PD
 Soft limit. \fBniceload\fR will suspend a process for a while and then
 let it run for a second thus only slowing down a process while the
 system is over one of the given limits. This is the default.
-.IP "\fB\-\-suspend\fR \fI\s-1SEC\s0\fR (beta testing)" 9
-.IX Item "--suspend SEC (beta testing)"
+.IP "\fB\-\-suspend\fR \fI\s-1SEC\s0\fR" 9
+.IX Item "--suspend SEC"
 .PD 0
-.IP "\fB\-s\fR \fI\s-1SEC\s0\fR (beta testing)" 9
-.IX Item "-s SEC (beta testing)"
+.IP "\fB\-s\fR \fI\s-1SEC\s0\fR" 9
+.IX Item "-s SEC"
 .PD
 Suspend time. Suspend the command this many seconds when the max load
 average is reached.
-.IP "\fB\-\-recheck\fR \fI\s-1SEC\s0\fR (beta testing)" 9
-.IX Item "--recheck SEC (beta testing)"
+.IP "\fB\-\-recheck\fR \fI\s-1SEC\s0\fR" 9
+.IX Item "--recheck SEC"
 .PD 0
-.IP "\fB\-t\fR \fI\s-1SEC\s0\fR (beta testing)" 9
-.IX Item "-t SEC (beta testing)"
+.IP "\fB\-t\fR \fI\s-1SEC\s0\fR" 9
+.IX Item "-t SEC"
 .PD
 Recheck load time. Sleep \s-1SEC\s0 seconds before checking load
 again. Default is 1 second.
-.IP "\fB\-\-verbose\fR (beta testing)" 9
-.IX Item "--verbose (beta testing)"
+.IP "\fB\-\-verbose\fR" 9
+.IX Item "--verbose"
 .PD 0
-.IP "\fB\-v\fR (beta testing)" 9
-.IX Item "-v (beta testing)"
+.IP "\fB\-v\fR" 9
+.IX Item "-v"
 .PD
 Verbose. Print some extra output on what is happening. Use \fB\-v\fR until
 you know what your are doing.

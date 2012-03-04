@@ -1,6 +1,6 @@
 bin_SCRIPTS = parallel sem sql niceload
 man_MANS = parallel.1 sem.1 sql.1 niceload.1
-doc_DATA = parallel.html sem.html sql.html niceload.html
+doc_DATA = parallel.html sem.html sql.html niceload.html parallel.texi sem.texi sql.texi niceload.texi
 
 parallel.1: parallel.pod Makefile
 	pod2man --release='$(PACKAGE_VERSION)' --center='$(PACKAGE_NAME)' \
@@ -18,21 +18,40 @@ niceload.1: niceload.pod Makefile
 	pod2man --release='$(PACKAGE_VERSION)' --center='$(PACKAGE_NAME)' \
 		--section=1 $(srcdir)/niceload.pod > $(srcdir)/niceload.1
 
-parallel.html: parallel Makefile sem
-	./sem --fg --id pod2html pod2html $(srcdir)/parallel.pod > $(srcdir)/parallel.html
-	./sem --fg --id pod2html rm -f $(srcdir)/pod2htm*
+parallel.html: parallel.pod Makefile
+	pod2html $(srcdir)/parallel.pod > $(srcdir)/parallel.html
+	rm -f $(srcdir)/pod2htm*
 
-sem.html: sem.pod Makefile sem
-	./sem --fg --id pod2html pod2html $(srcdir)/sem.pod > $(srcdir)/sem.html
-	./sem --fg --id pod2html rm -f $(srcdir)/pod2htm*
+# Depending on parallel.html to avoid stupid pod2html race condition
+sem.html: sem.pod Makefile parallel.html
+	pod2html $(srcdir)/sem.pod > $(srcdir)/sem.html
+	rm -f $(srcdir)/pod2htm*
 
-sql.html: sql Makefile sem
-	./sem --fg --id pod2html pod2html $(srcdir)/sql > $(srcdir)/sql.html
-	./sem --fg --id pod2html rm -f $(srcdir)/pod2htm*
+# Depending on sem.html to avoid stupid pod2html race condition
+sql.html: sql Makefile sem.html
+	pod2html $(srcdir)/sql > $(srcdir)/sql.html
+	rm -f $(srcdir)/pod2htm*
 
-niceload.html: niceload.pod Makefile sem
-	./sem --fg --id pod2html pod2html $(srcdir)/niceload.pod > $(srcdir)/niceload.html
-	./sem --fg --id pod2html rm -f $(srcdir)/pod2htm*
+# Depending on sql.html to avoid stupid pod2html race condition
+niceload.html: niceload.pod Makefile sql.html
+	pod2html $(srcdir)/niceload.pod > $(srcdir)/niceload.html
+	rm -f $(srcdir)/pod2htm*
+
+parallel.texi: parallel.pod
+# If pod2texi is not installed: Forget about it
+	pod2texi --output=$(srcdir)/parallel.texi $(srcdir)/parallel.pod || true
+
+sem.texi: sem.pod
+# If pod2texi is not installed: Forget about it
+	pod2texi --output=$(srcdir)/sem.texi $(srcdir)/sem.pod || true
+
+sql.texi: sql
+# If pod2texi is not installed: Forget about it
+	pod2texi --output=$(srcdir)/sql.texi $(srcdir)/sql || true
+
+niceload.texi: niceload.pod
+# If pod2texi is not installed: Forget about it
+	pod2texi --output=$(srcdir)/niceload.texi $(srcdir)/niceload.pod || true
 
 sem: parallel
 	ln -fs parallel sem
@@ -41,4 +60,5 @@ DISTCLEANFILES = parallel.html sem.html sql.html niceload.html
 EXTRA_DIST = parallel sem sql niceload \
 	parallel.1 sem.1 sql.1 niceload.1 \
 	parallel.html sem.html sql.html niceload.html \
-	sem.pod parallel.pod niceload.pod
+	sem.pod parallel.pod niceload.pod \
+	parallel.texi sem.texi sql.texi niceload.texi
