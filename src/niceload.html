@@ -73,42 +73,42 @@ like this:</p>
 <hr />
 <h1><a name="options">OPTIONS</a></h1>
 <dl>
-<dt><strong><a name="factor" class="item"><strong>-f</strong> <em>FACTOR</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="f_factor" class="item"><strong>-f</strong> <em>FACTOR</em></a></strong></dt>
 
-<dt><strong><strong>--factor</strong> <em>FACTOR</em> (beta testing)</strong></dt>
+<dt><strong><a name="factor_factor" class="item"><strong>--factor</strong> <em>FACTOR</em></a></strong></dt>
 
 <dd>
 <p>Suspend time factor. Dynamically set <strong>-s</strong> as amount over limit *
 factor. Default is 1.</p>
 </dd>
-<dt><strong><a name="h" class="item"><strong>-H</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="h" class="item"><strong>-H</strong></a></strong></dt>
 
-<dt><strong><a name="hard" class="item"><strong>--hard</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="hard" class="item"><strong>--hard</strong></a></strong></dt>
 
 <dd>
 <p>Hard limit. <strong>--hard</strong> will suspend the process until the system is
 under the limits. The default is <strong>--soft</strong>.</p>
 </dd>
-<dt><strong><a name="iolimit" class="item"><strong>--io</strong> <em>iolimit</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="io_iolimit" class="item"><strong>--io</strong> <em>iolimit</em></a></strong></dt>
 
-<dt><strong><strong>-I</strong> <em>iolimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="i_iolimit" class="item"><strong>-I</strong> <em>iolimit</em></a></strong></dt>
 
 <dd>
 <p>Limit for I/O. The amount of disk I/O will be computed as a value 0 -
 10, where 0 is no I/O and 10 is at least one disk is 100% satuated.</p>
 <p><strong>--io</strong> will set both <strong>--start-io</strong> and <strong>run-io</strong>.</p>
 </dd>
-<dt><strong><a name="loadlimit" class="item"><strong>--load</strong> <em>loadlimit</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="load_loadlimit" class="item"><strong>--load</strong> <em>loadlimit</em></a></strong></dt>
 
-<dt><strong><strong>-L</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="l_loadlimit" class="item"><strong>-L</strong> <em>loadlimit</em></a></strong></dt>
 
 <dd>
 <p>Limit for load average.</p>
 <p><strong>--load</strong> will set both <strong>--start-load</strong> and <strong>run-load</strong>.</p>
 </dd>
-<dt><strong><a name="memlimit" class="item"><strong>--mem</strong> <em>memlimit</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="mem_memlimit" class="item"><strong>--mem</strong> <em>memlimit</em></a></strong></dt>
 
-<dt><strong><strong>-M</strong> <em>memlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="m_memlimit" class="item"><strong>-M</strong> <em>memlimit</em></a></strong></dt>
 
 <dd>
 <p>Limit for free memory. This is the amount of bytes available as free
@@ -120,9 +120,9 @@ multiply the size with 1024, 1048576, 1073741824, or 1099511627776
 respectively.</p>
 <p><strong>--mem</strong> will set both <strong>--start-mem</strong> and <strong>run-mem</strong>.</p>
 </dd>
-<dt><strong><a name="noswap" class="item"><strong>--noswap</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="noswap" class="item"><strong>--noswap</strong></a></strong></dt>
 
-<dt><strong><a name="n" class="item"><strong>-N</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="n" class="item"><strong>-N</strong></a></strong></dt>
 
 <dd>
 <p>No swapping. If the system is swapping both in and out it is a good
@@ -130,88 +130,88 @@ indication that the system is memory stressed.</p>
 <p><strong>--noswap</strong> is over limit if the system is swapping both in and out.</p>
 <p><strong>--noswap</strong> will set both <strong>--start-noswap</strong> and <strong>run-noswap</strong>.</p>
 </dd>
-<dt><strong><a name="niceness" class="item"><strong>-n</strong> <em>niceness</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="n_niceness" class="item"><strong>-n</strong> <em>niceness</em></a></strong></dt>
 
-<dt><strong><strong>--nice</strong> <em>niceness</em> (beta testing)</strong></dt>
+<dt><strong><a name="nice_niceness" class="item"><strong>--nice</strong> <em>niceness</em></a></strong></dt>
 
 <dd>
 <p>Sets niceness. See <strong>nice</strong>(1).</p>
 </dd>
-<dt><strong><a name="pid" class="item"><strong>-p</strong> <em>PID</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="p_pid" class="item"><strong>-p</strong> <em>PID</em></a></strong></dt>
 
-<dt><strong><strong>--pid</strong> <em>PID</em> (beta testing)</strong></dt>
+<dt><strong><a name="pid_pid" class="item"><strong>--pid</strong> <em>PID</em></a></strong></dt>
 
 <dd>
 <p>Process ID of process to suspend.</p>
 </dd>
-<dt><strong><a name="quote" class="item"><strong>--quote</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="quote" class="item"><strong>--quote</strong></a></strong></dt>
 
-<dt><strong><a name="q" class="item"><strong>-q</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="q" class="item"><strong>-q</strong></a></strong></dt>
 
 <dd>
 <p>Quote the command line. Useful if the command contains chars like *,
 $, &gt;, and &quot; that should not be interpreted by the shell.</p>
 </dd>
-<dt><strong><strong>--run-io</strong> <em>iolimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="run_io_iolimit" class="item"><strong>--run-io</strong> <em>iolimit</em></a></strong></dt>
 
-<dt><strong><strong>--ri</strong> <em>iolimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="ri_iolimit" class="item"><strong>--ri</strong> <em>iolimit</em></a></strong></dt>
 
-<dt><strong><strong>--run-load</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="run_load_loadlimit" class="item"><strong>--run-load</strong> <em>loadlimit</em></a></strong></dt>
 
-<dt><strong><strong>--rl</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="rl_loadlimit" class="item"><strong>--rl</strong> <em>loadlimit</em></a></strong></dt>
 
-<dt><strong><strong>--run-mem</strong> <em>memlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="run_mem_memlimit" class="item"><strong>--run-mem</strong> <em>memlimit</em></a></strong></dt>
 
-<dt><strong><strong>--rm</strong> <em>memlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="rm_memlimit" class="item"><strong>--rm</strong> <em>memlimit</em></a></strong></dt>
 
 <dd>
 <p>Run limit. The running program will be slowed down if the system is
 above the limit. See: <strong>--io</strong>, <strong>--load</strong>, <strong>--mem</strong>, <strong>--noswap</strong>.</p>
 </dd>
-<dt><strong><strong>--start-io</strong> <em>iolimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="start_io_iolimit" class="item"><strong>--start-io</strong> <em>iolimit</em></a></strong></dt>
 
-<dt><strong><strong>--si</strong> <em>iolimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="si_iolimit" class="item"><strong>--si</strong> <em>iolimit</em></a></strong></dt>
 
-<dt><strong><strong>--start-load</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="start_load_loadlimit" class="item"><strong>--start-load</strong> <em>loadlimit</em></a></strong></dt>
 
-<dt><strong><strong>--sl</strong> <em>loadlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="sl_loadlimit" class="item"><strong>--sl</strong> <em>loadlimit</em></a></strong></dt>
 
-<dt><strong><strong>--start-mem</strong> <em>memlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="start_mem_memlimit" class="item"><strong>--start-mem</strong> <em>memlimit</em></a></strong></dt>
 
-<dt><strong><strong>--sm</strong> <em>memlimit</em> (beta testing)</strong></dt>
+<dt><strong><a name="sm_memlimit" class="item"><strong>--sm</strong> <em>memlimit</em></a></strong></dt>
 
 <dd>
 <p>Start limit. The program will not start until the system is below the
 limit. See: <strong>--io</strong>, <strong>--load</strong>, <strong>--mem</strong>, <strong>--noswap</strong>.</p>
 </dd>
-<dt><strong><a name="soft" class="item"><strong>--soft</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="soft" class="item"><strong>--soft</strong></a></strong></dt>
 
-<dt><strong><a name="s" class="item"><strong>-S</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="s" class="item"><strong>-S</strong></a></strong></dt>
 
 <dd>
 <p>Soft limit. <strong>niceload</strong> will suspend a process for a while and then
 let it run for a second thus only slowing down a process while the
 system is over one of the given limits. This is the default.</p>
 </dd>
-<dt><strong><a name="sec" class="item"><strong>--suspend</strong> <em>SEC</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="suspend_sec" class="item"><strong>--suspend</strong> <em>SEC</em></a></strong></dt>
 
-<dt><strong><strong>-s</strong> <em>SEC</em> (beta testing)</strong></dt>
+<dt><strong><a name="s_sec" class="item"><strong>-s</strong> <em>SEC</em></a></strong></dt>
 
 <dd>
 <p>Suspend time. Suspend the command this many seconds when the max load
 average is reached.</p>
 </dd>
-<dt><strong><strong>--recheck</strong> <em>SEC</em> (beta testing)</strong></dt>
+<dt><strong><a name="recheck_sec" class="item"><strong>--recheck</strong> <em>SEC</em></a></strong></dt>
 
-<dt><strong><strong>-t</strong> <em>SEC</em> (beta testing)</strong></dt>
+<dt><strong><a name="t_sec" class="item"><strong>-t</strong> <em>SEC</em></a></strong></dt>
 
 <dd>
 <p>Recheck load time. Sleep SEC seconds before checking load
 again. Default is 1 second.</p>
 </dd>
-<dt><strong><a name="verbose" class="item"><strong>--verbose</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="verbose" class="item"><strong>--verbose</strong></a></strong></dt>
 
-<dt><strong><a name="v" class="item"><strong>-v</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="v" class="item"><strong>-v</strong></a></strong></dt>
 
 <dd>
 <p>Verbose. Print some extra output on what is happening. Use <strong>-v</strong> until

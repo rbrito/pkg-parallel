@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "SQL 1"
-.TH SQL 1 "2011-08-22" "20110822" "parallel"
+.TH SQL 1 "2012-02-22" "20120222" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -200,6 +200,17 @@ Print a summary of the options to \s-1GNU\s0 \fBsql\fR and exit.
 .IX Item "--listproc"
 .PD
 Show the list of running queries.
+.IP "\fB\-\-show\-databases\fR" 9
+.IX Item "--show-databases"
+.PD 0
+.IP "\fB\-\-showdbs\fR" 9
+.IX Item "--showdbs"
+.IP "\fB\-\-list\-databases\fR" 9
+.IX Item "--list-databases"
+.IP "\fB\-\-listdbs\fR" 9
+.IX Item "--listdbs"
+.PD
+List the databases (table spaces) in the database.
 .IP "\fB\-\-show\-tables\fR" 9
 .IX Item "--show-tables"
 .PD 0
@@ -208,7 +219,7 @@ Show the list of running queries.
 .IP "\fB\-\-table\-list\fR" 9
 .IX Item "--table-list"
 .PD
-List the tables in the database
+List the tables in the database.
 .IP "\fB\-\-noheaders\fR" 9
 .IX Item "--noheaders"
 .PD 0
@@ -408,6 +419,11 @@ List the running processes:
 \&\s-1GNU\s0 \fBsql\fR is part of \s-1GNU\s0 \fBparallel\fR. Report bugs to <bug\-parallel@gnu.org>.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
+When using \s-1GNU\s0 \fBsql\fR for a publication please cite:
+.PP
+O. Tange (2011): \s-1GNU\s0 \s-1SQL\s0 \- A Command Line Tool for Accessing Different
+Databases Using DBURLs, ;login: The \s-1USENIX\s0 Magazine, April 2011:29\-32.
+.PP
 Copyright (C) 2008,2009,2010 Ole Tange http://ole.tange.dk
 .PP
 Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
