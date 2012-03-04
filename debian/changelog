@@ -1,11 +1,11 @@
-parallel (20120222-1~1.gbpd871a7) UNRELEASED; urgency=low
-
-  ** SNAPSHOT build @d871a7bf825d80dce113257f031e3cf430cc3083 **
+parallel (20120222-1) unstable; urgency=low
 
   * [94a10e6] debian/control: Add VCS-* fields.
   * [1f18132] Imported Upstream version 20120222
+  * [b24d39b] debian/control: Update Std-Version to 3.9.3. No other changes.
+  * [3427643] debian/copyright: Rework completely to Copyright-Format 1.0.
 
- -- Rogério Brito <rbrito@ime.usp.br>  Sun, 04 Mar 2012 18:25:17 -0300
+ -- Rogério Brito <rbrito@ime.usp.br>  Sun, 04 Mar 2012 18:40:33 -0300
 
 parallel (20110822-1) unstable; urgency=low
 
