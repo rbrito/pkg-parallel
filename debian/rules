@@ -11,4 +11,4 @@ override_dh_auto_install:
 
 override_dh_install:
 	dh_install
-	install -m 644 debian/parallel.config debian/parallel/etc/parallel/config
+	install -m 644 debian/parallel.config-file debian/parallel/etc/parallel/config
