@@ -5,5 +5,10 @@
 override_dh_installchangelogs:
 	dh_installchangelogs NEWS
 
+
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp
+
+override_dh_install:
+	dh_install
+	install -m 644 debian/parallel.config debian/parallel/etc/parallel/config
