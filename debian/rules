@@ -10,5 +10,5 @@ override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp
 
 override_dh_install:
-	dh_install
+	dh_install --list-missing
 	install -m 644 debian/parallel.config-file debian/parallel/etc/parallel/config
