@@ -20,7 +20,7 @@ B<#!/usr/bin/parallel> --shebang [options] [I<command> [arguments]]
 =head1 DESCRIPTION
 
 GNU B<parallel> is a shell tool for executing jobs in parallel using
-one or more computers. A job is can be a single command or a small
+one or more computers. A job can be a single command or a small
 script that has to be run for each of the lines in the input. The
 typical input is a list of files, a list of hosts, a list of users, a
 list of URLs, or a list of tables. A job can also be a command that
@@ -63,8 +63,9 @@ Command to execute.  If I<command> or the following arguments contain
 replacement strings (such as B<{}>) every instance will be substituted
 with the input.
 
-If I<command> is given, GNU B<parallel> will behave similar to B<xargs>. If
-I<command> is not given GNU B<parallel> will behave similar to B<cat | sh>.
+If I<command> is given, GNU B<parallel> solve the same tasks as
+B<xargs>. If I<command> is not given GNU B<parallel> will behave
+similar to B<cat | sh>.
 
 The I<command> must be an executable, a script, a composed command, or
 a function. If it is a function you need to B<export -f> the function
@@ -178,6 +179,18 @@ This positional replacement string will be replaced by the input from
 input source I<n> (when used with B<-a> or B<::::>) or with the
 I<n>'th argument (when used with B<-N>). The input will have the
 directory (if any) removed.
+
+To understand positional replacement strings see B<{>I<n>B<}>.
+
+
+=item B<{>I<n>//B<}>
+
+Dirname of argument from input source I<n> or the I<n>'th argument.
+It is a combination of B<{>I<n>B<}> and B<{//}>.
+
+This positional replacement string will be replaced by the dir of the
+input from input source I<n> (when used with B<-a> or B<::::>) or with
+the I<n>'th argument (when used with B<-N>). See B<dirname>(1).
 
 To understand positional replacement strings see B<{>I<n>B<}>.
 
@@ -500,7 +513,7 @@ status will be the exit status from the failing job.
 =back
 
 
-=item B<--header> I<regexp> (beta  testing)
+=item B<--header> I<regexp>
 
 Use upto regexp as header. For normal usage the matched header
 (typically the first line: B<--header '\n'>) will be split using
@@ -527,7 +540,7 @@ use B<-I> instead.
 
 =item B<--joblog> I<logfile>
 
-Logfile for executed jobs. Saved a list of the executed jobs to
+Logfile for executed jobs. Save a list of the executed jobs to
 I<logfile> in the following TAB separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
 bytes in files transfered, bytes in files returned, exit status,
@@ -562,10 +575,8 @@ If B<--semaphore> is set default is 1 thus making a mutex.
 
 =item B<-P> I<+N>
 
-Add N to the number of CPU cores.  Run this many jobs in parallel. For
-compute intensive jobs B<-j> +0 is useful as it will run
-number-of-cpu-cores jobs simultaneously. See also
-B<--use-cpus-instead-of-cores>.
+Add N to the number of CPU cores.  Run this many jobs in parallel.
+See also B<--use-cpus-instead-of-cores>.
 
 
 =item B<--jobs> I<-N>
@@ -653,11 +664,12 @@ Implies B<-X> unless B<-m> is set.
 
 Do not start new jobs on a given computer unless the load is less than
 I<max-load>. I<max-load> uses the same syntax as B<--jobs>, so I<100%>
-for one per CPU is a valid setting. Only difference is 0 which
-actually means 0.
+for one per CPU is a valid setting. Only difference is 0 which is
+interpreted as 0.01.
 
-The load average is only sampled every 10 seconds to avoid stressing
-small computers.
+The load average is only sampled every 10 seconds using B<uptime> to
+avoid stressing small computers. Only the first (1 minute) load is
+used.
 
 
 =item B<--controlmaster> (experimental)
@@ -827,7 +839,7 @@ important.
 
 =item B<--max-line-length-allowed>
 
-Print the maximal number characters allowed on the command line and
+Print the maximal number of characters allowed on the command line and
 exit (used by GNU B<parallel> itself to determine the line length
 on remote computers).
 
@@ -937,7 +949,7 @@ it to the command.
 Only used with B<--pipe>.
 
 
-=item B<--resume> (beta testing)
+=item B<--resume>
 
 Resumes from the last unfinished job. By reading B<--joblog> GNU
 B<parallel> will figure out the last unfinished job and continue from
@@ -1114,9 +1126,9 @@ B<--sshlogin> is often used with B<--transfer>, B<--return>,
 B<--cleanup>, and B<--trc>.
 
 
-=item B<--sshloginfile> I<filename> (beta testing)
+=item B<--sshloginfile> I<filename>
 
-=item B<--slf> I<filename> (beta testing)
+=item B<--slf> I<filename>
 
 File with sshlogins. The file consists of sshlogins on separate
 lines. Empty lines and lines starting with '#' are ignored. Example:
@@ -1322,9 +1334,9 @@ Use B<-v> B<-v> to print the wrapping ssh command when running remotely.
 Print the version GNU B<parallel> and exit.
 
 
-=item B<--workdir> I<mydir> (alpha testing)
+=item B<--workdir> I<mydir> (beta testing)
 
-=item B<--wd> I<mydir> (alpha testing)
+=item B<--wd> I<mydir> (beta testing)
 
 Files transferred using B<--transfer> and B<--return> will be relative
 to I<mydir> on remote computers, and the command will be executed in
@@ -2957,10 +2969,10 @@ B<prll> is also a tool for running jobs in parallel. It does not
 support running jobs on remote computers.
 
 B<prll> encourages using BASH aliases and BASH functions instead of
-scripts. GNU B<parallel> will never support running aliases and
-functions (see why
-http://www.perlmonks.org/index.pl?node_id=484296). However, scripts or
-composed commands work just fine.
+scripts. GNU B<parallel> will never support running aliases (see why
+http://www.perlmonks.org/index.pl?node_id=484296). However, scripts,
+composed commands, or functions exported with B<export -f> work just
+fine.
 
 B<prll> generates a lot of status information on stderr (standard
 error) which makes it harder to use the stderr (standard error) output
@@ -3101,9 +3113,10 @@ using GNU B<parallel>:
 
 ClusterSSH solves a different problem than GNU B<parallel>.
 
-ClusterSSH runs the same command with the same arguments on a list of
-computers - one per computer. This is typically used for administrating
-several computers that are almost identical.
+ClusterSSH opens a terminal window for each computer and using a
+master window you can run the same command on all the computers. This
+is typically used for administrating several computers that are almost
+identical.
 
 GNU B<parallel> runs the same (or different) commands with different
 arguments in parallel possibly using remote computers to help
@@ -3113,7 +3126,7 @@ computer has 8 cores).
 
 GNU B<parallel> can be used as a poor-man's version of ClusterSSH:
 
-B<cat hostlist | parallel ssh {} do_stuff>
+B<parallel --nonall -S server-a,server-b do_stuff foo bar>
 
 
 =head1 BUGS
@@ -3133,23 +3146,63 @@ echo 1,2,3 | parallel -vkd, "echo 'a'{}'b'"
 echo 1,2,3 | parallel -vkd, "echo 'a'"{}"'b'"
 
 
-=head2 Startup speed
+=head2 Speed
 
-GNU B<parallel> is slow at starting up. Half of the startup time on
-the local computer is spent finding the maximal length of a command
+=head3 Startup
+
+GNU B<parallel> is slow at starting up - around 250 ms. Half of the
+startup time is spent finding the maximal length of a command
 line. Setting B<-s> will remove this part of the startup time.
+
+=head3 Job startup
+
+Starting a job on the local machine takes around 3 ms. This can be a
+big overhead if the job takes very few ms to run. Often you can group
+small jobs together using B<-X> which will make the overhead less
+significant.
+
+Using B<--ungroup> the 3 ms can be lowered to around 2 ms.
+
+=head3 SSH
 
 When using multiple computers GNU B<parallel> opens B<ssh> connections
 to them to figure out how many connections can be used reliably
 simultaneously (Namely SSHD's MaxStartup). This test is done for each
-host in serial, so if your --sshloginfile contains many hosts it may
+host in serial, so if your B<--sshloginfile> contains many hosts it may
 be slow.
+
+If your jobs are short you may see that there are fewer jobs running
+on the remove systems than expected. This is due to time spent logging
+in and out. B<-M> may help here.
+
+=head3 Disk access
+
+A single disk can normally read data faster if it reads one file at a
+time instead of reading a lot of files in parallel, as this will avoid
+disk seeks. However, newer disk systems with multiple drives can read
+faster if reading from multiple files in parallel.
+
+If the jobs are of the form read-all-compute-all-write-all, so
+everything is read before anything is written, it may be faster to
+force only one disk access at the time:
+
+  sem --id diskio cat file | compute | sem --id diskio cat > file
+
+If the jobs are of the form read-compute-write, so writing starts
+before all reading is done, it may be faster to force only one reader
+and writer at the time:
+
+  sem --id read cat file | compute | sem --id write cat > file
+
+If the jobs are of the form read-compute-read-compute, it may be
+faster to run more jobs in parallel than the system has CPUs, as some
+of the jobs will be stuck waiting for disk access.
 
 =head2 --nice limits command length
 
 The current implementation of B<--nice> is too pessimistic in the max
 allowed command length. It only uses a little more than half of what
-it could. This affects -X and -m. If this becomes a real problem for
+it could. This affects B<-X> and B<-m>. If this becomes a real problem for
 you file a bug-report.
 
 =head2 Aliases and functions do not work
@@ -3163,10 +3216,10 @@ or:
 B<open3: exec of by I<command> failed>
 
 it may be because I<command> is not known, but it could also be
-because I<command> is an alias or a function. GNU B<parallel> will
-never support running aliases and functions (see why
-http://www.perlmonks.org/index.pl?node_id=484296), so change your
-alias or function to a script.
+because I<command> is an alias or a function. If it is a function you
+need to B<export -f> the function first. An alias will, however, not
+work (see why http://www.perlmonks.org/index.pl?node_id=484296), so
+change your alias to a script.
 
 
 =head1 REPORTING BUGS
@@ -3188,14 +3241,17 @@ fixed in that version.
 
 A complete example that others can run that shows the problem. A
 combination of B<seq>, B<cat>, B<echo>, and B<sleep> can reproduce
-most errors. If you example requires large files, see if you can use
-make them by something like B<seq 1000000>>B<file>.
+most errors. If your example requires large files, see if you can make
+them by something like B<seq 1000000> > B<file>.
 
 =back
 
 If you suspect the error is dependent on your distribution, please see
-if you can reproduce the error on one of these distibutions:
+if you can reproduce the error on one of these VirtualBox images:
 http://sourceforge.net/projects/virtualboximage/files/
+
+Specifying the name of your distribution is not enough as you may have
+installed software that is not in the VirtualBox images.
 
 
 =head1 AUTHOR

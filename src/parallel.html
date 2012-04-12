@@ -94,7 +94,15 @@
 	<ul>
 
 		<li><a href="#quoting_of_newline">Quoting of newline</a></li>
-		<li><a href="#startup_speed">Startup speed</a></li>
+		<li><a href="#speed">Speed</a></li>
+		<ul>
+
+			<li><a href="#startup">Startup</a></li>
+			<li><a href="#job_startup">Job startup</a></li>
+			<li><a href="#ssh">SSH</a></li>
+			<li><a href="#disk_access">Disk access</a></li>
+		</ul>
+
 		<li><a href="#__nice_limits_command_length">-nice limits command length</a></li>
 		<li><a href="#aliases_and_functions_do_not_work">Aliases and functions do not work</a></li>
 	</ul>
@@ -134,7 +142,7 @@
 <hr />
 <h1><a name="description">DESCRIPTION</a></h1>
 <p>GNU <strong>parallel</strong> is a shell tool for executing jobs in parallel using
-one or more computers. A job is can be a single command or a small
+one or more computers. A job can be a single command or a small
 script that has to be run for each of the lines in the input. The
 typical input is a list of files, a list of hosts, a list of users, a
 list of URLs, or a list of tables. A job can also be a command that
@@ -173,8 +181,9 @@ after the list of options. That will give you an idea of what GNU
 <p>Command to execute.  If <em>command</em> or the following arguments contain
 replacement strings (such as <strong>{}</strong>) every instance will be substituted
 with the input.</p>
-<p>If <em>command</em> is given, GNU <strong>parallel</strong> will behave similar to <strong>xargs</strong>. If
-<em>command</em> is not given GNU <strong>parallel</strong> will behave similar to <strong>cat | sh</strong>.</p>
+<p>If <em>command</em> is given, GNU <strong>parallel</strong> solve the same tasks as
+<strong>xargs</strong>. If <em>command</em> is not given GNU <strong>parallel</strong> will behave
+similar to <strong>cat | sh</strong>.</p>
 <p>The <em>command</em> must be an executable, a script, a composed command, or
 a function. If it is a function you need to <strong>export -f</strong> the function
 first. An alias will, however, not work (see why
@@ -273,7 +282,17 @@ input source <em>n</em> (when used with <strong>-a</strong> or <strong>::::</str
 directory (if any) removed.</p>
 <p>To understand positional replacement strings see <strong>{</strong><em>n</em><strong>}</strong>.</p>
 </dd>
-<dt><strong><a name="n4" class="item"><strong>{</strong><em>n</em>/.<strong>}</strong></a></strong></dt>
+<dt><strong><a name="n4" class="item"><strong>{</strong><em>n</em>//<strong>}</strong></a></strong></dt>
+
+<dd>
+<p>Dirname of argument from input source <em>n</em> or the <em>n</em>'th argument.
+It is a combination of <strong>{</strong><em>n</em><strong>}</strong> and <strong>{//}</strong>.</p>
+<p>This positional replacement string will be replaced by the dir of the
+input from input source <em>n</em> (when used with <strong>-a</strong> or <strong>::::</strong>) or with
+the <em>n</em>'th argument (when used with <strong>-N</strong>). See <strong>dirname</strong>(1).</p>
+<p>To understand positional replacement strings see <strong>{</strong><em>n</em><strong>}</strong>.</p>
+</dd>
+<dt><strong><a name="n5" class="item"><strong>{</strong><em>n</em>/.<strong>}</strong></a></strong></dt>
 
 <dd>
 <p>Basename of argument from input source <em>n</em> or the <em>n</em>'th argument
@@ -561,7 +580,7 @@ status will be the exit status from the failing job.</p>
 </li>
 </ol>
 </dd>
-<dt><strong><a name="regexp" class="item"><strong>--header</strong> <em>regexp</em> (beta  testing)</a></strong></dt>
+<dt><strong><a name="header_regexp" class="item"><strong>--header</strong> <em>regexp</em></a></strong></dt>
 
 <dd>
 <p>Use upto regexp as header. For normal usage the matched header
@@ -588,7 +607,7 @@ use <strong>-I</strong> instead.</p>
 <dt><strong><a name="joblog_logfile" class="item"><strong>--joblog</strong> <em>logfile</em></a></strong></dt>
 
 <dd>
-<p>Logfile for executed jobs. Saved a list of the executed jobs to
+<p>Logfile for executed jobs. Save a list of the executed jobs to
 <em>logfile</em> in the following TAB separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
 bytes in files transfered, bytes in files returned, exit status,
@@ -619,10 +638,8 @@ possible. Default is 100% which will run one job per CPU core.</p>
 <dt><strong><a name="p_n2" class="item"><strong>-P</strong> <em>+N</em></a></strong></dt>
 
 <dd>
-<p>Add N to the number of CPU cores.  Run this many jobs in parallel. For
-compute intensive jobs <strong>-j</strong> +0 is useful as it will run
-number-of-cpu-cores jobs simultaneously. See also
-<strong>--use-cpus-instead-of-cores</strong>.</p>
+<p>Add N to the number of CPU cores.  Run this many jobs in parallel.
+See also <strong>--use-cpus-instead-of-cores</strong>.</p>
 </dd>
 <dt><strong><a name="jobs_n3" class="item"><strong>--jobs</strong> <em>-N</em></a></strong></dt>
 
@@ -707,10 +724,11 @@ The <strong>-l</strong> option is deprecated since the POSIX standard specifies
 <dd>
 <p>Do not start new jobs on a given computer unless the load is less than
 <em>max-load</em>. <em>max-load</em> uses the same syntax as <strong>--jobs</strong>, so <em>100%</em>
-for one per CPU is a valid setting. Only difference is 0 which
-actually means 0.</p>
-<p>The load average is only sampled every 10 seconds to avoid stressing
-small computers.</p>
+for one per CPU is a valid setting. Only difference is 0 which is
+interpreted as 0.01.</p>
+<p>The load average is only sampled every 10 seconds using <strong>uptime</strong> to
+avoid stressing small computers. Only the first (1 minute) load is
+used.</p>
 </dd>
 <dt><strong><a name="controlmaster" class="item"><strong>--controlmaster</strong> (experimental)</a></strong></dt>
 
@@ -856,7 +874,7 @@ important.</p>
 <dt><strong><a name="max_line_length_allowed" class="item"><strong>--max-line-length-allowed</strong></a></strong></dt>
 
 <dd>
-<p>Print the maximal number characters allowed on the command line and
+<p>Print the maximal number of characters allowed on the command line and
 exit (used by GNU <strong>parallel</strong> itself to determine the line length
 on remote computers).</p>
 </dd>
@@ -938,7 +956,7 @@ defaults to '\n'. To have no record separator use <strong>--recend &quot;&quot;<
 <p>Use <strong>--regexp</strong> to interpret <strong>--recstart</strong> and <strong>--recend</strong> as regular
 expressions. This is slow, however.</p>
 </dd>
-<dt><strong><strong>--regexp</strong></strong></dt>
+<dt><strong><a name="regexp" class="item"><strong>--regexp</strong></a></strong></dt>
 
 <dd>
 <p>Use <strong>--regexp</strong> to interpret <strong>--recstart</strong> and <strong>--recend</strong> as regular
@@ -955,7 +973,7 @@ expressions. This is slow, however.</p>
 it to the command.</p>
 <p>Only used with <strong>--pipe</strong>.</p>
 </dd>
-<dt><strong><a name="resume" class="item"><strong>--resume</strong> (beta testing)</a></strong></dt>
+<dt><strong><a name="resume" class="item"><strong>--resume</strong></a></strong></dt>
 
 <dd>
 <p>Resumes from the last unfinished job. By reading <strong>--joblog</strong> GNU
@@ -1104,9 +1122,9 @@ the options multiple times.</p>
 <p><strong>--sshlogin</strong> is often used with <strong>--transfer</strong>, <strong>--return</strong>,
 <strong>--cleanup</strong>, and <strong>--trc</strong>.</p>
 </dd>
-<dt><strong><a name="filename" class="item"><strong>--sshloginfile</strong> <em>filename</em> (beta testing)</a></strong></dt>
+<dt><strong><a name="sshloginfile_filename" class="item"><strong>--sshloginfile</strong> <em>filename</em></a></strong></dt>
 
-<dt><strong><strong>--slf</strong> <em>filename</em> (beta testing)</strong></dt>
+<dt><strong><a name="slf_filename" class="item"><strong>--slf</strong> <em>filename</em></a></strong></dt>
 
 <dd>
 <p>File with sshlogins. The file consists of sshlogins on separate
@@ -1299,9 +1317,9 @@ with <strong>--silent</strong>. See also <strong>-t</strong>.</p>
 <dd>
 <p>Print the version GNU <strong>parallel</strong> and exit.</p>
 </dd>
-<dt><strong><a name="mydir" class="item"><strong>--workdir</strong> <em>mydir</em> (alpha testing)</a></strong></dt>
+<dt><strong><a name="mydir" class="item"><strong>--workdir</strong> <em>mydir</em> (beta testing)</a></strong></dt>
 
-<dt><strong><strong>--wd</strong> <em>mydir</em> (alpha testing)</strong></dt>
+<dt><strong><strong>--wd</strong> <em>mydir</em> (beta testing)</strong></dt>
 
 <dd>
 <p>Files transferred using <strong>--transfer</strong> and <strong>--return</strong> will be relative
@@ -2556,10 +2574,10 @@ echo tar cf /backup/myhome.tar /home/me &gt;&gt; /var/run/my_named_pipe</p>
 <p><strong>prll</strong> is also a tool for running jobs in parallel. It does not
 support running jobs on remote computers.</p>
 <p><strong>prll</strong> encourages using BASH aliases and BASH functions instead of
-scripts. GNU <strong>parallel</strong> will never support running aliases and
-functions (see why
-<a href="http://www.perlmonks.org/index.pl?node_id=484296).">http://www.perlmonks.org/index.pl?node_id=484296).</a> However, scripts or
-composed commands work just fine.</p>
+scripts. GNU <strong>parallel</strong> will never support running aliases (see why
+<a href="http://www.perlmonks.org/index.pl?node_id=484296).">http://www.perlmonks.org/index.pl?node_id=484296).</a> However, scripts,
+composed commands, or functions exported with <strong>export -f</strong> work just
+fine.</p>
 <p><strong>prll</strong> generates a lot of status information on stderr (standard
 error) which makes it harder to use the stderr (standard error) output
 of the job directly as input for another program.</p>
@@ -2664,16 +2682,17 @@ using GNU <strong>parallel</strong>:</p>
 </p>
 <h2><a name="differences_between_clusterssh_and_gnu_parallel">DIFFERENCES BETWEEN ClusterSSH AND GNU Parallel</a></h2>
 <p>ClusterSSH solves a different problem than GNU <strong>parallel</strong>.</p>
-<p>ClusterSSH runs the same command with the same arguments on a list of
-computers - one per computer. This is typically used for administrating
-several computers that are almost identical.</p>
+<p>ClusterSSH opens a terminal window for each computer and using a
+master window you can run the same command on all the computers. This
+is typically used for administrating several computers that are almost
+identical.</p>
 <p>GNU <strong>parallel</strong> runs the same (or different) commands with different
 arguments in parallel possibly using remote computers to help
 computing. If more than one computer is listed in <strong>-S</strong> GNU <strong>parallel</strong> may
 only use one of these (e.g. if there are 8 jobs to be run and one
 computer has 8 cores).</p>
 <p>GNU <strong>parallel</strong> can be used as a poor-man's version of ClusterSSH:</p>
-<p><strong>cat hostlist | parallel ssh {} do_stuff</strong></p>
+<p><strong>parallel --nonall -S server-a,server-b do_stuff foo bar</strong></p>
 <p>
 </p>
 <hr />
@@ -2689,21 +2708,58 @@ computer has 8 cores).</p>
 <p>echo 1,2,3 | parallel -vkd, &quot;echo 'a'&quot;{}&quot;'b'&quot;</p>
 <p>
 </p>
-<h2><a name="startup_speed">Startup speed</a></h2>
-<p>GNU <strong>parallel</strong> is slow at starting up. Half of the startup time on
-the local computer is spent finding the maximal length of a command
+<h2><a name="speed">Speed</a></h2>
+<p>
+</p>
+<h3><a name="startup">Startup</a></h3>
+<p>GNU <strong>parallel</strong> is slow at starting up - around 250 ms. Half of the
+startup time is spent finding the maximal length of a command
 line. Setting <strong>-s</strong> will remove this part of the startup time.</p>
+<p>
+</p>
+<h3><a name="job_startup">Job startup</a></h3>
+<p>Starting a job on the local machine takes around 3 ms. This can be a
+big overhead if the job takes very few ms to run. Often you can group
+small jobs together using <strong>-X</strong> which will make the overhead less
+significant.</p>
+<p>Using <strong>--ungroup</strong> the 3 ms can be lowered to around 2 ms.</p>
+<p>
+</p>
+<h3><a name="ssh">SSH</a></h3>
 <p>When using multiple computers GNU <strong>parallel</strong> opens <strong>ssh</strong> connections
 to them to figure out how many connections can be used reliably
 simultaneously (Namely SSHD's MaxStartup). This test is done for each
-host in serial, so if your --sshloginfile contains many hosts it may
+host in serial, so if your <strong>--sshloginfile</strong> contains many hosts it may
 be slow.</p>
+<p>If your jobs are short you may see that there are fewer jobs running
+on the remove systems than expected. This is due to time spent logging
+in and out. <strong>-M</strong> may help here.</p>
+<p>
+</p>
+<h3><a name="disk_access">Disk access</a></h3>
+<p>A single disk can normally read data faster if it reads one file at a
+time instead of reading a lot of files in parallel, as this will avoid
+disk seeks. However, newer disk systems with multiple drives can read
+faster if reading from multiple files in parallel.</p>
+<p>If the jobs are of the form read-all-compute-all-write-all, so
+everything is read before anything is written, it may be faster to
+force only one disk access at the time:</p>
+<pre>
+  sem --id diskio cat file | compute | sem --id diskio cat &gt; file</pre>
+<p>If the jobs are of the form read-compute-write, so writing starts
+before all reading is done, it may be faster to force only one reader
+and writer at the time:</p>
+<pre>
+  sem --id read cat file | compute | sem --id write cat &gt; file</pre>
+<p>If the jobs are of the form read-compute-read-compute, it may be
+faster to run more jobs in parallel than the system has CPUs, as some
+of the jobs will be stuck waiting for disk access.</p>
 <p>
 </p>
 <h2><a name="__nice_limits_command_length">--nice limits command length</a></h2>
 <p>The current implementation of <strong>--nice</strong> is too pessimistic in the max
 allowed command length. It only uses a little more than half of what
-it could. This affects -X and -m. If this becomes a real problem for
+it could. This affects <strong>-X</strong> and <strong>-m</strong>. If this becomes a real problem for
 you file a bug-report.</p>
 <p>
 </p>
@@ -2713,10 +2769,10 @@ you file a bug-report.</p>
 <p>or:</p>
 <p><strong>open3: exec of by <em>command</em> failed</strong></p>
 <p>it may be because <em>command</em> is not known, but it could also be
-because <em>command</em> is an alias or a function. GNU <strong>parallel</strong> will
-never support running aliases and functions (see why
-<a href="http://www.perlmonks.org/index.pl?node_id=484296),">http://www.perlmonks.org/index.pl?node_id=484296),</a> so change your
-alias or function to a script.</p>
+because <em>command</em> is an alias or a function. If it is a function you
+need to <strong>export -f</strong> the function first. An alias will, however, not
+work (see why <a href="http://www.perlmonks.org/index.pl?node_id=484296),">http://www.perlmonks.org/index.pl?node_id=484296),</a> so
+change your alias to a script.</p>
 <p>
 </p>
 <hr />
@@ -2733,13 +2789,15 @@ fixed in that version.</p>
 <li>
 <p>A complete example that others can run that shows the problem. A
 combination of <strong>seq</strong>, <strong>cat</strong>, <strong>echo</strong>, and <strong>sleep</strong> can reproduce
-most errors. If you example requires large files, see if you can use
-make them by something like <strong>seq 1000000</strong>&gt;<strong>file</strong>.</p>
+most errors. If your example requires large files, see if you can make
+them by something like <strong>seq 1000000</strong> &gt; <strong>file</strong>.</p>
 </li>
 </ul>
 <p>If you suspect the error is dependent on your distribution, please see
-if you can reproduce the error on one of these distibutions:
+if you can reproduce the error on one of these VirtualBox images:
 <a href="http://sourceforge.net/projects/virtualboximage/files/">http://sourceforge.net/projects/virtualboximage/files/</a></p>
+<p>Specifying the name of your distribution is not enough as you may have
+installed software that is not in the VirtualBox images.</p>
 <p>
 </p>
 <hr />

@@ -29,7 +29,7 @@ parallel - build and execute shell command lines from standard input in parallel
 @anchor{DESCRIPTION}
 
 GNU @strong{parallel} is a shell tool for executing jobs in parallel using
-one or more computers. A job is can be a single command or a small
+one or more computers. A job can be a single command or a small
 script that has to be run for each of the lines in the input. The
 typical input is a list of files, a list of hosts, a list of users, a
 list of URLs, or a list of tables. A job can also be a command that
@@ -74,8 +74,9 @@ Command to execute.  If @emph{command} or the following arguments contain
 replacement strings (such as @strong{@{@}}) every instance will be substituted
 with the input.
 
-If @emph{command} is given, GNU @strong{parallel} will behave similar to @strong{xargs}. If
-@emph{command} is not given GNU @strong{parallel} will behave similar to @strong{cat | sh}.
+If @emph{command} is given, GNU @strong{parallel} solve the same tasks as
+@strong{xargs}. If @emph{command} is not given GNU @strong{parallel} will behave
+similar to @strong{cat | sh}.
 
 The @emph{command} must be an executable, a script, a composed command, or
 a function. If it is a function you need to @strong{export -f} the function
@@ -189,6 +190,18 @@ This positional replacement string will be replaced by the input from
 input source @emph{n} (when used with @strong{-a} or @strong{::::}) or with the
 @emph{n}'th argument (when used with @strong{-N}). The input will have the
 directory (if any) removed.
+
+To understand positional replacement strings see @strong{@{}@emph{n}@strong{@}}.
+
+@item @strong{@{}@emph{n}//@strong{@}}
+@anchor{@strong{@{}@emph{n}//@strong{@}}}
+
+Dirname of argument from input source @emph{n} or the @emph{n}'th argument.
+It is a combination of @strong{@{}@emph{n}@strong{@}} and @strong{@{//@}}.
+
+This positional replacement string will be replaced by the dir of the
+input from input source @emph{n} (when used with @strong{-a} or @strong{::::}) or with
+the @emph{n}'th argument (when used with @strong{-N}). See @strong{dirname}(1).
 
 To understand positional replacement strings see @strong{@{}@emph{n}@strong{@}}.
 
@@ -531,8 +544,8 @@ status will be the exit status from the failing job.
 
 @end table
 
-@item @strong{--header} @emph{regexp} (beta  testing)
-@anchor{@strong{--header} @emph{regexp} (beta  testing)}
+@item @strong{--header} @emph{regexp}
+@anchor{@strong{--header} @emph{regexp}}
 
 Use upto regexp as header. For normal usage the matched header
 (typically the first line: @strong{--header '\n'}) will be split using
@@ -560,7 +573,7 @@ use @strong{-I} instead.
 @item @strong{--joblog} @emph{logfile}
 @anchor{@strong{--joblog} @emph{logfile}}
 
-Logfile for executed jobs. Saved a list of the executed jobs to
+Logfile for executed jobs. Save a list of the executed jobs to
 @emph{logfile} in the following TAB separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
 bytes in files transfered, bytes in files returned, exit status,
@@ -601,10 +614,8 @@ If @strong{--semaphore} is set default is 1 thus making a mutex.
 @item @strong{-P} @emph{+N}
 @anchor{@strong{-P} @emph{+N}}
 
-Add N to the number of CPU cores.  Run this many jobs in parallel. For
-compute intensive jobs @strong{-j} +0 is useful as it will run
-number-of-cpu-cores jobs simultaneously. See also
-@strong{--use-cpus-instead-of-cores}.
+Add N to the number of CPU cores.  Run this many jobs in parallel.
+See also @strong{--use-cpus-instead-of-cores}.
 
 @item @strong{--jobs} @emph{-N}
 @anchor{@strong{--jobs} @emph{-N}}
@@ -706,11 +717,12 @@ Implies @strong{-X} unless @strong{-m} is set.
 
 Do not start new jobs on a given computer unless the load is less than
 @emph{max-load}. @emph{max-load} uses the same syntax as @strong{--jobs}, so @emph{100%}
-for one per CPU is a valid setting. Only difference is 0 which
-actually means 0.
+for one per CPU is a valid setting. Only difference is 0 which is
+interpreted as 0.01.
 
-The load average is only sampled every 10 seconds to avoid stressing
-small computers.
+The load average is only sampled every 10 seconds using @strong{uptime} to
+avoid stressing small computers. Only the first (1 minute) load is
+used.
 
 @item @strong{--controlmaster} (experimental)
 @anchor{@strong{--controlmaster} (experimental)}
@@ -886,7 +898,7 @@ important.
 @item @strong{--max-line-length-allowed}
 @anchor{@strong{--max-line-length-allowed}}
 
-Print the maximal number characters allowed on the command line and
+Print the maximal number of characters allowed on the command line and
 exit (used by GNU @strong{parallel} itself to determine the line length
 on remote computers).
 
@@ -1002,8 +1014,8 @@ it to the command.
 
 Only used with @strong{--pipe}.
 
-@item @strong{--resume} (beta testing)
-@anchor{@strong{--resume} (beta testing)}
+@item @strong{--resume}
+@anchor{@strong{--resume}}
 
 Resumes from the last unfinished job. By reading @strong{--joblog} GNU
 @strong{parallel} will figure out the last unfinished job and continue from
@@ -1190,11 +1202,11 @@ The remote host must have GNU @strong{parallel} installed.
 @strong{--sshlogin} is often used with @strong{--transfer}, @strong{--return},
 @strong{--cleanup}, and @strong{--trc}.
 
-@item @strong{--sshloginfile} @emph{filename} (beta testing)
-@anchor{@strong{--sshloginfile} @emph{filename} (beta testing)}
+@item @strong{--sshloginfile} @emph{filename}
+@anchor{@strong{--sshloginfile} @emph{filename}}
 
-@item @strong{--slf} @emph{filename} (beta testing)
-@anchor{@strong{--slf} @emph{filename} (beta testing)}
+@item @strong{--slf} @emph{filename}
+@anchor{@strong{--slf} @emph{filename}}
 
 File with sshlogins. The file consists of sshlogins on separate
 lines. Empty lines and lines starting with '#' are ignored. Example:
@@ -1413,11 +1425,11 @@ Use @strong{-v} @strong{-v} to print the wrapping ssh command when running remot
 
 Print the version GNU @strong{parallel} and exit.
 
-@item @strong{--workdir} @emph{mydir} (alpha testing)
-@anchor{@strong{--workdir} @emph{mydir} (alpha testing)}
+@item @strong{--workdir} @emph{mydir} (beta testing)
+@anchor{@strong{--workdir} @emph{mydir} (beta testing)}
 
-@item @strong{--wd} @emph{mydir} (alpha testing)
-@anchor{@strong{--wd} @emph{mydir} (alpha testing)}
+@item @strong{--wd} @emph{mydir} (beta testing)
+@anchor{@strong{--wd} @emph{mydir} (beta testing)}
 
 Files transferred using @strong{--transfer} and @strong{--return} will be relative
 to @emph{mydir} on remote computers, and the command will be executed in
@@ -3148,10 +3160,10 @@ echo tar cf /backup/myhome.tar /home/me >> /var/run/my_named_pipe
 support running jobs on remote computers.
 
 @strong{prll} encourages using BASH aliases and BASH functions instead of
-scripts. GNU @strong{parallel} will never support running aliases and
-functions (see why
-http://www.perlmonks.org/index.pl?node_id=484296). However, scripts or
-composed commands work just fine.
+scripts. GNU @strong{parallel} will never support running aliases (see why
+http://www.perlmonks.org/index.pl?node_id=484296). However, scripts,
+composed commands, or functions exported with @strong{export -f} work just
+fine.
 
 @strong{prll} generates a lot of status information on stderr (standard
 error) which makes it harder to use the stderr (standard error) output
@@ -3305,9 +3317,10 @@ using GNU @strong{parallel}:
 
 ClusterSSH solves a different problem than GNU @strong{parallel}.
 
-ClusterSSH runs the same command with the same arguments on a list of
-computers - one per computer. This is typically used for administrating
-several computers that are almost identical.
+ClusterSSH opens a terminal window for each computer and using a
+master window you can run the same command on all the computers. This
+is typically used for administrating several computers that are almost
+identical.
 
 GNU @strong{parallel} runs the same (or different) commands with different
 arguments in parallel possibly using remote computers to help
@@ -3317,7 +3330,7 @@ computer has 8 cores).
 
 GNU @strong{parallel} can be used as a poor-man's version of ClusterSSH:
 
-@strong{cat hostlist | parallel ssh @{@} do_stuff}
+@strong{parallel --nonall -S server-a,server-b do_stuff foo bar}
 
 @chapter BUGS
 @anchor{BUGS}
@@ -3337,25 +3350,73 @@ echo 1,2,3 | parallel -vkd, "echo 'a'@{@}'b'"
 
 echo 1,2,3 | parallel -vkd, "echo 'a'"@{@}"'b'"
 
-@section Startup speed
-@anchor{Startup speed}
+@section Speed
+@anchor{Speed}
 
-GNU @strong{parallel} is slow at starting up. Half of the startup time on
-the local computer is spent finding the maximal length of a command
+@subsection Startup
+@anchor{Startup}
+
+GNU @strong{parallel} is slow at starting up - around 250 ms. Half of the
+startup time is spent finding the maximal length of a command
 line. Setting @strong{-s} will remove this part of the startup time.
+
+@subsection Job startup
+@anchor{Job startup}
+
+Starting a job on the local machine takes around 3 ms. This can be a
+big overhead if the job takes very few ms to run. Often you can group
+small jobs together using @strong{-X} which will make the overhead less
+significant.
+
+Using @strong{--ungroup} the 3 ms can be lowered to around 2 ms.
+
+@subsection SSH
+@anchor{SSH}
 
 When using multiple computers GNU @strong{parallel} opens @strong{ssh} connections
 to them to figure out how many connections can be used reliably
 simultaneously (Namely SSHD's MaxStartup). This test is done for each
-host in serial, so if your --sshloginfile contains many hosts it may
+host in serial, so if your @strong{--sshloginfile} contains many hosts it may
 be slow.
+
+If your jobs are short you may see that there are fewer jobs running
+on the remove systems than expected. This is due to time spent logging
+in and out. @strong{-M} may help here.
+
+@subsection Disk access
+@anchor{Disk access}
+
+A single disk can normally read data faster if it reads one file at a
+time instead of reading a lot of files in parallel, as this will avoid
+disk seeks. However, newer disk systems with multiple drives can read
+faster if reading from multiple files in parallel.
+
+If the jobs are of the form read-all-compute-all-write-all, so
+everything is read before anything is written, it may be faster to
+force only one disk access at the time:
+
+@verbatim
+  sem --id diskio cat file | compute | sem --id diskio cat > file
+@end verbatim
+
+If the jobs are of the form read-compute-write, so writing starts
+before all reading is done, it may be faster to force only one reader
+and writer at the time:
+
+@verbatim
+  sem --id read cat file | compute | sem --id write cat > file
+@end verbatim
+
+If the jobs are of the form read-compute-read-compute, it may be
+faster to run more jobs in parallel than the system has CPUs, as some
+of the jobs will be stuck waiting for disk access.
 
 @section --nice limits command length
 @anchor{--nice limits command length}
 
 The current implementation of @strong{--nice} is too pessimistic in the max
 allowed command length. It only uses a little more than half of what
-it could. This affects -X and -m. If this becomes a real problem for
+it could. This affects @strong{-X} and @strong{-m}. If this becomes a real problem for
 you file a bug-report.
 
 @section Aliases and functions do not work
@@ -3370,10 +3431,10 @@ or:
 @strong{open3: exec of by @emph{command} failed}
 
 it may be because @emph{command} is not known, but it could also be
-because @emph{command} is an alias or a function. GNU @strong{parallel} will
-never support running aliases and functions (see why
-http://www.perlmonks.org/index.pl?node_id=484296), so change your
-alias or function to a script.
+because @emph{command} is an alias or a function. If it is a function you
+need to @strong{export -f} the function first. An alias will, however, not
+work (see why http://www.perlmonks.org/index.pl?node_id=484296), so
+change your alias to a script.
 
 @chapter REPORTING BUGS
 @anchor{REPORTING BUGS}
@@ -3390,14 +3451,17 @@ fixed in that version.
 
 @item A complete example that others can run that shows the problem. A
 combination of @strong{seq}, @strong{cat}, @strong{echo}, and @strong{sleep} can reproduce
-most errors. If you example requires large files, see if you can use
-make them by something like @strong{seq 1000000}>@strong{file}.
+most errors. If your example requires large files, see if you can make
+them by something like @strong{seq 1000000} > @strong{file}.
 
 @end itemize
 
 If you suspect the error is dependent on your distribution, please see
-if you can reproduce the error on one of these distibutions:
+if you can reproduce the error on one of these VirtualBox images:
 http://sourceforge.net/projects/virtualboximage/files/
+
+Specifying the name of your distribution is not enough as you may have
+installed software that is not in the VirtualBox images.
 
 @chapter AUTHOR
 @anchor{AUTHOR}
