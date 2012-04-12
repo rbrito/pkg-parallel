@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "install" ]; then
+    dpkg-divert --package parallel --add --rename \
+                --divert /usr/bin/parallel.moreutils \
+                /usr/bin/parallel
+    dpkg-divert --package parallel --add --rename \
+                --divert /usr/share/man/man1/parallel.moreutils.1.gz \
+                /usr/share/man/man1/parallel.1.gz
+fi
+
+#DEBHELPER#
+
+exit 0

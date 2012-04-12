@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ]; then
+    dpkg-divert --package parallel --remove --rename \
+                --divert /usr/bin/parallel.moreutils \
+                /usr/bin/parallel
+    dpkg-divert --package parallel --remove --rename \
+                --divert /usr/share/man/man1/parallel.moreutils.1.gz \
+                /usr/share/man/man1/parallel.1.gz
+fi
+
+#DEBHELPER#
+
+exit 0
