@@ -3,7 +3,6 @@ Section: utils
 Priority: extra
 Maintainer: Rogério Brito <rbrito@ime.usp.br>
 Uploaders:
- Ole Tange <ole@tange.dk>,
  Ondřej Surý <ondrej@debian.org>
 Build-Depends:
  debhelper (>= 8)
