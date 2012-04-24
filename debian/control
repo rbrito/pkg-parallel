@@ -2,8 +2,11 @@ Source: parallel
 Section: utils
 Priority: extra
 Maintainer: Rogério Brito <rbrito@ime.usp.br>
-Uploaders: Ole Tange <ole@tange.dk>, Ondřej Surý <ondrej@debian.org>
-Build-Depends: debhelper (>= 8)
+Uploaders:
+ Ole Tange <ole@tange.dk>,
+ Ondřej Surý <ondrej@debian.org>
+Build-Depends:
+ debhelper (>= 8)
 Standards-Version: 3.9.3
 Homepage: https://www.gnu.org/software/parallel/
 Vcs-Git: git://git.debian.org/collab-maint/parallel.git
@@ -11,7 +14,10 @@ Vcs-Browser: http://git.debian.org/?p=collab-maint/parallel.git
 
 Package: parallel
 Architecture: all
-Depends: perl-modules, ${misc:Depends}, ${perl:Depends}
+Depends:
+ perl-modules,
+ ${misc:Depends},
+ ${perl:Depends}
 Description: build and execute command lines from standard input in parallel
  GNU Parallel is a shell tool for executing jobs in parallel using one
  or more machines. A job is typically a single command or a small
