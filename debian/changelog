@@ -1,6 +1,6 @@
-parallel (20130622-1~2.gbp0c6728) UNRELEASED; urgency=low
+parallel (20130622-1~3.gbpec08bb) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @0c672811e6bfb46f0f652555f5295f72a11b1662 **
+  ** SNAPSHOT build @ec08bb20b803f8f45a6a4c61f802cfcf99d3674d **
 
   * Imported Upstream version 20130622 (Closes: #697828)
   * debian/watch:
@@ -11,7 +11,10 @@ parallel (20130622-1~2.gbp0c6728) UNRELEASED; urgency=low
     + Use debhelper compat version 9.
   * debian/control:
     + Add Conflicts: against moreutils.
+    + Use canonical URLs for VCS fields.
   * Adjust for removal of config file under /etc/parallel.
+  * debian/patches:
+    + Add patch to fix typo in sql.texi.
 
  -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 05:51:00 -0300
 
