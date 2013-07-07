@@ -1,0 +1,15 @@
+parallel (20130622-1) unstable; urgency=low
+
+  With this release, we make the GNU parallel package have its native
+  behavior by default, that is, the one provided by the `--gnu` command
+  line option.
+
+  This is accomplished by removing the conffile /etc/parallel/config if
+  you have not changed it. Previously, the file contained the sole option
+  `--tollef`, for compatibility with the moreutils package.
+
+  If you made changes to the file, they will be preserved, but be warned
+  that keeping the `--tollef` option is not a recommended mode of
+  execution of GNU parallel.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 18:57:53 -0300
