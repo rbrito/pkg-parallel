@@ -1,6 +1,4 @@
-parallel (20130622-1~4.gbp5648c3) UNRELEASED; urgency=low
-
-  ** SNAPSHOT build @5648c3b5b084cf8cb45b50f09bf1fda1fc508f95 **
+parallel (20130622-1) unstable; urgency=low
 
   * Imported Upstream version 20130622 (Closes: #697828)
   * debian/watch:
@@ -13,10 +11,14 @@ parallel (20130622-1~4.gbp5648c3) UNRELEASED; urgency=low
     + Add Conflicts: against moreutils.
     + Use canonical URLs for VCS fields.
   * Adjust for removal of config file under /etc/parallel.
+    (Closes: #671798, #674698, #688929)
   * debian/patches:
     + Add patch to fix typo in sql.
+  * debian/NEWS:
+    + Add file describing the removal of the configuration file
+      and its implications.
 
- -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 05:51:00 -0300
+ -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 19:07:20 -0300
 
 parallel (20120422-1) unstable; urgency=low
 
