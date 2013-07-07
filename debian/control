@@ -13,6 +13,8 @@ Vcs-Browser: http://git.debian.org/?p=collab-maint/parallel.git
 
 Package: parallel
 Architecture: all
+Conflicts:
+ moreutils
 Depends:
  perl-modules,
  ${misc:Depends},
