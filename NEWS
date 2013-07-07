@@ -1,3 +1,362 @@
+20130622
+
+* --xapply now recycles arguments if an input source has more
+  arguments than others.
+
+* The sleep time between jobs is now both increased and decreased
+  exponentially.
+
+* 10 seconds installation check the signature using GnuPG if GnuPG is
+  installed.
+
+* Developer job asking for GNU Parallel expertise.
+  http://careers.stackoverflow.com/jobs/35562/developer-big-data-geo-and-web-climate-central
+
+* A small utility program to run youtube-dl in parallel.
+  https://github.com/dlh/youtube-dl-parallel
+
+* Parallelizing Freesurfer:
+  http://blog.cogneurostats.com/?p=148
+
+* Bug fixes and man page updates.
+
+
+20130522
+
+* --ctrlc is now default if --pipe is not used; thus making it
+  possible to kill remotely started jobs simply by pressing Ctrl-C.
+
+* --timeout 200% now means kill jobs that take more than twice the
+  time of the median run time of a job.
+
+* Jobs are now distributed round robin when having mulitiple
+  --sshlogin instead of filling up one --sshlogin at a time.
+
+* niceload: darwin version of --io --mem --swap. Thanks to Anders F
+  Björklund.
+
+* Bug fixes and man page updates.
+
+
+20130422
+
+* 10 seconds installation: wget -O - pi.dk/3 | sh
+
+* HPUX CPU/core detection. Thanks to Javier Tarradas.
+
+* CPU detection for HURD, IRIX, SCO OpenServer and (old) HPUX.
+
+* --ctrlc will send SIGINT to tasks running on remote computers and
+  thus killing them.
+
+* --load now uses 'ps' to see immediately see the number of running
+  processes instead of 'uptime' thus making --load react much faster.
+
+* Testing on Centos 3.9 and FreeBSD 7 revealed a lot of compability
+  bugs. Some of these required quite extensive changes making this
+  release beta quality.
+
+*  --retries works with --onall.
+
+* The new --load computation now works on FreeBSD 7.
+
+* --nice works under tcsh.
+
+* GNU Parallel is officially supported in NetBSD.
+  http://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/parallel/parallel/README.html
+
+* GNU Parallel is accepted for openSUSE.
+  http://software.opensuse.org/package/gnu_parallel
+
+* GNU Parallel can be installed under Microsoft Windows (CygWin).
+  http://blogs.msdn.com/b/hpctrekker/archive/2013/03/30/preparing-and-uploading-datasets-for-hdinsight.aspx
+
+* Excuses for not installing GNU Parallel.
+  http://oletange.blogspot.dk/2013/04/why-not-install-gnu-parallel.html
+
+* Job advert that requires GNU Parallel competence.
+  http://versium.com/about/careers/
+
+* Parallelizing Batch Jobs for Fun and Profit.
+  http://mikeseidle.com/tech/programming/2013/03/parallelizing-batch-jobs
+
+* Processing Transcription Start Sites(TSS) for the entire Mouse genome.
+  http://qbrc.swmed.edu/2013/03/gnu-parallel-speeding-up-unix-commands-and-scripts/
+
+* GNU parallel is used throughout Scrimer.
+  http://scrimer.readthedocs.org/en/latest/
+
+* GNU Parallel helped making public documents searchable.
+  http://danpalmer.me/blog/articles/2013-04-06-unlocking-hillsborough.html
+
+* Identifying big movie files (German).
+  http://blackappsolutions.wordpress.com/2013/03/23/wenn-der-plattenplatz-knapp-wird-filme-identifizieren-die-viel-platz-belegen/
+
+* Bug fixes and man page updates.
+
+
+20130222
+
+* --resume works with --pipe.
+
+* --resume-failed will go through --joblog, redo the failed jobs and
+  then continue like --resume.
+
+* Negative positional arguments count from the end: {-1} means the
+  last argument, {-2} the second to last.
+
+* NetBSD CPU detection.
+
+* --blocksize increases exponentially if it smaller than a full
+  record.
+
+* Processing n-line records (--pipe -L n) is now much faster.
+
+* --tollef is obsoleted after discussion on the mailing list.
+
+* GNU Parallel is the highest rated tool on:
+  http://www.biostars.org/show/tools/?sort=votes&since=all%20time
+
+* GNU Parallel was loved during FSFE's #ilovefs campaign.
+  http://fsfe.org/news/2013/news-20130212-01.en.html
+
+* Using GNU Parallel with s3cmd (Japanese).
+  http://blog.suz-lab.com/2013/02/s3cmd-gnu-paralells3.html
+
+* Intro to GNU Parallel (Chinese).
+  http://guiquanz.github.com/2013/02/12/gnu-parallel-intro/
+
+* Bug fixes and man page updates.
+
+
+20130122
+
+* --sshdelay Delay starting next ssh by secs seconds. GNU parallel
+  will pause secs seconds after starting each ssh. secs can be less
+  than 1 seconds.
+
+* Official OpenBSD port:
+  http://ftp.openbsd.org/ports/sysutils/parallel/
+
+* Official DragonFlyBSD package:
+  http://www.mirrorservice.org/sites/ftp.dragonflybsd.org/packages/amd64/DragonFly-3.0.0/stable/parallel/
+
+* Post about niceload in Hungarian:
+  http://commandline.blog.hu/2013/01/02/niceload
+
+* 自炊スキャンデータをKobo Gloに最適化
+  http://interstadial.wordpress.com/2013/01/20/
+
+* GNU parallel+ssh で複数のリモートホストに複数のコマンドを実行させる
+  http://oshiire.to/archives/1686
+
+* Bug fixes and man page updates.
+
+
+20121222
+
+* --shebang-wrap makes is possible to parallelize scripts by putting
+  parallel in the shebang line (the first #! line in scripts).
+
+* --delay puts in a delay after starting each job. Useful to avoid
+  raceconditions and thundering herd problems.
+
+* --results now uses / as separator instead of TAB and thus creates
+  subdirs. Thanks to Drew Frank.
+
+* parallel: OpenBSD CPU detection. Thanks to Michał Markowski.
+
+* niceload --sensor allows for negative numbers to signify a lower
+  number means the limit is lower.
+
+* niceload --prg suspend a named program that is already running.
+
+* niceload multiple --pid suspend process ids that are already running.
+
+* Convertir des images avec find et imagemagick
+  http://roger.b.over-blog.com/article-convertir-des-images-avec-find-et-imagemagick-113416637.html
+
+* Bug fixes and man page updates.
+
+
+20121122
+
+* niceload --sensor makes it possible to use a program to control if a
+  program should be suspended.
+
+* GNU Parallel was part of the justification for Nordic Free Software
+  Award 2012
+  https://fsfe.org/news/2012/news-20121112-01.html
+
+* Dateien schneller packen und konvertieren mit GNU parallel
+  http://www.linux-community.de/Archiv/Tipp-der-Woche/Dateien-schneller-packen-und-konvertieren-mit-GNU-parallel
+
+* Processing images from Lunar Reconnaissance Orbiter Narrow Angle
+  Camera http://lunokhod.org/?p=774
+
+* GNU Parallel is used in types2: Type and Hapax Accumulation Curves
+  http://www.cs.helsinki.fi/u/josuomel/types2/
+
+* GNU Parallel used in: A Hybrid Factor Analysis and Probabilistic
+  PCA-based system for Dictionary Learning and Encoding for Robust
+  Speaker Recognition
+  http://www.superlectures.com/odyssey2012/lecture.php?id=8&lang=en
+  http://www.cse.iitm.ac.in/~mrsri/ppca.pdf
+
+* Mapreduce avec parallel, cat et une redirection
+  http://datacratic.com/site/blog/mapreduce-avec-parallel-cat-et-une-redirection
+
+* GNU Parallel for Large Batches of Small Jobs
+  https://support.scinet.utoronto.ca/wiki/images/7/7b/Tech-talk-gnu-parallel.pdf
+
+* GNU Parallel used in black belt tip (8:50-10:12)
+  https://aws.amazon.com/apac/awspodcast/episode20/
+
+* Bug fixes and man page updates.
+
+
+20121022
+
+* --results structures output files so they can be imported using
+  Pandas (http://pandas.pydata.org/). Useful when doing simulations to
+  select output from some arguments.
+
+* Use --env to transfer environment variables through ssh to remote
+  machines.
+
+* GNU Parallel is accepted for Ubuntu Quantal.
+  http://packages.ubuntu.com/quantal/parallel
+
+* GNU Parallel was requested for OpenSUSE (go vote!)
+  https://features.opensuse.org/314461
+
+* Kneth's Korner: Map/Reduce and GNU Parallel
+  http://kenneth.geisshirt.dk/2012/10/mapreduce-and-gnu-parallel.html
+
+* Blog post in Japanese by Siguniang.
+  https://siguniang.wordpress.com/2012/09/09/notes-on-gnu-parallel-the-command-line-power-tool/
+  (Siguniang mentions the logo is called 'The Cafe Wall Illusion')
+  http://www.michaelbach.de/ot/ang_cafewall/index.html
+
+* GNU Parallel, where have you been all my life?
+  http://ssdigit.nothingisreal.com/2012/09/gnu-parallel-where-have-you-been-all-my.html
+
+* Reference-free ddRADseq analysis tools uses GNU Parallel.
+  https://github.com/brantp/rtd#readme
+
+* When bash just isn’t quick enough.
+  https://soimasysadmin.wordpress.com/2012/08/15/gnu-parallel-when-bash-just-isnt-quick-enough/
+
+* Using GNU Parallel to Package Multiple Jobs in a Single PBS Job.
+  http://www.nas.nasa.gov/hecc/support/kb/Using-GNU-Parallel-to-Package-Multiple-Jobs-in-a-Single-PBS-Job_303.html
+
+* GNU Parallel Notes.
+  http://xed.ch/help/parallel.html
+
+* Bug fixes and man page updates.
+
+
+20120822
+
+* Due to a bugfix the main flow has changed. Making this release beta
+  quality.
+
+* Parallel Proxy Scraper & Checker Tool 
+  https://www.youtube.com/watch?v=iXCeR_XsP6o
+
+* Bug fixes and man page updates.
+
+
+20120722
+
+* GNU Parallel was presented at Chiang Mai Bar Camp
+  http://barcampchiangmai.org/
+  See write up here:
+  http://www.cnx-software.com/2012/07/02/use-gnu-parallel-to-speed-up-script-execution-on-multiple-cores-andor-machines/
+
+* I don't always max out all my CPUs, but when I do, I do it with GNU
+  Parallel.
+  http://memegenerator.net/instance/22638454
+
+* Bug fixes and man page updates.
+
+
+20120622
+
+* '-L n --pipe' will use records of n lines. This is useful when
+  processing data that have fixed records with a fixed number of
+  lines (e.g. fastq).
+
+* --filter-hosts will remove down hosts. For each remote host: check
+  that login through ssh works. If not: do not use this host.
+  Currently you can not put --filter-hosts in a profile, $PARALLEL,
+  /etc/parallel/config or similar. This is because GNU Parallel uses
+  GNU Parallel to compute this, so you will get an infinite loop. This
+  will likely be fixed in a later release.
+
+* --pipe now uses fork() instead of busy wait. The performance should
+  be better on computers with >10 cores while remaining the same on
+  computers with few cores.
+
+* GNU Parallel will be represented at Chiang Mai Bar Camp.
+  http://barcampchiangmai.org/
+
+* Indexing Big Data on Amazon AWS: The Screencast
+  (Check out his T-shirt at 18:40-21:00).
+  http://www.opensourceconnections.com/2012/06/06/indexing-big-data-on-amazon-aws-screencast/
+
+* biotoolbox uses GNU Parallel.
+  https://code.google.com/p/biotoolbox/wiki/Pod_novo_wrapper
+
+* Spiceweasel uses GNU Parallel.
+  https://github.com/mattray/spiceweasel
+
+* GNU Parallel part of The Administrators Challenge.
+  http://challenge.twistedrack.com/questions/qs3.php
+
+* Finding Oldest Firefox Code using GNU Parallel.
+  http://gregoryszorc.com/blog/2012/06/18/finding-oldest-firefox-code/
+
+* Bug fixes (quite a few for remote job running) and man page updates.
+
+
+20120522
+
+* Timings in --joblog now with milliseconds.
+
+* Thesis using GNU Parallel (correctly cited; hooray!).
+  http://scholarworks.sjsu.edu/etd_projects/222/
+
+* Package for AIX.
+  http://www.perzl.org/aix/index.php?n=Main.Parallel
+
+* Prokka uses GNU Parallel.
+  http://bioinformatics.net.au/prokka-manual.html
+
+* GNU Parallel was presented at MUUG.
+  http://muug.mb.ca/blog/meetings/2012/05/09/may-8th-2012-rtfm-gnu-parallel1/
+
+* Blog post: Manipulating many or large files with GNU parallel.
+  http://compbiously.blogspot.com/2012/05/manipulating-many-or-large-files-with.html
+
+* Blog post: Running commands in parallel using bash.
+  http://blog.michaelboman.org/2012/04/running-commands-in-parallel-using-bash.html  
+
+* Blog post: Efficient log processing.
+  http://www.francoismaillet.com/blog/?p=399
+
+* Blog post about GNU Parallel and Amazon EC2.
+  http://blog.kevinformatics.com/post/4970574713/interested-in-your-experience-using-gnu-parallel-in
+
+* Blog post in Hungarian.
+  http://commandline.blog.hu/2012/05/03/gnu_parallel
+
+* Popularity of GNU Parallel in Debian explodes.
+  http://qa.debian.org/popcon-graph.php?packages=parallel
+
+* Bug fixes and man page updates.
+
+
 20120422
 
 * A race condition bug caused restructuring of a central piece of the
@@ -6,6 +365,9 @@
 
 * sql --dbsize will now list sizes of all databases if given no
   database.
+
+* GNU Parallel is now in Debian Unstable.
+  apt-get install parallel
 
 * Article: Computational and experimental analyses of
   retrotransposon-associated minisatellite DNAs in the soybean genome.

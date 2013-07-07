@@ -152,7 +152,8 @@ To understand replacement strings see B<{}>.
 Argument from input source I<n> or the I<n>'th argument. This
 positional replacement string will be replaced by the input from input
 source I<n> (when used with B<-a> or B<::::>) or with the I<n>'th
-argument (when used with B<-N>).
+argument (when used with B<-N>). If I<n> is negative it refers to the
+I<n>'th last argument.
 
 To understand replacement strings see B<{}>.
 
@@ -354,7 +355,8 @@ k, m, g, t, or p which would multiply the size with 1024, 1048576,
 1000000000, 1000000000000, or 1000000000000000 respectively.
 
 GNU B<parallel> tries to meet the block size but can be off by the
-length of one record.
+length of one record. For performance reasons I<size> should be bigger
+than a single record.
 
 I<size> defaults to 1M.
 
@@ -395,6 +397,11 @@ I<regexp> is a Perl Regular Expression:
 http://perldoc.perl.org/perlre.html
 
 
+=item B<--ctrlc> (beta testing)
+
+Sends SIGINT to tasks running on remote computers thus killing them.
+
+
 =item B<--delimiter> I<delim>
 
 =item B<-d> I<delim>
@@ -425,6 +432,13 @@ occurs as a line of input, the rest of the input is ignored.  If
 neither B<-E> nor B<-e> is used, no end of file string is used.
 
 
+=item B<--delay> I<secs>
+
+Delay starting next job I<secs> seconds. GNU B<parallel> will pause
+I<secs> seconds after starting each job. I<secs> can be less than 1
+seconds.
+
+
 =item B<--dry-run>
 
 Print the job to run on stdout (standard output), but do not run the
@@ -444,6 +458,15 @@ If I<eof-str> is omitted, there is no end of file string.  If neither
 B<-E> nor B<-e> is used, no end of file string is used.
 
 
+=item B<--env> I<var>
+
+Copy environment variable I<var>. This will copy I<var> to the
+environment that the command is run in. This is especially useful for
+remote environments.
+
+Caveat: If I<var> contains newline ('\n') the value is messed up.
+
+
 =item B<--eta>
 
 Show the estimated number of seconds before finishing. This forces GNU
@@ -460,6 +483,17 @@ completion of the command before exiting.
 See also: B<--bg>, B<man sem>
 
 Implies B<--semaphore>.
+
+
+=item B<--filter-hosts> (alpha testing)
+
+Remove down hosts. For each remote host: check that login through ssh
+works. If not: do not use this host.
+
+Currently you can I<not> put B<--filter-hosts> in a profile,
+$PARALLEL, /etc/parallel/config or similar. This is because GNU
+B<parallel> uses GNU B<parallel> to compute this, so you will get an
+infinite loop. This will likely be fixed in a later release.
 
 
 =item B<--gnu>
@@ -543,7 +577,7 @@ use B<-I> instead.
 Logfile for executed jobs. Save a list of the executed jobs to
 I<logfile> in the following TAB separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
-bytes in files transfered, bytes in files returned, exit status,
+bytes in files transferred, bytes in files returned, exit status,
 and command run.
 
 To convert the times into ISO-8601 strict do:
@@ -636,40 +670,40 @@ to see the difference:
 
 =item B<-L> I<max-lines>
 
-Use at most I<max-lines> nonblank input lines per command line.
-Trailing blanks cause an input line to be logically continued on the
-next input line.
+When used with B<--pipe>: Read records of I<max-lines>.
+
+When used otherwise: Use at most I<max-lines> nonblank input lines per
+command line.  Trailing blanks cause an input line to be logically
+continued on the next input line.
 
 B<-L 0> means read one line, but insert 0 arguments on the command
 line.
 
-Implies B<-X> unless B<-m> or B<--xargs> is set.
+Implies B<-X> unless B<-m>, B<--xargs>, or B<--pipe> is set.
 
 
 =item B<--max-lines>[=I<max-lines>]
 
 =item B<-l>[I<max-lines>]
 
-Synonym for the B<-L> option.  Unlike B<-L>, the I<max-lines> argument
-is optional.  If I<max-lines> is not specified, it defaults to one.
-The B<-l> option is deprecated since the POSIX standard specifies
-B<-L> instead.
+When used with B<--pipe>: Read records of I<max-lines>.
+
+When used otherwise: Synonym for the B<-L> option.  Unlike B<-L>, the
+I<max-lines> argument is optional.  If I<max-lines> is not specified,
+it defaults to one.  The B<-l> option is deprecated since the POSIX
+standard specifies B<-L> instead.
 
 B<-l 0> is an alias for B<-l 1>.
 
-Implies B<-X> unless B<-m> is set.
+Implies B<-X> unless B<-m>, B<--xargs>, or B<--pipe> is set.
 
 
 =item B<--load> I<max-load>
 
-Do not start new jobs on a given computer unless the load is less than
-I<max-load>. I<max-load> uses the same syntax as B<--jobs>, so I<100%>
-for one per CPU is a valid setting. Only difference is 0 which is
-interpreted as 0.01.
-
-The load average is only sampled every 10 seconds using B<uptime> to
-avoid stressing small computers. Only the first (1 minute) load is
-used.
+Do not start new jobs on a given computer unless the number of running
+processes on the computer is less than I<max-load>. I<max-load> uses
+the same syntax as B<--jobs>, so I<100%> for one per CPU is a valid
+setting. Only difference is 0 which is interpreted as 0.01.
 
 
 =item B<--controlmaster> (experimental)
@@ -782,6 +816,13 @@ defaults to '\n'. To have no record separator use B<--recend "">.
 B<--files> is often used with B<--pipe>.
 
 
+=item B<--plain>
+
+Ignore any B<--profile>, $PARALLEL, ~/.parallel/config, and
+B<--tollef> to get full control on the command line (used by GNU
+B<parallel> internally when called with B<--sshlogin>).
+
+
 =item B<--progress>
 
 Show progress of computations. List the computers involved in the task
@@ -833,8 +874,7 @@ B<tr ':' '\n' < /etc/passwd | parallel -N7 chown {1} {6}>
 Implies B<-X> unless B<-m> or B<--pipe> is set.
 
 When used with B<--pipe> B<-N> is the number of records to read. This
-is much slower than B<--block> so avoid it if performance is
-important.
+is somewhat slower than B<--block>.
 
 
 =item B<--max-line-length-allowed>
@@ -949,6 +989,50 @@ it to the command.
 Only used with B<--pipe>.
 
 
+=item B<--results> I<prefix>
+
+=item B<--res> I<prefix>
+
+Save the output into files. The files will be stored in a directory tree
+rooted at I<prefix>.  Within this directory tree, each command will result
+in two files: I<prefix>/<ARGS>/stdout and I<prefix>/<ARGS>/stderr, where
+<ARGS> is a sequence of directories representing the header of the input
+source (if using B<--header :>) or the number of the input source and
+corresponding values.
+
+E.g:
+
+  parallel --header : --results foo echo {a} {b} ::: a I II ::: b III IIII
+
+will generate the files:
+
+  foo/a/I/b/III/stderr
+  foo/a/I/b/IIII/stderr
+  foo/a/II/b/III/stderr
+  foo/a/II/b/IIII/stderr
+  foo/a/I/b/III/stdout
+  foo/a/I/b/IIII/stdout
+  foo/a/II/b/III/stdout
+  foo/a/II/b/IIII/stdout
+
+and
+
+  parallel --results foo echo {1} {2} ::: I II ::: III IIII
+
+will generate the files:
+
+  foo/1/I/2/III/stderr
+  foo/1/I/2/IIII/stderr
+  foo/1/II/2/III/stderr
+  foo/1/II/2/IIII/stderr
+  foo/1/I/2/III/stdout
+  foo/1/I/2/IIII/stdout
+  foo/1/II/2/III/stdout
+  foo/1/II/2/IIII/stdout
+
+See also B<--files>, B<--header>, B<--joblog>.
+
+
 =item B<--resume>
 
 Resumes from the last unfinished job. By reading B<--joblog> GNU
@@ -957,7 +1041,20 @@ there. As GNU B<parallel> only looks at the sequence numbers in
 B<--joblog> then the input, the command, and B<--joblog> all have to
 remain unchanged; otherwise GNU B<parallel> may run wrong commands.
 
-See also: B<--joblog>.
+See also: B<--joblog>, B<--resume-failed>.
+
+
+=item B<--resume-failed>
+
+Retry all failed and resume from the last unfinished job. By reading
+B<--joblog> GNU B<parallel> will figure out the failed jobs and run
+those again. After that it will resume last unfinished job and
+continue from there. As GNU B<parallel> only looks at the sequence
+numbers in B<--joblog> then the input, the command, and B<--joblog>
+all have to remain unchanged; otherwise GNU B<parallel> may run wrong
+commands.
+
+See also: B<--joblog>, B<--resume>.
 
 
 =item B<--retries> I<n>
@@ -1076,6 +1173,55 @@ Use the replacement string I<replace-str> instead of B<{#}> for
 job sequence number.
 
 
+=item B<--shebang>
+
+=item B<--hashbang>
+
+GNU B<parallel> can be called as a shebang (#!) command as the first
+line of a script. The content of the file will be treated as
+inputsource.
+
+Like this:
+
+  #!/usr/bin/parallel --shebang -r traceroute
+
+  foss.org.my
+  debian.org
+  freenetproject.org
+
+B<--shebang> must be set as the first option.
+
+
+=item B<--shebang-wrap>
+
+GNU B<parallel> can parallelize scripts by wrapping the shebang
+line. If the program can be run like this:
+
+  cat arguments | parallel the_program
+
+then the script can be changed to:
+
+  #!/usr/bin/parallel --shebang-wrap /the/original/parser --with-options
+
+E.g.
+
+  #!/usr/bin/parallel --shebang-wrap /usr/bin/python
+
+If the program can be run like this:
+
+  cat data | parallel --pipe the_program
+
+then the script can be changed to:
+
+  #!/usr/bin/parallel --shebang-wrap --pipe /the/original/parser --with-options
+
+E.g.
+
+  #!/usr/bin/parallel --shebang-wrap --pipe /usr/bin/perl -w
+
+B<--shebang-wrap> must be set as the first option.
+
+
 =item B<--shellquote>
 
 Does not run the command but quotes it. Useful for making quoted
@@ -1086,6 +1232,13 @@ composed commands for GNU B<parallel>.
 
 Do not use the first line of input (used by GNU B<parallel> itself
 when called with B<--shebang>).
+
+
+=item B<--sshdelay> I<secs>
+
+Delay starting next ssh by I<secs> seconds. GNU B<parallel> will pause
+I<secs> seconds after starting each ssh. I<secs> can be less than 1
+seconds.
 
 
 =item B<-S> I<[ncpu/]sshlogin[,[ncpu/]sshlogin[,...]]>
@@ -1200,6 +1353,15 @@ the lines will be prepended with the sshlogin instead.
 B<--tag> is ignored when using B<-u>.
 
 
+=item B<--tagstring> I<str>
+
+Tag lines with a string. Each output line will be prepended with
+I<str> and TAB (\t). I<str> can contain replacement strings such as
+{}.
+
+B<--tagstring> is ignored when using B<-u>, B<--onall>, and B<--nonall>.
+
+
 =item B<--tmpdir> I<dirname>
 
 Directory for temporary files. GNU B<parallel> normally buffers output
@@ -1208,17 +1370,28 @@ different dir for the files. Setting B<--tmpdir> is equivalent to
 setting $TMPDIR.
 
 
-=item B<--timeout> I<sec>
+=item B<--timeout> I<val> (beta testing)
 
-Time out for command. If the command runs for longer than I<sec>
+Time out for command. If the command runs for longer than I<val>
 seconds it will get killed with SIGTERM, followed by SIGTERM 200 ms
 later, followed by SIGKILL 200 ms later.
 
+If I<val> is followed by a % then the timeout will dynamically be
+computed as a percentage of the smoothed average runtime. Only values
+> 100% will make sense.
 
-=item B<--tollef>
 
-Make GNU B<parallel> behave like Tollef's parallel command. To
-override use B<--gnu>.
+=item B<--tollef> (obsolete - will be retired 20140222)
+
+Make GNU B<parallel> behave more like Tollef's parallel command. It
+activates B<-u>, B<-q>, and B<--arg-sep -->. It also causes B<-l> to
+change meaning to B<--load>.
+
+Not giving '--' is unsupported.
+
+B<Do not use --tollef unless you know what you are doing>.
+
+To override use B<--gnu>.
 
 
 =item B<--verbose>
@@ -1295,9 +1468,17 @@ a bc " -> "a bc". This is the default if B<--colsep> is used.
 
 =item B<-u>
 
-Ungroup output.  Output is printed as soon as possible. This may cause
-output from different commands to be mixed. GNU B<parallel> runs
-faster with B<-u>. Can be reversed with B<--group>.
+Ungroup output.  Output is printed as soon as possible and by passes
+GNU B<parallel> internal processing. This may cause output from
+different commands to be mixed thus should only be used if you do not
+care about the output. Compare these:
+
+B<parallel -j0 'sleep {};echo -n start{};sleep {};echo {}end' ::: 1 2 3 4>
+
+B<parallel -u -j0 'sleep {};echo -n start{};sleep {};echo {}end' ::: 1 2 3 4>
+
+It also disables B<--tag>. GNU B<parallel> runs faster with B<-u>. Can
+be reversed with B<--group>.
 
 
 =item B<--extensionreplace> I<replace-str>
@@ -1352,6 +1533,15 @@ treated as the relative path to your home dir. This means that if your
 home dir is different on remote computers (e.g. if your login is
 different) the relative path will still be relative to your home dir.
 
+To see the difference try:
+
+B<parallel -S server pwd ::: "">
+
+B<parallel --wd . -S server pwd ::: "">
+
+B<parallel --wd ... -S server pwd ::: "">
+
+
 
 =item B<--wait>
 
@@ -1389,7 +1579,7 @@ See also B<-m>.
 Exit if the size (see the B<-s> option) is exceeded.
 
 
-=item B<--xapply>
+=item B<--xapply> (alpha testing)
 
 Read multiple input sources like B<xapply>. If multiple input sources
 are given, one argument will be read from each of the input
@@ -1403,23 +1593,11 @@ Compare these two:
   parallel echo {1} {2} ::: 1 2 3 ::: a b c
   parallel --xapply echo {1} {2} ::: 1 2 3 ::: a b c
 
+Arguments will be recycled if one input source has more arguments than the others:
+
+  parallel --xapply echo {1} {2} {3} ::: 1 2 ::: I II III ::: a b c d e f g 
+
 See also B<--header>.
-
-
-=item B<--shebang>
-
-=item B<--hashbang>
-
-GNU B<Parallel> can be called as a shebang (#!) command as the first line of a script. Like this:
-
-  #!/usr/bin/parallel --shebang -r traceroute
-
-  foss.org.my
-  debian.org
-  freenetproject.org
-
-For this to work B<--shebang> must be set as the first option.
-
 
 =back
 
@@ -1531,7 +1709,7 @@ solution is to quote the whole command:
 
 B<parallel "zcat {} >>B<{.}" ::: *.gz>
 
-Other special shell charaters (such as * ; $ > < | >> <<) also need
+Other special shell characters (such as * ; $ > < | >> <<) also need
 to be put in quotes, as they may otherwise be interpreted by the shell
 and not given to GNU B<parallel>.
 
@@ -1563,7 +1741,7 @@ symlinks are empty files.
 
 B<cp -rs /the/source/dir mirror_dir; find mirror_dir -type l | parallel -m rm {} '&&' touch {}>
 
-Find the files in a list that do no exist.
+Find the files in a list that do not exist
 
 B<cat file_list | parallel 'if [ ! -e {} ] ; then echo {}; fi'>
 
@@ -1690,6 +1868,10 @@ can be written like this:
 
 B<cat list | parallel do_something | process_output>
 
+For example: Find which host name in a list has IP address 1.2.3 4:
+
+B<cat hosts.txt | parallel -P 100 host | grep 1.2.3.4>
+
 If the processing requires more steps the for-loop like this:
 
  (for x in `cat list` ; do
@@ -1750,6 +1932,38 @@ positional replacement string:
 This also works if the input file is a file with columns:
 
   cat addressbook.tsv | parallel --colsep '\t' --header : echo {Name} {E-mail address}
+
+
+=head1 EXAMPLE: Count the differences between all files in a dir
+
+Using B<--results> the results are saved in /tmp/diffcount*.
+
+  parallel --results /tmp/diffcount "diff -U 0 {1} {2} |tail -n +3 |grep -v '^@'|wc -l" ::: * ::: *
+
+To see the difference between file A and file B look at the file
+'/tmp/diffcount 1 A 2 B' where spaces are TABs (\t).
+
+
+=head1 EXAMPLE: Speeding up fast jobs
+
+Starting a job on the local machine takes around 3 ms. This can be a
+big overhead if the job takes very few ms to run. Often you can group
+small jobs together using B<-X> which will make the overhead less
+significant. Compare the speed of these:
+
+    seq -w 0 9999 | parallel touch pict{}.jpg
+
+    seq -w 0 9999 | parallel -X touch pict{}.jpg
+
+If your program cannot take multiple arguments, then you can use GNU
+B<parallel> to spawn multiple GNU B<parallel>s:
+
+    seq -w 0 999999 | parallel -j10 --pipe parallel -j0 touch pict{}.jpg
+
+If B<-j0> normally spawns 506 jobs, then the above will try to spawn
+5060 jobs. It is likely that you this way will hit the limit of number
+of processes and/or filehandles. Look at 'ulimit -n' and 'ulimit -u'
+to raise these limits.
 
 
 =head1 EXAMPLE: Using shell variables
@@ -1862,14 +2076,6 @@ GNU B<parallel> can often speed this up.
 B<find . -type f | parallel -k -j150% -n 1000 -m grep -H -n STRING {}>
 
 This will run 1.5 job per core, and give 1000 arguments to B<grep>.
-
-To grep a big file in parallel use B<--pipe>:
-
-B<cat bigfile | parallel --pipe grep foo>
-
-Depending on your disks and CPUs it may be faster to read larger blocks:
-
-B<cat bigfile | parallel --pipe --block 10M grep foo>
 
 
 =head1 EXAMPLE: Using remote computers
@@ -2030,13 +2236,18 @@ files over high speed connections.
 The following will start one B<rsync> per big file in I<src-dir> to
 I<dest-dir> on the server I<fooserver>:
 
-B<find src-dir -type f -size +100000 | parallel -v ssh fooserver
+B<cd src-dir; find . -type f -size +100000 | parallel -v ssh fooserver
 mkdir -p /dest-dir/{//}\;rsync -Havessh {} fooserver:/dest-dir/{}>
 
 The dirs created may end up with wrong permissions and smaller files
 are not being transferred. To fix those run B<rsync> a final time:
 
 B<rsync -Havessh src-dir/ fooserver:/dest-dir/>
+
+If you are unable to push data, but need to pull them and the files
+are called digits.png (e.g. 000000.png) you might be able to do:
+
+<seq -w 0 99 | parallel rsync -Havessh fooserver:src-path/*{}.png destdir/>
 
 
 =head1 EXAMPLE: Use multiple inputs in one command
@@ -2162,7 +2373,7 @@ complete.
 
 Run 10 jobs concurrently in the background:
 
-  for i in `ls *.log` ; do
+  for i in *.log ; do
     echo $i
     sem -j10 gzip $i ";" echo done
   done
@@ -2225,7 +2436,7 @@ The idea is to put the jobs into a file and have GNU B<parallel> read
 from that continuously. As GNU B<parallel> will stop at end of file we
 use B<tail> to continue reading:
 
-B<echo >>B<jobqueue>; B<tail -f jobqueue | parallel>
+B<true >>B<jobqueue>; B<tail -f jobqueue | parallel>
 
 To submit your jobs to the queue:
 
@@ -2243,17 +2454,23 @@ system/batch manager:
 
 =item *
 
-You will get a warning if you do not submit JobSlots jobs within the
-first second. E.g. if you have 8 cores and use B<-j+2> you have to submit
-10 jobs. These can be dummy jobs (e.g. B<echo foo>). You can also simply
-ignore the warning.
+You will get a warning if you do not submit JobSlots jobs within
+the first second. E.g. if you have 8 cores and use -j+2 you have to
+submit 10 jobs. These can be dummy jobs (e.g. echo foo). You can also
+simply ignore the warning.  For parallel versions 20110322 and higher,
+the warnings will not appear.
 
 =item *
 
-Jobs will be run immediately, but output from jobs will only be
-printed when JobSlots more jobs has been started. E.g. if you have 10
-jobslots then the output from the first completed job will only be
-printed when job 11 is started.
+You have to submit JobSlot number of jobs before they will start, and
+after that you can submit one at a time, and job will start
+immediately if free slots are available.  Output from the running or
+completed jobs are held back and will only be printed when JobSlots
+more jobs has been started (unless you use --ungroup or -u, in which
+case the output from the jobs are printed immediately).  E.g. if you
+have 10 jobslots then the output from the first completed job will
+only be printed when job 11 has started, and the output of second
+completed job will only be printed when job 12 has started.
 
 =back
 
@@ -2264,24 +2481,24 @@ If you have a dir in which users drop files that needs to be processed
 you can do this on GNU/Linux (If you know what B<inotifywait> is
 called on other platforms file a bug report):
 
-B<inotifywait -q -m -r -e CLOSE_WRITE --format %w%f my_dir | parallel
+B<inotifywait -q -m -r -e MOVED_TO -e CLOSE_WRITE --format %w%f my_dir | parallel
 -u echo>
 
 This will run the command B<echo> on each file put into B<my_dir> or
 subdirs of B<my_dir>.
 
-The B<-u> is needed because of a small bug in GNU B<parallel>. If that
-proves to be a problem, file a bug report.
-
 You can of course use B<-S> to distribute the jobs to remote
 computers:
 
-B<inotifywait -q -m -r -e CLOSE_WRITE --format %w%f my_dir | parallel -S ..
--u echo>
+B<inotifywait -q -m -r -e MOVED_TO -e CLOSE_WRITE --format %w%f my_dir
+| parallel -S ..  -u echo>
 
 If the files to be processed are in a tar file then unpacking one file
 and processing it immediately may be faster than first unpacking all
 files. Set up the dir processor as above and unpack into the dir.
+
+Using GNU Parallel as dir processor has the same limitations as using
+GNU Parallel as queue system/batch manager.
 
 
 =head1 QUOTING
@@ -2293,10 +2510,18 @@ characters that have special meaning in shell:
 
 and depending on context these needs to be quoted, too:
 
-* ~ & # ! ? space * {
+~ & # ! ? space * {
 
 Therefore most people will never need more quoting than putting '\'
 in front of the special characters.
+
+Often you can simply put \' around every ':
+
+  perl -ne '/^\S+\s+\S+$/ and print $ARGV,"\n"' file
+
+can be quoted:
+
+  parallel perl -ne \''/^\S+\s+\S+$/ and print $ARGV,"\n"'\' ::: file
 
 However, when you want to use a shell variable you need to quote the
 $-sign. Here is an example using $PARALLEL_SEQ. This variable is set
@@ -2418,7 +2643,7 @@ GNU B<parallel> will then print the currently running jobs on stderr
 =head1 COMPLETE RUNNING JOBS BUT DO NOT START NEW JOBS
 
 If you regret starting a lot of jobs you can simply break GNU B<parallel>,
-but if you want to make sure you do not have halfcompleted jobs you
+but if you want to make sure you do not have half-completed jobs you
 should send the signal B<SIGTERM> to GNU B<parallel>:
 
 B<killall -TERM parallel>
@@ -2560,7 +2785,7 @@ If B<--halt-on-error> 1 or 2: Exit status of the failing job.
 
 There are a lot programs with some of the functionality of GNU
 B<parallel>. GNU B<parallel> strives to include the best of the
-functionality without sacrifying ease of use.
+functionality without sacrificing ease of use.
 
 =head2 SUMMARY TABLE
 
@@ -2608,7 +2833,7 @@ Remote execution
  R6. No config files needed
  R7. Do not run more than SSHD's MaxStartup can handle
  R8. Configurable SSH command
- R9. Retry if connection breaks occationally
+ R9. Retry if connection breaks occasionally
 
 Semaphore
  S1. Possibility to work as a mutex
@@ -2695,7 +2920,7 @@ supports (See REPORTING BUGS).
 
 =head2 DIFFERENCES BETWEEN xargs AND GNU Parallel
 
-B<xargs> offer some of the same possibilites as GNU B<parallel>.
+B<xargs> offer some of the same possibilities as GNU B<parallel>.
 
 B<xargs> deals badly with special characters (such as space, ' and
 "). To see the problem try this:
@@ -2767,7 +2992,7 @@ B<ls | xargs -d "\n" -P8 -I {} bash -c "echo {}; ls {}|wc">
 
 =head2 DIFFERENCES BETWEEN find -exec AND GNU Parallel
 
-B<find -exec> offer some of the same possibilites as GNU B<parallel>.
+B<find -exec> offer some of the same possibilities as GNU B<parallel>.
 
 B<find -exec> only works on files. So processing other input (such as
 hosts or URLs) will require creating these inputs as files. B<find
@@ -3233,25 +3458,41 @@ Your bug report should always include:
 
 =item *
 
+The error message you get (if any).
+
+=item *
+
 The output of B<parallel --version>. If you are not running the latest
 released version you should specify why you believe the problem is not
 fixed in that version.
 
 =item *
 
-A complete example that others can run that shows the problem. A
-combination of B<seq>, B<cat>, B<echo>, and B<sleep> can reproduce
-most errors. If your example requires large files, see if you can make
-them by something like B<seq 1000000> > B<file>.
+A complete example that others can run that shows the problem. This
+should preferably be small and simple. A combination of B<yes>, B<seq>,
+B<cat>, B<echo>, and B<sleep> can reproduce most errors. If your
+example requires large files, see if you can make them by something
+like B<seq 1000000> > B<file> or B<yes | head -n 10000000> > B<file>.
+
+=item *
+
+The output of your example. If your problem is not easily reproduced
+by others, the output might help them figure out the problem.
 
 =back
 
-If you suspect the error is dependent on your distribution, please see
-if you can reproduce the error on one of these VirtualBox images:
+If you suspect the error is dependent on your environment or
+distribution, please see if you can reproduce the error on one of
+these VirtualBox images:
 http://sourceforge.net/projects/virtualboximage/files/
 
 Specifying the name of your distribution is not enough as you may have
 installed software that is not in the VirtualBox images.
+
+If you cannot reproduce the error on any of the VirtualBox images
+above, you should assume the debugging will be done through you. That
+will put more burden on you and it is extra important you give any
+information that help.
 
 
 =head1 AUTHOR
@@ -3265,8 +3506,8 @@ Copyright (C) 2007-10-18 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2008,2009,2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
-Software Foundation, Inc.
+Copyright (C) 2010,2011,2012,2013 Ole Tange, http://ole.tange.dk and
+Free Software Foundation, Inc.
 
 Parts of the manual concerning B<xargs> compatibility is inspired by
 the manual of B<xargs> from GNU findutils 4.4.2.
@@ -3274,7 +3515,7 @@ the manual of B<xargs> from GNU findutils 4.4.2.
 
 =head1 LICENSE
 
-Copyright (C) 2007,2008,2009,2010,2011,2012 Free Software Foundation,
+Copyright (C) 2007,2008,2009,2010,2011,2012,2013 Free Software Foundation,
 Inc.
 
 This program is free software; you can redistribute it and/or modify
