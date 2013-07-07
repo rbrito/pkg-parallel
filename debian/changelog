@@ -1,6 +1,6 @@
-parallel (20130622-1~1.gbp759988) UNRELEASED; urgency=low
+parallel (20130622-1~2.gbp0c6728) UNRELEASED; urgency=low
 
-  ** SNAPSHOT build @759988415912b503c89b0dc36184e1acff90a24f **
+  ** SNAPSHOT build @0c672811e6bfb46f0f652555f5295f72a11b1662 **
 
   * Imported Upstream version 20130622 (Closes: #697828)
   * debian/watch:
@@ -9,6 +9,9 @@ parallel (20130622-1~1.gbp759988) UNRELEASED; urgency=low
     + Update copyright years.
   * debian/{compat,control}:
     + Use debhelper compat version 9.
+  * debian/control:
+    + Add Conflicts: against moreutils.
+  * Adjust for removal of config file under /etc/parallel.
 
  -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 05:51:00 -0300
 
