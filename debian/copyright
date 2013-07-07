@@ -4,12 +4,12 @@ Upstream-Contact: Ole Tange <ole@tange.dk>
 Source: ftp://ftp.gnu.org/gnu/parallel/
 
 Files: *
-Copyright: 2007-2012, Ole Tange and Free Software Foundation, Inc.
+Copyright: 2007-2013, Ole Tange and Free Software Foundation, Inc.
 License: GPL-3+
 
 Files: debian/*
 Copyright: 2010, Ole Tange <ole@tange.dk>
-	   2010-2012, Rogério Theodoro de Brito <rbrito@ime.usp.br>
+	   2010-2013, Rogério Theodoro de Brito <rbrito@ime.usp.br>
 License: GPL-3+
 
 License: GPL-3+
