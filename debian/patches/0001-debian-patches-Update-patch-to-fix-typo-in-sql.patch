@@ -1,0 +1,27 @@
+From: =?UTF-8?q?Rog=C3=A9rio=20Brito?= <rbrito@ime.usp.br>
+Date: Sun, 7 Jul 2013 07:09:34 -0300
+Subject: debian/patches: Update patch to fix typo in sql.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The rest of the documentation is generated from it.
+
+Signed-off-by: Rogério Brito <rbrito@ime.usp.br>
+---
+ src/sql | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sql b/src/sql
+index 28492d3..10d3b0e 100755
+--- a/src/sql
++++ b/src/sql
+@@ -295,7 +295,7 @@ B<sql -s '\t' :myalias 'SELECT * FROM foo;' | parallel --colsep '\t' do_stuff {4
+ 
+ =head2 Retry if the connection fails
+ 
+-If the access to the database fails occationally B<--retries> can help
++If the access to the database fails occasionally B<--retries> can help
+ make sure the query succeeds:
+ 
+ B<sql --retries 5 :myalias 'SELECT * FROM really_big_foo;'>
