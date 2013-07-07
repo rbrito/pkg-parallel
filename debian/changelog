@@ -2,7 +2,7 @@ parallel (20130622-1~1.gbp759988) UNRELEASED; urgency=low
 
   ** SNAPSHOT build @759988415912b503c89b0dc36184e1acff90a24f **
 
-  * Imported Upstream version 20130622
+  * Imported Upstream version 20130622 (Closes: #697828)
   * debian/watch:
     + Track only versions that begin with digits.
   * debian/copyright:
