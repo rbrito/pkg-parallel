@@ -1,2 +1,2 @@
 version=3
-ftp://ftp.gnu.org/gnu/parallel/parallel-(.*).tar.bz2
+ftp://ftp.gnu.org/gnu/parallel/parallel-(\d.*).tar.bz2
