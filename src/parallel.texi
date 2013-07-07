@@ -163,7 +163,8 @@ To understand replacement strings see @strong{@{@}}.
 Argument from input source @emph{n} or the @emph{n}'th argument. This
 positional replacement string will be replaced by the input from input
 source @emph{n} (when used with @strong{-a} or @strong{::::}) or with the @emph{n}'th
-argument (when used with @strong{-N}).
+argument (when used with @strong{-N}). If @emph{n} is negative it refers to the
+@emph{n}'th last argument.
 
 To understand replacement strings see @strong{@{@}}.
 
@@ -375,7 +376,8 @@ k, m, g, t, or p which would multiply the size with 1024, 1048576,
 1000000000, 1000000000000, or 1000000000000000 respectively.
 
 GNU @strong{parallel} tries to meet the block size but can be off by the
-length of one record.
+length of one record. For performance reasons @emph{size} should be bigger
+than a single record.
 
 @emph{size} defaults to 1M.
 
@@ -418,6 +420,11 @@ separating the columns. The n'th column can be access using
 @emph{regexp} is a Perl Regular Expression:
 http://perldoc.perl.org/perlre.html
 
+@item @strong{--ctrlc} (beta testing)
+@anchor{@strong{--ctrlc} (beta testing)}
+
+Sends SIGINT to tasks running on remote computers thus killing them.
+
 @item @strong{--delimiter} @emph{delim}
 @anchor{@strong{--delimiter} @emph{delim}}
 
@@ -451,6 +458,13 @@ Set the end of file string to eof-str.  If the end of file string
 occurs as a line of input, the rest of the input is ignored.  If
 neither @strong{-E} nor @strong{-e} is used, no end of file string is used.
 
+@item @strong{--delay} @emph{secs}
+@anchor{@strong{--delay} @emph{secs}}
+
+Delay starting next job @emph{secs} seconds. GNU @strong{parallel} will pause
+@emph{secs} seconds after starting each job. @emph{secs} can be less than 1
+seconds.
+
 @item @strong{--dry-run}
 @anchor{@strong{--dry-run}}
 
@@ -471,6 +485,15 @@ because it is POSIX compliant for @strong{xargs} while this option is not.
 If @emph{eof-str} is omitted, there is no end of file string.  If neither
 @strong{-E} nor @strong{-e} is used, no end of file string is used.
 
+@item @strong{--env} @emph{var}
+@anchor{@strong{--env} @emph{var}}
+
+Copy environment variable @emph{var}. This will copy @emph{var} to the
+environment that the command is run in. This is especially useful for
+remote environments.
+
+Caveat: If @emph{var} contains newline ('\n') the value is messed up.
+
 @item @strong{--eta}
 @anchor{@strong{--eta}}
 
@@ -488,6 +511,17 @@ completion of the command before exiting.
 See also: @strong{--bg}, @strong{man sem}
 
 Implies @strong{--semaphore}.
+
+@item @strong{--filter-hosts} (alpha testing)
+@anchor{@strong{--filter-hosts} (alpha testing)}
+
+Remove down hosts. For each remote host: check that login through ssh
+works. If not: do not use this host.
+
+Currently you can @emph{not} put @strong{--filter-hosts} in a profile,
+$PARALLEL, /etc/parallel/config or similar. This is because GNU
+@strong{parallel} uses GNU @strong{parallel} to compute this, so you will get an
+infinite loop. This will likely be fixed in a later release.
 
 @item @strong{--gnu}
 @anchor{@strong{--gnu}}
@@ -576,7 +610,7 @@ use @strong{-I} instead.
 Logfile for executed jobs. Save a list of the executed jobs to
 @emph{logfile} in the following TAB separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
-bytes in files transfered, bytes in files returned, exit status,
+bytes in files transferred, bytes in files returned, exit status,
 and command run.
 
 To convert the times into ISO-8601 strict do:
@@ -688,14 +722,16 @@ to see the difference:
 @item @strong{-L} @emph{max-lines}
 @anchor{@strong{-L} @emph{max-lines}}
 
-Use at most @emph{max-lines} nonblank input lines per command line.
-Trailing blanks cause an input line to be logically continued on the
-next input line.
+When used with @strong{--pipe}: Read records of @emph{max-lines}.
+
+When used otherwise: Use at most @emph{max-lines} nonblank input lines per
+command line.  Trailing blanks cause an input line to be logically
+continued on the next input line.
 
 @strong{-L 0} means read one line, but insert 0 arguments on the command
 line.
 
-Implies @strong{-X} unless @strong{-m} or @strong{--xargs} is set.
+Implies @strong{-X} unless @strong{-m}, @strong{--xargs}, or @strong{--pipe} is set.
 
 @item @strong{--max-lines}[=@emph{max-lines}]
 @anchor{@strong{--max-lines}[=@emph{max-lines}]}
@@ -703,26 +739,24 @@ Implies @strong{-X} unless @strong{-m} or @strong{--xargs} is set.
 @item @strong{-l}[@emph{max-lines}]
 @anchor{@strong{-l}[@emph{max-lines}]}
 
-Synonym for the @strong{-L} option.  Unlike @strong{-L}, the @emph{max-lines} argument
-is optional.  If @emph{max-lines} is not specified, it defaults to one.
-The @strong{-l} option is deprecated since the POSIX standard specifies
-@strong{-L} instead.
+When used with @strong{--pipe}: Read records of @emph{max-lines}.
+
+When used otherwise: Synonym for the @strong{-L} option.  Unlike @strong{-L}, the
+@emph{max-lines} argument is optional.  If @emph{max-lines} is not specified,
+it defaults to one.  The @strong{-l} option is deprecated since the POSIX
+standard specifies @strong{-L} instead.
 
 @strong{-l 0} is an alias for @strong{-l 1}.
 
-Implies @strong{-X} unless @strong{-m} is set.
+Implies @strong{-X} unless @strong{-m}, @strong{--xargs}, or @strong{--pipe} is set.
 
 @item @strong{--load} @emph{max-load}
 @anchor{@strong{--load} @emph{max-load}}
 
-Do not start new jobs on a given computer unless the load is less than
-@emph{max-load}. @emph{max-load} uses the same syntax as @strong{--jobs}, so @emph{100%}
-for one per CPU is a valid setting. Only difference is 0 which is
-interpreted as 0.01.
-
-The load average is only sampled every 10 seconds using @strong{uptime} to
-avoid stressing small computers. Only the first (1 minute) load is
-used.
+Do not start new jobs on a given computer unless the number of running
+processes on the computer is less than @emph{max-load}. @emph{max-load} uses
+the same syntax as @strong{--jobs}, so @emph{100%} for one per CPU is a valid
+setting. Only difference is 0 which is interpreted as 0.01.
 
 @item @strong{--controlmaster} (experimental)
 @anchor{@strong{--controlmaster} (experimental)}
@@ -838,6 +872,13 @@ defaults to '\n'. To have no record separator use @strong{--recend ""}.
 
 @strong{--files} is often used with @strong{--pipe}.
 
+@item @strong{--plain}
+@anchor{@strong{--plain}}
+
+Ignore any @strong{--profile}, $PARALLEL, ~/.parallel/config, and
+@strong{--tollef} to get full control on the command line (used by GNU
+@strong{parallel} internally when called with @strong{--sshlogin}).
+
 @item @strong{--progress}
 @anchor{@strong{--progress}}
 
@@ -892,8 +933,7 @@ This will set the owner of the homedir to the user:
 Implies @strong{-X} unless @strong{-m} or @strong{--pipe} is set.
 
 When used with @strong{--pipe} @strong{-N} is the number of records to read. This
-is much slower than @strong{--block} so avoid it if performance is
-important.
+is somewhat slower than @strong{--block}.
 
 @item @strong{--max-line-length-allowed}
 @anchor{@strong{--max-line-length-allowed}}
@@ -1014,6 +1054,59 @@ it to the command.
 
 Only used with @strong{--pipe}.
 
+@item @strong{--results} @emph{prefix}
+@anchor{@strong{--results} @emph{prefix}}
+
+@item @strong{--res} @emph{prefix}
+@anchor{@strong{--res} @emph{prefix}}
+
+Save the output into files. The files will be stored in a directory tree
+rooted at @emph{prefix}.  Within this directory tree, each command will result
+in two files: @emph{prefix}/<ARGS>/stdout and @emph{prefix}/<ARGS>/stderr, where
+<ARGS> is a sequence of directories representing the header of the input
+source (if using @strong{--header :}) or the number of the input source and
+corresponding values.
+
+E.g:
+
+@verbatim
+  parallel --header : --results foo echo {a} {b} ::: a I II ::: b III IIII
+@end verbatim
+
+will generate the files:
+
+@verbatim
+  foo/a/I/b/III/stderr
+  foo/a/I/b/IIII/stderr
+  foo/a/II/b/III/stderr
+  foo/a/II/b/IIII/stderr
+  foo/a/I/b/III/stdout
+  foo/a/I/b/IIII/stdout
+  foo/a/II/b/III/stdout
+  foo/a/II/b/IIII/stdout
+@end verbatim
+
+and
+
+@verbatim
+  parallel --results foo echo {1} {2} ::: I II ::: III IIII
+@end verbatim
+
+will generate the files:
+
+@verbatim
+  foo/1/I/2/III/stderr
+  foo/1/I/2/IIII/stderr
+  foo/1/II/2/III/stderr
+  foo/1/II/2/IIII/stderr
+  foo/1/I/2/III/stdout
+  foo/1/I/2/IIII/stdout
+  foo/1/II/2/III/stdout
+  foo/1/II/2/IIII/stdout
+@end verbatim
+
+See also @strong{--files}, @strong{--header}, @strong{--joblog}.
+
 @item @strong{--resume}
 @anchor{@strong{--resume}}
 
@@ -1023,7 +1116,20 @@ there. As GNU @strong{parallel} only looks at the sequence numbers in
 @strong{--joblog} then the input, the command, and @strong{--joblog} all have to
 remain unchanged; otherwise GNU @strong{parallel} may run wrong commands.
 
-See also: @strong{--joblog}.
+See also: @strong{--joblog}, @strong{--resume-failed}.
+
+@item @strong{--resume-failed}
+@anchor{@strong{--resume-failed}}
+
+Retry all failed and resume from the last unfinished job. By reading
+@strong{--joblog} GNU @strong{parallel} will figure out the failed jobs and run
+those again. After that it will resume last unfinished job and
+continue from there. As GNU @strong{parallel} only looks at the sequence
+numbers in @strong{--joblog} then the input, the command, and @strong{--joblog}
+all have to remain unchanged; otherwise GNU @strong{parallel} may run wrong
+commands.
+
+See also: @strong{--joblog}, @strong{--resume}.
 
 @item @strong{--retries} @emph{n}
 @anchor{@strong{--retries} @emph{n}}
@@ -1149,6 +1255,70 @@ See also: @strong{man sem}
 Use the replacement string @emph{replace-str} instead of @strong{@{#@}} for
 job sequence number.
 
+@item @strong{--shebang}
+@anchor{@strong{--shebang}}
+
+@item @strong{--hashbang}
+@anchor{@strong{--hashbang}}
+
+GNU @strong{parallel} can be called as a shebang (#!) command as the first
+line of a script. The content of the file will be treated as
+inputsource.
+
+Like this:
+
+@verbatim
+  #!/usr/bin/parallel --shebang -r traceroute
+
+  foss.org.my
+  debian.org
+  freenetproject.org
+@end verbatim
+
+@strong{--shebang} must be set as the first option.
+
+@item @strong{--shebang-wrap}
+@anchor{@strong{--shebang-wrap}}
+
+GNU @strong{parallel} can parallelize scripts by wrapping the shebang
+line. If the program can be run like this:
+
+@verbatim
+  cat arguments | parallel the_program
+@end verbatim
+
+then the script can be changed to:
+
+@verbatim
+  #!/usr/bin/parallel --shebang-wrap /the/original/parser --with-options
+@end verbatim
+
+E.g.
+
+@verbatim
+  #!/usr/bin/parallel --shebang-wrap /usr/bin/python
+@end verbatim
+
+If the program can be run like this:
+
+@verbatim
+  cat data | parallel --pipe the_program
+@end verbatim
+
+then the script can be changed to:
+
+@verbatim
+  #!/usr/bin/parallel --shebang-wrap --pipe /the/original/parser --with-options
+@end verbatim
+
+E.g.
+
+@verbatim
+  #!/usr/bin/parallel --shebang-wrap --pipe /usr/bin/perl -w
+@end verbatim
+
+@strong{--shebang-wrap} must be set as the first option.
+
 @item @strong{--shellquote}
 @anchor{@strong{--shellquote}}
 
@@ -1160,6 +1330,13 @@ composed commands for GNU @strong{parallel}.
 
 Do not use the first line of input (used by GNU @strong{parallel} itself
 when called with @strong{--shebang}).
+
+@item @strong{--sshdelay} @emph{secs}
+@anchor{@strong{--sshdelay} @emph{secs}}
+
+Delay starting next ssh by @emph{secs} seconds. GNU @strong{parallel} will pause
+@emph{secs} seconds after starting each ssh. @emph{secs} can be less than 1
+seconds.
 
 @item @strong{-S} @emph{[ncpu/]sshlogin[,[ncpu/]sshlogin[,...]]}
 @anchor{@strong{-S} @emph{[ncpu/]sshlogin[@comma{}[ncpu/]sshlogin[@comma{}...]]}}
@@ -1279,6 +1456,15 @@ the lines will be prepended with the sshlogin instead.
 
 @strong{--tag} is ignored when using @strong{-u}.
 
+@item @strong{--tagstring} @emph{str}
+@anchor{@strong{--tagstring} @emph{str}}
+
+Tag lines with a string. Each output line will be prepended with
+@emph{str} and TAB (\t). @emph{str} can contain replacement strings such as
+@{@}.
+
+@strong{--tagstring} is ignored when using @strong{-u}, @strong{--onall}, and @strong{--nonall}.
+
 @item @strong{--tmpdir} @emph{dirname}
 @anchor{@strong{--tmpdir} @emph{dirname}}
 
@@ -1287,18 +1473,29 @@ into temporary files in /tmp. By setting @strong{--tmpdir} you can use a
 different dir for the files. Setting @strong{--tmpdir} is equivalent to
 setting $TMPDIR.
 
-@item @strong{--timeout} @emph{sec}
-@anchor{@strong{--timeout} @emph{sec}}
+@item @strong{--timeout} @emph{val} (beta testing)
+@anchor{@strong{--timeout} @emph{val} (beta testing)}
 
-Time out for command. If the command runs for longer than @emph{sec}
+Time out for command. If the command runs for longer than @emph{val}
 seconds it will get killed with SIGTERM, followed by SIGTERM 200 ms
 later, followed by SIGKILL 200 ms later.
 
-@item @strong{--tollef}
-@anchor{@strong{--tollef}}
+If @emph{val} is followed by a % then the timeout will dynamically be
+computed as a percentage of the smoothed average runtime. Only values
+> 100% will make sense.
 
-Make GNU @strong{parallel} behave like Tollef's parallel command. To
-override use @strong{--gnu}.
+@item @strong{--tollef} (obsolete - will be retired 20140222)
+@anchor{@strong{--tollef} (obsolete - will be retired 20140222)}
+
+Make GNU @strong{parallel} behave more like Tollef's parallel command. It
+activates @strong{-u}, @strong{-q}, and @strong{--arg-sep --}. It also causes @strong{-l} to
+change meaning to @strong{--load}.
+
+Not giving '--' is unsupported.
+
+@strong{Do not use --tollef unless you know what you are doing}.
+
+To override use @strong{--gnu}.
 
 @item @strong{--verbose}
 @anchor{@strong{--verbose}}
@@ -1385,9 +1582,17 @@ a bc " -> "a bc". This is the default if @strong{--colsep} is used.
 @item @strong{-u}
 @anchor{@strong{-u}}
 
-Ungroup output.  Output is printed as soon as possible. This may cause
-output from different commands to be mixed. GNU @strong{parallel} runs
-faster with @strong{-u}. Can be reversed with @strong{--group}.
+Ungroup output.  Output is printed as soon as possible and by passes
+GNU @strong{parallel} internal processing. This may cause output from
+different commands to be mixed thus should only be used if you do not
+care about the output. Compare these:
+
+@strong{parallel -j0 'sleep @{@};echo -n start@{@};sleep @{@};echo @{@}end' ::: 1 2 3 4}
+
+@strong{parallel -u -j0 'sleep @{@};echo -n start@{@};sleep @{@};echo @{@}end' ::: 1 2 3 4}
+
+It also disables @strong{--tag}. GNU @strong{parallel} runs faster with @strong{-u}. Can
+be reversed with @strong{--group}.
 
 @item @strong{--extensionreplace} @emph{replace-str}
 @anchor{@strong{--extensionreplace} @emph{replace-str}}
@@ -1445,6 +1650,14 @@ treated as the relative path to your home dir. This means that if your
 home dir is different on remote computers (e.g. if your login is
 different) the relative path will still be relative to your home dir.
 
+To see the difference try:
+
+@strong{parallel -S server pwd ::: ""}
+
+@strong{parallel --wd . -S server pwd ::: ""}
+
+@strong{parallel --wd ... -S server pwd ::: ""}
+
 @item @strong{--wait}
 @anchor{@strong{--wait}}
 
@@ -1482,8 +1695,8 @@ See also @strong{-m}.
 
 Exit if the size (see the @strong{-s} option) is exceeded.
 
-@item @strong{--xapply}
-@anchor{@strong{--xapply}}
+@item @strong{--xapply} (alpha testing)
+@anchor{@strong{--xapply} (alpha testing)}
 
 Read multiple input sources like @strong{xapply}. If multiple input sources
 are given, one argument will be read from each of the input
@@ -1499,25 +1712,13 @@ Compare these two:
   parallel --xapply echo {1} {2} ::: 1 2 3 ::: a b c
 @end verbatim
 
-See also @strong{--header}.
-
-@item @strong{--shebang}
-@anchor{@strong{--shebang}}
-
-@item @strong{--hashbang}
-@anchor{@strong{--hashbang}}
-
-GNU @strong{Parallel} can be called as a shebang (#!) command as the first line of a script. Like this:
+Arguments will be recycled if one input source has more arguments than the others:
 
 @verbatim
-  #!/usr/bin/parallel --shebang -r traceroute
-
-  foss.org.my
-  debian.org
-  freenetproject.org
+  parallel --xapply echo {1} {2} {3} ::: 1 2 ::: I II III ::: a b c d e f g 
 @end verbatim
 
-For this to work @strong{--shebang} must be set as the first option.
+See also @strong{--header}.
 
 @end table
 
@@ -1629,7 +1830,7 @@ solution is to quote the whole command:
 
 @strong{parallel "zcat @{@} }>@strong{@{.@}" ::: *.gz}
 
-Other special shell charaters (such as * ; $ > < | >> <<) also need
+Other special shell characters (such as * ; $ > < | >> <<) also need
 to be put in quotes, as they may otherwise be interpreted by the shell
 and not given to GNU @strong{parallel}.
 
@@ -1661,7 +1862,7 @@ symlinks are empty files.
 
 @strong{cp -rs /the/source/dir mirror_dir; find mirror_dir -type l | parallel -m rm @{@} '&&' touch @{@}}
 
-Find the files in a list that do no exist.
+Find the files in a list that do not exist
 
 @strong{cat file_list | parallel 'if [ ! -e @{@} ] ; then echo @{@}; fi'}
 
@@ -1796,6 +1997,10 @@ can be written like this:
 
 @strong{cat list | parallel do_something | process_output}
 
+For example: Find which host name in a list has IP address 1.2.3 4:
+
+@strong{cat hosts.txt | parallel -P 100 host | grep 1.2.3.4}
+
 If the processing requires more steps the for-loop like this:
 
 @verbatim
@@ -1868,6 +2073,44 @@ This also works if the input file is a file with columns:
 @verbatim
   cat addressbook.tsv | parallel --colsep '\t' --header : echo {Name} {E-mail address}
 @end verbatim
+
+@chapter EXAMPLE: Count the differences between all files in a dir
+@anchor{EXAMPLE: Count the differences between all files in a dir}
+
+Using @strong{--results} the results are saved in /tmp/diffcount*.
+
+@verbatim
+  parallel --results /tmp/diffcount "diff -U 0 {1} {2} |tail -n +3 |grep -v '^@'|wc -l" ::: * ::: *
+@end verbatim
+
+To see the difference between file A and file B look at the file
+'/tmp/diffcount 1 A 2 B' where spaces are TABs (\t).
+
+@chapter EXAMPLE: Speeding up fast jobs
+@anchor{EXAMPLE: Speeding up fast jobs}
+
+Starting a job on the local machine takes around 3 ms. This can be a
+big overhead if the job takes very few ms to run. Often you can group
+small jobs together using @strong{-X} which will make the overhead less
+significant. Compare the speed of these:
+
+@verbatim
+    seq -w 0 9999 | parallel touch pict{}.jpg
+
+    seq -w 0 9999 | parallel -X touch pict{}.jpg
+@end verbatim
+
+If your program cannot take multiple arguments, then you can use GNU
+@strong{parallel} to spawn multiple GNU @strong{parallel}s:
+
+@verbatim
+    seq -w 0 999999 | parallel -j10 --pipe parallel -j0 touch pict{}.jpg
+@end verbatim
+
+If @strong{-j0} normally spawns 506 jobs, then the above will try to spawn
+5060 jobs. It is likely that you this way will hit the limit of number
+of processes and/or filehandles. Look at 'ulimit -n' and 'ulimit -u'
+to raise these limits.
 
 @chapter EXAMPLE: Using shell variables
 @anchor{EXAMPLE: Using shell variables}
@@ -1986,14 +2229,6 @@ GNU @strong{parallel} can often speed this up.
 @strong{find . -type f | parallel -k -j150% -n 1000 -m grep -H -n STRING @{@}}
 
 This will run 1.5 job per core, and give 1000 arguments to @strong{grep}.
-
-To grep a big file in parallel use @strong{--pipe}:
-
-@strong{cat bigfile | parallel --pipe grep foo}
-
-Depending on your disks and CPUs it may be faster to read larger blocks:
-
-@strong{cat bigfile | parallel --pipe --block 10M grep foo}
 
 @chapter EXAMPLE: Using remote computers
 @anchor{EXAMPLE: Using remote computers}
@@ -2188,13 +2423,18 @@ files over high speed connections.
 The following will start one @strong{rsync} per big file in @emph{src-dir} to
 @emph{dest-dir} on the server @emph{fooserver}:
 
-@strong{find src-dir -type f -size +100000 | parallel -v ssh fooserver
+@strong{cd src-dir; find . -type f -size +100000 | parallel -v ssh fooserver
 mkdir -p /dest-dir/@{//@}\;rsync -Havessh @{@} fooserver:/dest-dir/@{@}}
 
 The dirs created may end up with wrong permissions and smaller files
 are not being transferred. To fix those run @strong{rsync} a final time:
 
 @strong{rsync -Havessh src-dir/ fooserver:/dest-dir/}
+
+If you are unable to push data, but need to pull them and the files
+are called digits.png (e.g. 000000.png) you might be able to do:
+
+<seq -w 0 99 | parallel rsync -Havessh fooserver:src-path/*@{@}.png destdir/>
 
 @chapter EXAMPLE: Use multiple inputs in one command
 @anchor{EXAMPLE: Use multiple inputs in one command}
@@ -2327,7 +2567,7 @@ complete.
 Run 10 jobs concurrently in the background:
 
 @verbatim
-  for i in `ls *.log` ; do
+  for i in *.log ; do
     echo $i
     sem -j10 gzip $i ";" echo done
   done
@@ -2401,7 +2641,7 @@ The idea is to put the jobs into a file and have GNU @strong{parallel} read
 from that continuously. As GNU @strong{parallel} will stop at end of file we
 use @strong{tail} to continue reading:
 
-@strong{echo }>@strong{jobqueue}; @strong{tail -f jobqueue | parallel}
+@strong{true }>@strong{jobqueue}; @strong{tail -f jobqueue | parallel}
 
 To submit your jobs to the queue:
 
@@ -2416,15 +2656,21 @@ There are a two small issues when using GNU @strong{parallel} as queue
 system/batch manager:
 
 @itemize
-@item You will get a warning if you do not submit JobSlots jobs within the
-first second. E.g. if you have 8 cores and use @strong{-j+2} you have to submit
-10 jobs. These can be dummy jobs (e.g. @strong{echo foo}). You can also simply
-ignore the warning.
+@item You will get a warning if you do not submit JobSlots jobs within
+the first second. E.g. if you have 8 cores and use -j+2 you have to
+submit 10 jobs. These can be dummy jobs (e.g. echo foo). You can also
+simply ignore the warning.  For parallel versions 20110322 and higher,
+the warnings will not appear.
 
-@item Jobs will be run immediately, but output from jobs will only be
-printed when JobSlots more jobs has been started. E.g. if you have 10
-jobslots then the output from the first completed job will only be
-printed when job 11 is started.
+@item You have to submit JobSlot number of jobs before they will start, and
+after that you can submit one at a time, and job will start
+immediately if free slots are available.  Output from the running or
+completed jobs are held back and will only be printed when JobSlots
+more jobs has been started (unless you use --ungroup or -u, in which
+case the output from the jobs are printed immediately).  E.g. if you
+have 10 jobslots then the output from the first completed job will
+only be printed when job 11 has started, and the output of second
+completed job will only be printed when job 12 has started.
 
 @end itemize
 
@@ -2435,24 +2681,24 @@ If you have a dir in which users drop files that needs to be processed
 you can do this on GNU/Linux (If you know what @strong{inotifywait} is
 called on other platforms file a bug report):
 
-@strong{inotifywait -q -m -r -e CLOSE_WRITE --format %w%f my_dir | parallel
+@strong{inotifywait -q -m -r -e MOVED_TO -e CLOSE_WRITE --format %w%f my_dir | parallel
 -u echo}
 
 This will run the command @strong{echo} on each file put into @strong{my_dir} or
 subdirs of @strong{my_dir}.
 
-The @strong{-u} is needed because of a small bug in GNU @strong{parallel}. If that
-proves to be a problem, file a bug report.
-
 You can of course use @strong{-S} to distribute the jobs to remote
 computers:
 
-@strong{inotifywait -q -m -r -e CLOSE_WRITE --format %w%f my_dir | parallel -S ..
--u echo}
+@strong{inotifywait -q -m -r -e MOVED_TO -e CLOSE_WRITE --format %w%f my_dir
+| parallel -S ..  -u echo}
 
 If the files to be processed are in a tar file then unpacking one file
 and processing it immediately may be faster than first unpacking all
 files. Set up the dir processor as above and unpack into the dir.
+
+Using GNU Parallel as dir processor has the same limitations as using
+GNU Parallel as queue system/batch manager.
 
 @chapter QUOTING
 @anchor{QUOTING}
@@ -2464,10 +2710,22 @@ characters that have special meaning in shell:
 
 and depending on context these needs to be quoted, too:
 
-* ~ & # ! ? space * @{
+~ & # ! ? space * @{
 
 Therefore most people will never need more quoting than putting '\'
 in front of the special characters.
+
+Often you can simply put \' around every ':
+
+@verbatim
+  perl -ne '/^\S+\s+\S+$/ and print $ARGV,"\n"' file
+@end verbatim
+
+can be quoted:
+
+@verbatim
+  parallel perl -ne \''/^\S+\s+\S+$/ and print $ARGV,"\n"'\' ::: file
+@end verbatim
 
 However, when you want to use a shell variable you need to quote the
 $-sign. Here is an example using $PARALLEL_SEQ. This variable is set
@@ -2591,7 +2849,7 @@ GNU @strong{parallel} will then print the currently running jobs on stderr
 @anchor{COMPLETE RUNNING JOBS BUT DO NOT START NEW JOBS}
 
 If you regret starting a lot of jobs you can simply break GNU @strong{parallel},
-but if you want to make sure you do not have halfcompleted jobs you
+but if you want to make sure you do not have half-completed jobs you
 should send the signal @strong{SIGTERM} to GNU @strong{parallel}:
 
 @strong{killall -TERM parallel}
@@ -2744,7 +3002,7 @@ If @strong{--halt-on-error} 1 or 2: Exit status of the failing job.
 
 There are a lot programs with some of the functionality of GNU
 @strong{parallel}. GNU @strong{parallel} strives to include the best of the
-functionality without sacrifying ease of use.
+functionality without sacrificing ease of use.
 
 @section SUMMARY TABLE
 @anchor{SUMMARY TABLE}
@@ -2793,7 +3051,7 @@ Remote execution
  R6. No config files needed
  R7. Do not run more than SSHD's MaxStartup can handle
  R8. Configurable SSH command
- R9. Retry if connection breaks occationally
+ R9. Retry if connection breaks occasionally
 
 Semaphore
  S1. Possibility to work as a mutex
@@ -2880,7 +3138,7 @@ supports (See REPORTING BUGS).
 @section DIFFERENCES BETWEEN xargs AND GNU Parallel
 @anchor{DIFFERENCES BETWEEN xargs AND GNU Parallel}
 
-@strong{xargs} offer some of the same possibilites as GNU @strong{parallel}.
+@strong{xargs} offer some of the same possibilities as GNU @strong{parallel}.
 
 @strong{xargs} deals badly with special characters (such as space, ' and
 "). To see the problem try this:
@@ -2956,7 +3214,7 @@ becomes (assuming you have 8 cores)
 @section DIFFERENCES BETWEEN find -exec AND GNU Parallel
 @anchor{DIFFERENCES BETWEEN find -exec AND GNU Parallel}
 
-@strong{find -exec} offer some of the same possibilites as GNU @strong{parallel}.
+@strong{find -exec} offer some of the same possibilities as GNU @strong{parallel}.
 
 @strong{find -exec} only works on files. So processing other input (such as
 hosts or URLs) will require creating these inputs as files. @strong{find
@@ -3445,23 +3703,35 @@ https://savannah.gnu.org/bugs/?func=additem&group=parallel
 Your bug report should always include:
 
 @itemize
+@item The error message you get (if any).
+
 @item The output of @strong{parallel --version}. If you are not running the latest
 released version you should specify why you believe the problem is not
 fixed in that version.
 
-@item A complete example that others can run that shows the problem. A
-combination of @strong{seq}, @strong{cat}, @strong{echo}, and @strong{sleep} can reproduce
-most errors. If your example requires large files, see if you can make
-them by something like @strong{seq 1000000} > @strong{file}.
+@item A complete example that others can run that shows the problem. This
+should preferably be small and simple. A combination of @strong{yes}, @strong{seq},
+@strong{cat}, @strong{echo}, and @strong{sleep} can reproduce most errors. If your
+example requires large files, see if you can make them by something
+like @strong{seq 1000000} > @strong{file} or @strong{yes | head -n 10000000} > @strong{file}.
+
+@item The output of your example. If your problem is not easily reproduced
+by others, the output might help them figure out the problem.
 
 @end itemize
 
-If you suspect the error is dependent on your distribution, please see
-if you can reproduce the error on one of these VirtualBox images:
+If you suspect the error is dependent on your environment or
+distribution, please see if you can reproduce the error on one of
+these VirtualBox images:
 http://sourceforge.net/projects/virtualboximage/files/
 
 Specifying the name of your distribution is not enough as you may have
 installed software that is not in the VirtualBox images.
+
+If you cannot reproduce the error on any of the VirtualBox images
+above, you should assume the debugging will be done through you. That
+will put more burden on you and it is extra important you give any
+information that help.
 
 @chapter AUTHOR
 @anchor{AUTHOR}
@@ -3475,8 +3745,8 @@ Copyright (C) 2007-10-18 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2008,2009,2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
-Software Foundation, Inc.
+Copyright (C) 2010,2011,2012,2013 Ole Tange, http://ole.tange.dk and
+Free Software Foundation, Inc.
 
 Parts of the manual concerning @strong{xargs} compatibility is inspired by
 the manual of @strong{xargs} from GNU findutils 4.4.2.
@@ -3484,7 +3754,7 @@ the manual of @strong{xargs} from GNU findutils 4.4.2.
 @chapter LICENSE
 @anchor{LICENSE}
 
-Copyright (C) 2007,2008,2009,2010,2011,2012 Free Software Foundation,
+Copyright (C) 2007,2008,2009,2010,2011,2012,2013 Free Software Foundation,
 Inc.
 
 This program is free software; you can redistribute it and/or modify

@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PARALLEL 1"
-.TH PARALLEL 1 "2012-04-21" "20120422" "parallel"
+.TH PARALLEL 1 "2013-06-22" "20130622" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -258,7 +258,8 @@ To understand replacement strings see \fB{}\fR.
 Argument from input source \fIn\fR or the \fIn\fR'th argument. This
 positional replacement string will be replaced by the input from input
 source \fIn\fR (when used with \fB\-a\fR or \fB::::\fR) or with the \fIn\fR'th
-argument (when used with \fB\-N\fR).
+argument (when used with \fB\-N\fR). If \fIn\fR is negative it refers to the
+\&\fIn\fR'th last argument.
 .Sp
 To understand replacement strings see \fB{}\fR.
 .IP "\fB{\fR\fIn\fR.\fB}\fR" 9
@@ -444,7 +445,8 @@ k, m, g, t, or p which would multiply the size with 1024, 1048576,
 1000000000, 1000000000000, or 1000000000000000 respectively.
 .Sp
 \&\s-1GNU\s0 \fBparallel\fR tries to meet the block size but can be off by the
-length of one record.
+length of one record. For performance reasons \fIsize\fR should be bigger
+than a single record.
 .Sp
 \&\fIsize\fR defaults to 1M.
 .Sp
@@ -483,6 +485,9 @@ separating the columns. The n'th column can be access using
 .Sp
 \&\fIregexp\fR is a Perl Regular Expression:
 http://perldoc.perl.org/perlre.html
+.IP "\fB\-\-ctrlc\fR (beta testing)" 9
+.IX Item "--ctrlc (beta testing)"
+Sends \s-1SIGINT\s0 to tasks running on remote computers thus killing them.
 .IP "\fB\-\-delimiter\fR \fIdelim\fR" 9
 .IX Item "--delimiter delim"
 .PD 0
@@ -512,6 +517,11 @@ dirname of input line.
 Set the end of file string to eof-str.  If the end of file string
 occurs as a line of input, the rest of the input is ignored.  If
 neither \fB\-E\fR nor \fB\-e\fR is used, no end of file string is used.
+.IP "\fB\-\-delay\fR \fIsecs\fR" 9
+.IX Item "--delay secs"
+Delay starting next job \fIsecs\fR seconds. \s-1GNU\s0 \fBparallel\fR will pause
+\&\fIsecs\fR seconds after starting each job. \fIsecs\fR can be less than 1
+seconds.
 .IP "\fB\-\-dry\-run\fR" 9
 .IX Item "--dry-run"
 Print the job to run on stdout (standard output), but do not run the
@@ -529,6 +539,13 @@ This option is a synonym for the \fB\-E\fR option.  Use \fB\-E\fR instead,
 because it is \s-1POSIX\s0 compliant for \fBxargs\fR while this option is not.
 If \fIeof-str\fR is omitted, there is no end of file string.  If neither
 \&\fB\-E\fR nor \fB\-e\fR is used, no end of file string is used.
+.IP "\fB\-\-env\fR \fIvar\fR" 9
+.IX Item "--env var"
+Copy environment variable \fIvar\fR. This will copy \fIvar\fR to the
+environment that the command is run in. This is especially useful for
+remote environments.
+.Sp
+Caveat: If \fIvar\fR contains newline ('\en') the value is messed up.
 .IP "\fB\-\-eta\fR" 9
 .IX Item "--eta"
 Show the estimated number of seconds before finishing. This forces \s-1GNU\s0
@@ -543,6 +560,15 @@ completion of the command before exiting.
 See also: \fB\-\-bg\fR, \fBman sem\fR
 .Sp
 Implies \fB\-\-semaphore\fR.
+.IP "\fB\-\-filter\-hosts\fR (alpha testing)" 9
+.IX Item "--filter-hosts (alpha testing)"
+Remove down hosts. For each remote host: check that login through ssh
+works. If not: do not use this host.
+.Sp
+Currently you can \fInot\fR put \fB\-\-filter\-hosts\fR in a profile,
+\&\f(CW$PARALLEL\fR, /etc/parallel/config or similar. This is because \s-1GNU\s0
+\&\fBparallel\fR uses \s-1GNU\s0 \fBparallel\fR to compute this, so you will get an
+infinite loop. This will likely be fixed in a later release.
 .IP "\fB\-\-gnu\fR" 9
 .IX Item "--gnu"
 Behave like \s-1GNU\s0 \fBparallel\fR. If \fB\-\-tollef\fR and \fB\-\-gnu\fR are both set,
@@ -613,7 +639,7 @@ use \fB\-I\fR instead.
 Logfile for executed jobs. Save a list of the executed jobs to
 \&\fIlogfile\fR in the following \s-1TAB\s0 separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
-bytes in files transfered, bytes in files returned, exit status,
+bytes in files transferred, bytes in files returned, exit status,
 and command run.
 .Sp
 To convert the times into \s-1ISO\-8601\s0 strict do:
@@ -707,38 +733,38 @@ to see the difference:
 .Ve
 .IP "\fB\-L\fR \fImax-lines\fR" 9
 .IX Item "-L max-lines"
-Use at most \fImax-lines\fR nonblank input lines per command line.
-Trailing blanks cause an input line to be logically continued on the
-next input line.
+When used with \fB\-\-pipe\fR: Read records of \fImax-lines\fR.
+.Sp
+When used otherwise: Use at most \fImax-lines\fR nonblank input lines per
+command line.  Trailing blanks cause an input line to be logically
+continued on the next input line.
 .Sp
 \&\fB\-L 0\fR means read one line, but insert 0 arguments on the command
 line.
 .Sp
-Implies \fB\-X\fR unless \fB\-m\fR or \fB\-\-xargs\fR is set.
+Implies \fB\-X\fR unless \fB\-m\fR, \fB\-\-xargs\fR, or \fB\-\-pipe\fR is set.
 .IP "\fB\-\-max\-lines\fR[=\fImax-lines\fR]" 9
 .IX Item "--max-lines[=max-lines]"
 .PD 0
 .IP "\fB\-l\fR[\fImax-lines\fR]" 9
 .IX Item "-l[max-lines]"
 .PD
-Synonym for the \fB\-L\fR option.  Unlike \fB\-L\fR, the \fImax-lines\fR argument
-is optional.  If \fImax-lines\fR is not specified, it defaults to one.
-The \fB\-l\fR option is deprecated since the \s-1POSIX\s0 standard specifies
-\&\fB\-L\fR instead.
+When used with \fB\-\-pipe\fR: Read records of \fImax-lines\fR.
+.Sp
+When used otherwise: Synonym for the \fB\-L\fR option.  Unlike \fB\-L\fR, the
+\&\fImax-lines\fR argument is optional.  If \fImax-lines\fR is not specified,
+it defaults to one.  The \fB\-l\fR option is deprecated since the \s-1POSIX\s0
+standard specifies \fB\-L\fR instead.
 .Sp
 \&\fB\-l 0\fR is an alias for \fB\-l 1\fR.
 .Sp
-Implies \fB\-X\fR unless \fB\-m\fR is set.
+Implies \fB\-X\fR unless \fB\-m\fR, \fB\-\-xargs\fR, or \fB\-\-pipe\fR is set.
 .IP "\fB\-\-load\fR \fImax-load\fR" 9
 .IX Item "--load max-load"
-Do not start new jobs on a given computer unless the load is less than
-\&\fImax-load\fR. \fImax-load\fR uses the same syntax as \fB\-\-jobs\fR, so \fI100%\fR
-for one per \s-1CPU\s0 is a valid setting. Only difference is 0 which is
-interpreted as 0.01.
-.Sp
-The load average is only sampled every 10 seconds using \fBuptime\fR to
-avoid stressing small computers. Only the first (1 minute) load is
-used.
+Do not start new jobs on a given computer unless the number of running
+processes on the computer is less than \fImax-load\fR. \fImax-load\fR uses
+the same syntax as \fB\-\-jobs\fR, so \fI100%\fR for one per \s-1CPU\s0 is a valid
+setting. Only difference is 0 which is interpreted as 0.01.
 .IP "\fB\-\-controlmaster\fR (experimental)" 9
 .IX Item "--controlmaster (experimental)"
 .PD 0
@@ -839,6 +865,11 @@ If neither \fB\-\-recstart\fR nor \fB\-\-recend\fR are given \fB\-\-recend\fR
 defaults to '\en'. To have no record separator use \fB\-\-recend ""\fR.
 .Sp
 \&\fB\-\-files\fR is often used with \fB\-\-pipe\fR.
+.IP "\fB\-\-plain\fR" 9
+.IX Item "--plain"
+Ignore any \fB\-\-profile\fR, \f(CW$PARALLEL\fR, ~/.parallel/config, and
+\&\fB\-\-tollef\fR to get full control on the command line (used by \s-1GNU\s0
+\&\fBparallel\fR internally when called with \fB\-\-sshlogin\fR).
 .IP "\fB\-\-progress\fR" 9
 .IX Item "--progress"
 Show progress of computations. List the computers involved in the task
@@ -890,8 +921,7 @@ This will set the owner of the homedir to the user:
 Implies \fB\-X\fR unless \fB\-m\fR or \fB\-\-pipe\fR is set.
 .Sp
 When used with \fB\-\-pipe\fR \fB\-N\fR is the number of records to read. This
-is much slower than \fB\-\-block\fR so avoid it if performance is
-important.
+is somewhat slower than \fB\-\-block\fR.
 .IP "\fB\-\-max\-line\-length\-allowed\fR" 9
 .IX Item "--max-line-length-allowed"
 Print the maximal number of characters allowed on the command line and
@@ -994,6 +1024,58 @@ Remove the text matched by \fB\-\-recstart\fR and \fB\-\-recend\fR before piping
 it to the command.
 .Sp
 Only used with \fB\-\-pipe\fR.
+.IP "\fB\-\-results\fR \fIprefix\fR" 9
+.IX Item "--results prefix"
+.PD 0
+.IP "\fB\-\-res\fR \fIprefix\fR" 9
+.IX Item "--res prefix"
+.PD
+Save the output into files. The files will be stored in a directory tree
+rooted at \fIprefix\fR.  Within this directory tree, each command will result
+in two files: \fIprefix\fR/<\s-1ARGS\s0>/stdout and \fIprefix\fR/<\s-1ARGS\s0>/stderr, where
+<\s-1ARGS\s0> is a sequence of directories representing the header of the input
+source (if using \fB\-\-header :\fR) or the number of the input source and
+corresponding values.
+.Sp
+E.g:
+.Sp
+.Vb 1
+\&  parallel \-\-header : \-\-results foo echo {a} {b} ::: a I II ::: b III IIII
+.Ve
+.Sp
+will generate the files:
+.Sp
+.Vb 8
+\&  foo/a/I/b/III/stderr
+\&  foo/a/I/b/IIII/stderr
+\&  foo/a/II/b/III/stderr
+\&  foo/a/II/b/IIII/stderr
+\&  foo/a/I/b/III/stdout
+\&  foo/a/I/b/IIII/stdout
+\&  foo/a/II/b/III/stdout
+\&  foo/a/II/b/IIII/stdout
+.Ve
+.Sp
+and
+.Sp
+.Vb 1
+\&  parallel \-\-results foo echo {1} {2} ::: I II ::: III IIII
+.Ve
+.Sp
+will generate the files:
+.Sp
+.Vb 8
+\&  foo/1/I/2/III/stderr
+\&  foo/1/I/2/IIII/stderr
+\&  foo/1/II/2/III/stderr
+\&  foo/1/II/2/IIII/stderr
+\&  foo/1/I/2/III/stdout
+\&  foo/1/I/2/IIII/stdout
+\&  foo/1/II/2/III/stdout
+\&  foo/1/II/2/IIII/stdout
+.Ve
+.Sp
+See also \fB\-\-files\fR, \fB\-\-header\fR, \fB\-\-joblog\fR.
 .IP "\fB\-\-resume\fR" 9
 .IX Item "--resume"
 Resumes from the last unfinished job. By reading \fB\-\-joblog\fR \s-1GNU\s0
@@ -1002,7 +1084,18 @@ there. As \s-1GNU\s0 \fBparallel\fR only looks at the sequence numbers in
 \&\fB\-\-joblog\fR then the input, the command, and \fB\-\-joblog\fR all have to
 remain unchanged; otherwise \s-1GNU\s0 \fBparallel\fR may run wrong commands.
 .Sp
-See also: \fB\-\-joblog\fR.
+See also: \fB\-\-joblog\fR, \fB\-\-resume\-failed\fR.
+.IP "\fB\-\-resume\-failed\fR" 9
+.IX Item "--resume-failed"
+Retry all failed and resume from the last unfinished job. By reading
+\&\fB\-\-joblog\fR \s-1GNU\s0 \fBparallel\fR will figure out the failed jobs and run
+those again. After that it will resume last unfinished job and
+continue from there. As \s-1GNU\s0 \fBparallel\fR only looks at the sequence
+numbers in \fB\-\-joblog\fR then the input, the command, and \fB\-\-joblog\fR
+all have to remain unchanged; otherwise \s-1GNU\s0 \fBparallel\fR may run wrong
+commands.
+.Sp
+See also: \fB\-\-joblog\fR, \fB\-\-resume\fR.
 .IP "\fB\-\-retries\fR \fIn\fR" 9
 .IX Item "--retries n"
 If a job fails, retry it on another computer. Do this \fIn\fR times. If
@@ -1113,6 +1206,67 @@ See also: \fBman sem\fR
 .IX Item "--seqreplace replace-str"
 Use the replacement string \fIreplace-str\fR instead of \fB{#}\fR for
 job sequence number.
+.IP "\fB\-\-shebang\fR" 9
+.IX Item "--shebang"
+.PD 0
+.IP "\fB\-\-hashbang\fR" 9
+.IX Item "--hashbang"
+.PD
+\&\s-1GNU\s0 \fBparallel\fR can be called as a shebang (#!) command as the first
+line of a script. The content of the file will be treated as
+inputsource.
+.Sp
+Like this:
+.Sp
+.Vb 1
+\&  #!/usr/bin/parallel \-\-shebang \-r traceroute
+\&
+\&  foss.org.my
+\&  debian.org
+\&  freenetproject.org
+.Ve
+.Sp
+\&\fB\-\-shebang\fR must be set as the first option.
+.IP "\fB\-\-shebang\-wrap\fR" 9
+.IX Item "--shebang-wrap"
+\&\s-1GNU\s0 \fBparallel\fR can parallelize scripts by wrapping the shebang
+line. If the program can be run like this:
+.Sp
+.Vb 1
+\&  cat arguments | parallel the_program
+.Ve
+.Sp
+then the script can be changed to:
+.Sp
+.Vb 1
+\&  #!/usr/bin/parallel \-\-shebang\-wrap /the/original/parser \-\-with\-options
+.Ve
+.Sp
+E.g.
+.Sp
+.Vb 1
+\&  #!/usr/bin/parallel \-\-shebang\-wrap /usr/bin/python
+.Ve
+.Sp
+If the program can be run like this:
+.Sp
+.Vb 1
+\&  cat data | parallel \-\-pipe the_program
+.Ve
+.Sp
+then the script can be changed to:
+.Sp
+.Vb 1
+\&  #!/usr/bin/parallel \-\-shebang\-wrap \-\-pipe /the/original/parser \-\-with\-options
+.Ve
+.Sp
+E.g.
+.Sp
+.Vb 1
+\&  #!/usr/bin/parallel \-\-shebang\-wrap \-\-pipe /usr/bin/perl \-w
+.Ve
+.Sp
+\&\fB\-\-shebang\-wrap\fR must be set as the first option.
 .IP "\fB\-\-shellquote\fR" 9
 .IX Item "--shellquote"
 Does not run the command but quotes it. Useful for making quoted
@@ -1121,6 +1275,11 @@ composed commands for \s-1GNU\s0 \fBparallel\fR.
 .IX Item "--skip-first-line"
 Do not use the first line of input (used by \s-1GNU\s0 \fBparallel\fR itself
 when called with \fB\-\-shebang\fR).
+.IP "\fB\-\-sshdelay\fR \fIsecs\fR" 9
+.IX Item "--sshdelay secs"
+Delay starting next ssh by \fIsecs\fR seconds. \s-1GNU\s0 \fBparallel\fR will pause
+\&\fIsecs\fR seconds after starting each ssh. \fIsecs\fR can be less than 1
+seconds.
 .IP "\fB\-S\fR \fI[ncpu/]sshlogin[,[ncpu/]sshlogin[,...]]\fR" 9
 .IX Item "-S [ncpu/]sshlogin[,[ncpu/]sshlogin[,...]]"
 .PD 0
@@ -1229,21 +1388,39 @@ arguments and \s-1TAB\s0 (\et). When combined with \fB\-\-onall\fR or \fB\-\-non
 the lines will be prepended with the sshlogin instead.
 .Sp
 \&\fB\-\-tag\fR is ignored when using \fB\-u\fR.
+.IP "\fB\-\-tagstring\fR \fIstr\fR" 9
+.IX Item "--tagstring str"
+Tag lines with a string. Each output line will be prepended with
+\&\fIstr\fR and \s-1TAB\s0 (\et). \fIstr\fR can contain replacement strings such as
+{}.
+.Sp
+\&\fB\-\-tagstring\fR is ignored when using \fB\-u\fR, \fB\-\-onall\fR, and \fB\-\-nonall\fR.
 .IP "\fB\-\-tmpdir\fR \fIdirname\fR" 9
 .IX Item "--tmpdir dirname"
 Directory for temporary files. \s-1GNU\s0 \fBparallel\fR normally buffers output
 into temporary files in /tmp. By setting \fB\-\-tmpdir\fR you can use a
 different dir for the files. Setting \fB\-\-tmpdir\fR is equivalent to
 setting \f(CW$TMPDIR\fR.
-.IP "\fB\-\-timeout\fR \fIsec\fR" 9
-.IX Item "--timeout sec"
-Time out for command. If the command runs for longer than \fIsec\fR
+.IP "\fB\-\-timeout\fR \fIval\fR (beta testing)" 9
+.IX Item "--timeout val (beta testing)"
+Time out for command. If the command runs for longer than \fIval\fR
 seconds it will get killed with \s-1SIGTERM\s0, followed by \s-1SIGTERM\s0 200 ms
 later, followed by \s-1SIGKILL\s0 200 ms later.
-.IP "\fB\-\-tollef\fR" 9
-.IX Item "--tollef"
-Make \s-1GNU\s0 \fBparallel\fR behave like Tollef's parallel command. To
-override use \fB\-\-gnu\fR.
+.Sp
+If \fIval\fR is followed by a % then the timeout will dynamically be
+computed as a percentage of the smoothed average runtime. Only values
+> 100% will make sense.
+.IP "\fB\-\-tollef\fR (obsolete \- will be retired 20140222)" 9
+.IX Item "--tollef (obsolete - will be retired 20140222)"
+Make \s-1GNU\s0 \fBparallel\fR behave more like Tollef's parallel command. It
+activates \fB\-u\fR, \fB\-q\fR, and \fB\-\-arg\-sep \-\-\fR. It also causes \fB\-l\fR to
+change meaning to \fB\-\-load\fR.
+.Sp
+Not giving '\-\-' is unsupported.
+.Sp
+\&\fBDo not use \-\-tollef unless you know what you are doing\fR.
+.Sp
+To override use \fB\-\-gnu\fR.
 .IP "\fB\-\-verbose\fR" 9
 .IX Item "--verbose"
 .PD 0
@@ -1316,9 +1493,17 @@ a bc \*(R" \-> \*(L"a bc\*(R". This is the default if \fB\-\-colsep\fR is used.
 .IP "\fB\-u\fR" 9
 .IX Item "-u"
 .PD
-Ungroup output.  Output is printed as soon as possible. This may cause
-output from different commands to be mixed. \s-1GNU\s0 \fBparallel\fR runs
-faster with \fB\-u\fR. Can be reversed with \fB\-\-group\fR.
+Ungroup output.  Output is printed as soon as possible and by passes
+\&\s-1GNU\s0 \fBparallel\fR internal processing. This may cause output from
+different commands to be mixed thus should only be used if you do not
+care about the output. Compare these:
+.Sp
+\&\fBparallel \-j0 'sleep {};echo \-n start{};sleep {};echo {}end' ::: 1 2 3 4\fR
+.Sp
+\&\fBparallel \-u \-j0 'sleep {};echo \-n start{};sleep {};echo {}end' ::: 1 2 3 4\fR
+.Sp
+It also disables \fB\-\-tag\fR. \s-1GNU\s0 \fBparallel\fR runs faster with \fB\-u\fR. Can
+be reversed with \fB\-\-group\fR.
 .IP "\fB\-\-extensionreplace\fR \fIreplace-str\fR" 9
 .IX Item "--extensionreplace replace-str"
 .PD 0
@@ -1368,6 +1553,14 @@ current working dir is beneath your home dir, the value \fB.\fR is
 treated as the relative path to your home dir. This means that if your
 home dir is different on remote computers (e.g. if your login is
 different) the relative path will still be relative to your home dir.
+.Sp
+To see the difference try:
+.Sp
+\&\fBparallel \-S server pwd ::: ""\fR
+.Sp
+\&\fBparallel \-\-wd . \-S server pwd ::: ""\fR
+.Sp
+\&\fBparallel \-\-wd ... \-S server pwd ::: ""\fR
 .IP "\fB\-\-wait\fR" 9
 .IX Item "--wait"
 Wait for all commands to complete.
@@ -1400,8 +1593,8 @@ See also \fB\-m\fR.
 .IX Item "-x"
 .PD
 Exit if the size (see the \fB\-s\fR option) is exceeded.
-.IP "\fB\-\-xapply\fR" 9
-.IX Item "--xapply"
+.IP "\fB\-\-xapply\fR (alpha testing)" 9
+.IX Item "--xapply (alpha testing)"
 Read multiple input sources like \fBxapply\fR. If multiple input sources
 are given, one argument will be read from each of the input
 sources. The arguments can be accessed in the command as \fB{1}\fR
@@ -1416,24 +1609,13 @@ Compare these two:
 \&  parallel \-\-xapply echo {1} {2} ::: 1 2 3 ::: a b c
 .Ve
 .Sp
-See also \fB\-\-header\fR.
-.IP "\fB\-\-shebang\fR" 9
-.IX Item "--shebang"
-.PD 0
-.IP "\fB\-\-hashbang\fR" 9
-.IX Item "--hashbang"
-.PD
-\&\s-1GNU\s0 \fBParallel\fR can be called as a shebang (#!) command as the first line of a script. Like this:
+Arguments will be recycled if one input source has more arguments than the others:
 .Sp
 .Vb 1
-\&  #!/usr/bin/parallel \-\-shebang \-r traceroute
-\&
-\&  foss.org.my
-\&  debian.org
-\&  freenetproject.org
+\&  parallel \-\-xapply echo {1} {2} {3} ::: 1 2 ::: I II III ::: a b c d e f g
 .Ve
 .Sp
-For this to work \fB\-\-shebang\fR must be set as the first option.
+See also \fB\-\-header\fR.
 .SH "EXAMPLE: Working as xargs \-n1. Argument appending"
 .IX Header "EXAMPLE: Working as xargs -n1. Argument appending"
 \&\s-1GNU\s0 \fBparallel\fR can work similar to \fBxargs \-n1\fR.
@@ -1531,7 +1713,7 @@ solution is to quote the whole command:
 .PP
 \&\fBparallel "zcat {} \fR>\fB{.}" ::: *.gz\fR
 .PP
-Other special shell charaters (such as * ; $ > < | >> <<) also need
+Other special shell characters (such as * ; $ > < | >> <<) also need
 to be put in quotes, as they may otherwise be interpreted by the shell
 and not given to \s-1GNU\s0 \fBparallel\fR.
 .SH "EXAMPLE: Composed commands"
@@ -1561,7 +1743,7 @@ symlinks are empty files.
 .PP
 \&\fBcp \-rs /the/source/dir mirror_dir; find mirror_dir \-type l | parallel \-m rm {} '&&' touch {}\fR
 .PP
-Find the files in a list that do no exist.
+Find the files in a list that do not exist
 .PP
 \&\fBcat file_list | parallel 'if [ ! \-e {} ] ; then echo {}; fi'\fR
 .SH "EXAMPLE: Removing file extension when processing files"
@@ -1684,6 +1866,10 @@ can be written like this:
 .PP
 \&\fBcat list | parallel do_something | process_output\fR
 .PP
+For example: Find which host name in a list has \s-1IP\s0 address 1.2.3 4:
+.PP
+\&\fBcat hosts.txt | parallel \-P 100 host | grep 1.2.3.4\fR
+.PP
 If the processing requires more steps the for-loop like this:
 .PP
 .Vb 5
@@ -1752,6 +1938,40 @@ This also works if the input file is a file with columns:
 .Vb 1
 \&  cat addressbook.tsv | parallel \-\-colsep \*(Aq\et\*(Aq \-\-header : echo {Name} {E\-mail address}
 .Ve
+.SH "EXAMPLE: Count the differences between all files in a dir"
+.IX Header "EXAMPLE: Count the differences between all files in a dir"
+Using \fB\-\-results\fR the results are saved in /tmp/diffcount*.
+.PP
+.Vb 1
+\&  parallel \-\-results /tmp/diffcount "diff \-U 0 {1} {2} |tail \-n +3 |grep \-v \*(Aq^@\*(Aq|wc \-l" ::: * ::: *
+.Ve
+.PP
+To see the difference between file A and file B look at the file
+\&'/tmp/diffcount 1 A 2 B' where spaces are TABs (\et).
+.SH "EXAMPLE: Speeding up fast jobs"
+.IX Header "EXAMPLE: Speeding up fast jobs"
+Starting a job on the local machine takes around 3 ms. This can be a
+big overhead if the job takes very few ms to run. Often you can group
+small jobs together using \fB\-X\fR which will make the overhead less
+significant. Compare the speed of these:
+.PP
+.Vb 1
+\&    seq \-w 0 9999 | parallel touch pict{}.jpg
+\&
+\&    seq \-w 0 9999 | parallel \-X touch pict{}.jpg
+.Ve
+.PP
+If your program cannot take multiple arguments, then you can use \s-1GNU\s0
+\&\fBparallel\fR to spawn multiple \s-1GNU\s0 \fBparallel\fRs:
+.PP
+.Vb 1
+\&    seq \-w 0 999999 | parallel \-j10 \-\-pipe parallel \-j0 touch pict{}.jpg
+.Ve
+.PP
+If \fB\-j0\fR normally spawns 506 jobs, then the above will try to spawn
+5060 jobs. It is likely that you this way will hit the limit of number
+of processes and/or filehandles. Look at 'ulimit \-n' and 'ulimit \-u'
+to raise these limits.
 .SH "EXAMPLE: Using shell variables"
 .IX Header "EXAMPLE: Using shell variables"
 When using shell variables you need to quote them correctly as they
@@ -1860,14 +2080,6 @@ combined in the correct order.
 \&\fBfind . \-type f | parallel \-k \-j150% \-n 1000 \-m grep \-H \-n \s-1STRING\s0 {}\fR
 .PP
 This will run 1.5 job per core, and give 1000 arguments to \fBgrep\fR.
-.PP
-To grep a big file in parallel use \fB\-\-pipe\fR:
-.PP
-\&\fBcat bigfile | parallel \-\-pipe grep foo\fR
-.PP
-Depending on your disks and CPUs it may be faster to read larger blocks:
-.PP
-\&\fBcat bigfile | parallel \-\-pipe \-\-block 10M grep foo\fR
 .SH "EXAMPLE: Using remote computers"
 .IX Header "EXAMPLE: Using remote computers"
 To run commands on a remote computer \s-1SSH\s0 needs to be set up and you
@@ -2052,13 +2264,18 @@ files over high speed connections.
 The following will start one \fBrsync\fR per big file in \fIsrc-dir\fR to
 \&\fIdest-dir\fR on the server \fIfooserver\fR:
 .PP
-\&\fBfind src-dir \-type f \-size +100000 | parallel \-v ssh fooserver
+\&\fBcd src-dir; find . \-type f \-size +100000 | parallel \-v ssh fooserver
 mkdir \-p /dest\-dir/{//}\e;rsync \-Havessh {} fooserver:/dest\-dir/{}\fR
 .PP
 The dirs created may end up with wrong permissions and smaller files
 are not being transferred. To fix those run \fBrsync\fR a final time:
 .PP
 \&\fBrsync \-Havessh src\-dir/ fooserver:/dest\-dir/\fR
+.PP
+If you are unable to push data, but need to pull them and the files
+are called digits.png (e.g. 000000.png) you might be able to do:
+.PP
+<seq \-w 0 99 | parallel rsync \-Havessh fooserver:src\-path/*{}.png destdir/>
 .SH "EXAMPLE: Use multiple inputs in one command"
 .IX Header "EXAMPLE: Use multiple inputs in one command"
 Copy files like foo.es.ext to foo.ext:
@@ -2179,7 +2396,7 @@ complete.
 Run 10 jobs concurrently in the background:
 .PP
 .Vb 5
-\&  for i in \`ls *.log\` ; do
+\&  for i in *.log ; do
 \&    echo $i
 \&    sem \-j10 gzip $i ";" echo done
 \&  done
@@ -2247,7 +2464,7 @@ The idea is to put the jobs into a file and have \s-1GNU\s0 \fBparallel\fR read
 from that continuously. As \s-1GNU\s0 \fBparallel\fR will stop at end of file we
 use \fBtail\fR to continue reading:
 .PP
-\&\fBecho \fR>\fBjobqueue\fR; \fBtail \-f jobqueue | parallel\fR
+\&\fBtrue \fR>\fBjobqueue\fR; \fBtail \-f jobqueue | parallel\fR
 .PP
 To submit your jobs to the queue:
 .PP
@@ -2261,39 +2478,45 @@ computers:
 There are a two small issues when using \s-1GNU\s0 \fBparallel\fR as queue
 system/batch manager:
 .IP "\(bu" 2
-You will get a warning if you do not submit JobSlots jobs within the
-first second. E.g. if you have 8 cores and use \fB\-j+2\fR you have to submit
-10 jobs. These can be dummy jobs (e.g. \fBecho foo\fR). You can also simply
-ignore the warning.
+You will get a warning if you do not submit JobSlots jobs within
+the first second. E.g. if you have 8 cores and use \-j+2 you have to
+submit 10 jobs. These can be dummy jobs (e.g. echo foo). You can also
+simply ignore the warning.  For parallel versions 20110322 and higher,
+the warnings will not appear.
 .IP "\(bu" 2
-Jobs will be run immediately, but output from jobs will only be
-printed when JobSlots more jobs has been started. E.g. if you have 10
-jobslots then the output from the first completed job will only be
-printed when job 11 is started.
+You have to submit JobSlot number of jobs before they will start, and
+after that you can submit one at a time, and job will start
+immediately if free slots are available.  Output from the running or
+completed jobs are held back and will only be printed when JobSlots
+more jobs has been started (unless you use \-\-ungroup or \-u, in which
+case the output from the jobs are printed immediately).  E.g. if you
+have 10 jobslots then the output from the first completed job will
+only be printed when job 11 has started, and the output of second
+completed job will only be printed when job 12 has started.
 .SH "EXAMPLE: GNU Parallel as dir processor"
 .IX Header "EXAMPLE: GNU Parallel as dir processor"
 If you have a dir in which users drop files that needs to be processed
 you can do this on GNU/Linux (If you know what \fBinotifywait\fR is
 called on other platforms file a bug report):
 .PP
-\&\fBinotifywait \-q \-m \-r \-e \s-1CLOSE_WRITE\s0 \-\-format \f(CB%w\fB%f my_dir | parallel
+\&\fBinotifywait \-q \-m \-r \-e \s-1MOVED_TO\s0 \-e \s-1CLOSE_WRITE\s0 \-\-format \f(CB%w\fB%f my_dir | parallel
 \&\-u echo\fR
 .PP
 This will run the command \fBecho\fR on each file put into \fBmy_dir\fR or
 subdirs of \fBmy_dir\fR.
 .PP
-The \fB\-u\fR is needed because of a small bug in \s-1GNU\s0 \fBparallel\fR. If that
-proves to be a problem, file a bug report.
-.PP
 You can of course use \fB\-S\fR to distribute the jobs to remote
 computers:
 .PP
-\&\fBinotifywait \-q \-m \-r \-e \s-1CLOSE_WRITE\s0 \-\-format \f(CB%w\fB%f my_dir | parallel \-S ..
-\&\-u echo\fR
+\&\fBinotifywait \-q \-m \-r \-e \s-1MOVED_TO\s0 \-e \s-1CLOSE_WRITE\s0 \-\-format \f(CB%w\fB%f my_dir
+| parallel \-S ..  \-u echo\fR
 .PP
 If the files to be processed are in a tar file then unpacking one file
 and processing it immediately may be faster than first unpacking all
 files. Set up the dir processor as above and unpack into the dir.
+.PP
+Using \s-1GNU\s0 Parallel as dir processor has the same limitations as using
+\&\s-1GNU\s0 Parallel as queue system/batch manager.
 .SH "QUOTING"
 .IX Header "QUOTING"
 \&\s-1GNU\s0 \fBparallel\fR is very liberal in quoting. You only need to quote
@@ -2303,10 +2526,22 @@ characters that have special meaning in shell:
 .PP
 and depending on context these needs to be quoted, too:
 .PP
-* ~ & # ! ? space * {
+~ & # ! ? space * {
 .PP
 Therefore most people will never need more quoting than putting '\e'
 in front of the special characters.
+.PP
+Often you can simply put \e' around every ':
+.PP
+.Vb 1
+\&  perl \-ne \*(Aq/^\eS+\es+\eS+$/ and print $ARGV,"\en"\*(Aq file
+.Ve
+.PP
+can be quoted:
+.PP
+.Vb 1
+\&  parallel perl \-ne \e\*(Aq\*(Aq/^\eS+\es+\eS+$/ and print $ARGV,"\en"\*(Aq\e\*(Aq ::: file
+.Ve
 .PP
 However, when you want to use a shell variable you need to quote the
 $\-sign. Here is an example using \f(CW$PARALLEL_SEQ\fR. This variable is set
@@ -2426,7 +2661,7 @@ If you want a list of the jobs currently running you can run:
 .SH "COMPLETE RUNNING JOBS BUT DO NOT START NEW JOBS"
 .IX Header "COMPLETE RUNNING JOBS BUT DO NOT START NEW JOBS"
 If you regret starting a lot of jobs you can simply break \s-1GNU\s0 \fBparallel\fR,
-but if you want to make sure you do not have halfcompleted jobs you
+but if you want to make sure you do not have half-completed jobs you
 should send the signal \fB\s-1SIGTERM\s0\fR to \s-1GNU\s0 \fBparallel\fR:
 .PP
 \&\fBkillall \-TERM parallel\fR
@@ -2551,7 +2786,7 @@ If \fB\-\-halt\-on\-error\fR 1 or 2: Exit status of the failing job.
 .IX Header "DIFFERENCES BETWEEN GNU Parallel AND ALTERNATIVES"
 There are a lot programs with some of the functionality of \s-1GNU\s0
 \&\fBparallel\fR. \s-1GNU\s0 \fBparallel\fR strives to include the best of the
-functionality without sacrifying ease of use.
+functionality without sacrificing ease of use.
 .SS "\s-1SUMMARY\s0 \s-1TABLE\s0"
 .IX Subsection "SUMMARY TABLE"
 The following features are in some of the comparable tools:
@@ -2598,7 +2833,7 @@ Remote execution
  R6. No config files needed
  R7. Do not run more than \s-1SSHD\s0's MaxStartup can handle
  R8. Configurable \s-1SSH\s0 command
- R9. Retry if connection breaks occationally
+ R9. Retry if connection breaks occasionally
 .PP
 Semaphore
  S1. Possibility to work as a mutex
@@ -2683,7 +2918,7 @@ ClusterSSH: \s-1TODO\s0 \- Please file a bug-report if you know what features Cl
 supports (See \s-1REPORTING\s0 \s-1BUGS\s0).
 .SS "\s-1DIFFERENCES\s0 \s-1BETWEEN\s0 xargs \s-1AND\s0 \s-1GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN xargs AND GNU Parallel"
-\&\fBxargs\fR offer some of the same possibilites as \s-1GNU\s0 \fBparallel\fR.
+\&\fBxargs\fR offer some of the same possibilities as \s-1GNU\s0 \fBparallel\fR.
 .PP
 \&\fBxargs\fR deals badly with special characters (such as space, ' and
 "). To see the problem try this:
@@ -2757,7 +2992,7 @@ becomes (assuming you have 8 cores)
 \&\fBls | xargs \-d \*(L"\en\*(R" \-P8 \-I {} bash \-c \*(L"echo {}; ls {}|wc\*(R"\fR
 .SS "\s-1DIFFERENCES\s0 \s-1BETWEEN\s0 find \-exec \s-1AND\s0 \s-1GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN find -exec AND GNU Parallel"
-\&\fBfind \-exec\fR offer some of the same possibilites as \s-1GNU\s0 \fBparallel\fR.
+\&\fBfind \-exec\fR offer some of the same possibilities as \s-1GNU\s0 \fBparallel\fR.
 .PP
 \&\fBfind \-exec\fR only works on files. So processing other input (such as
 hosts or URLs) will require creating these inputs as files. \fBfind
@@ -3203,21 +3438,33 @@ https://savannah.gnu.org/bugs/?func=additem&group=parallel
 .PP
 Your bug report should always include:
 .IP "\(bu" 2
+The error message you get (if any).
+.IP "\(bu" 2
 The output of \fBparallel \-\-version\fR. If you are not running the latest
 released version you should specify why you believe the problem is not
 fixed in that version.
 .IP "\(bu" 2
-A complete example that others can run that shows the problem. A
-combination of \fBseq\fR, \fBcat\fR, \fBecho\fR, and \fBsleep\fR can reproduce
-most errors. If your example requires large files, see if you can make
-them by something like \fBseq 1000000\fR > \fBfile\fR.
+A complete example that others can run that shows the problem. This
+should preferably be small and simple. A combination of \fByes\fR, \fBseq\fR,
+\&\fBcat\fR, \fBecho\fR, and \fBsleep\fR can reproduce most errors. If your
+example requires large files, see if you can make them by something
+like \fBseq 1000000\fR > \fBfile\fR or \fByes | head \-n 10000000\fR > \fBfile\fR.
+.IP "\(bu" 2
+The output of your example. If your problem is not easily reproduced
+by others, the output might help them figure out the problem.
 .PP
-If you suspect the error is dependent on your distribution, please see
-if you can reproduce the error on one of these VirtualBox images:
+If you suspect the error is dependent on your environment or
+distribution, please see if you can reproduce the error on one of
+these VirtualBox images:
 http://sourceforge.net/projects/virtualboximage/files/
 .PP
 Specifying the name of your distribution is not enough as you may have
 installed software that is not in the VirtualBox images.
+.PP
+If you cannot reproduce the error on any of the VirtualBox images
+above, you should assume the debugging will be done through you. That
+will put more burden on you and it is extra important you give any
+information that help.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 When using \s-1GNU\s0 \fBparallel\fR for a publication please cite:
@@ -3229,14 +3476,14 @@ Copyright (C) 2007\-10\-18 Ole Tange, http://ole.tange.dk
 .PP
 Copyright (C) 2008,2009,2010 Ole Tange, http://ole.tange.dk
 .PP
-Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
-Software Foundation, Inc.
+Copyright (C) 2010,2011,2012,2013 Ole Tange, http://ole.tange.dk and
+Free Software Foundation, Inc.
 .PP
 Parts of the manual concerning \fBxargs\fR compatibility is inspired by
 the manual of \fBxargs\fR from \s-1GNU\s0 findutils 4.4.2.
 .SH "LICENSE"
 .IX Header "LICENSE"
-Copyright (C) 2007,2008,2009,2010,2011,2012 Free Software Foundation,
+Copyright (C) 2007,2008,2009,2010,2011,2012,2013 Free Software Foundation,
 Inc.
 .PP
 This program is free software; you can redistribute it and/or modify

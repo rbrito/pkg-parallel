@@ -52,7 +52,7 @@
 <hr />
 <h1><a name="synopsis">SYNOPSIS</a></h1>
 <p><strong>niceload</strong> [-v] [-h] [-n nice] [-I io] [-L load] [-M mem] [-N]
-[-t time] [-s time|-f factor] ( command | -p PID )</p>
+[--sensor program] [-t time] [-s time|-f factor] ( command | -p PID [-p PID ...] )</p>
 <p>
 </p>
 <hr />
@@ -95,7 +95,7 @@ under the limits. The default is <strong>--soft</strong>.</p>
 
 <dd>
 <p>Limit for I/O. The amount of disk I/O will be computed as a value 0 -
-10, where 0 is no I/O and 10 is at least one disk is 100% satuated.</p>
+10, where 0 is no I/O and 10 is at least one disk is 100% saturated.</p>
 <p><strong>--io</strong> will set both <strong>--start-io</strong> and <strong>run-io</strong>.</p>
 </dd>
 <dt><strong><a name="load_loadlimit" class="item"><strong>--load</strong> <em>loadlimit</em></a></strong></dt>
@@ -137,12 +137,21 @@ indication that the system is memory stressed.</p>
 <dd>
 <p>Sets niceness. See <strong>nice</strong>(1).</p>
 </dd>
-<dt><strong><a name="p_pid" class="item"><strong>-p</strong> <em>PID</em></a></strong></dt>
+<dt><strong><a name="pid" class="item"><strong>-p</strong> <em>PID</em> (alpha testing)</a></strong></dt>
 
-<dt><strong><a name="pid_pid" class="item"><strong>--pid</strong> <em>PID</em></a></strong></dt>
+<dt><strong><strong>--pid</strong> <em>PID</em> (alpha testing)</strong></dt>
 
 <dd>
-<p>Process ID of process to suspend.</p>
+<p>Process ID of process to suspend. You can specify multiple process IDs
+with multiple <strong>-p</strong> <em>PID</em>.</p>
+</dd>
+<dt><strong><a name="program" class="item"><strong>--prg</strong> <em>program</em> (alpha testing)</a></strong></dt>
+
+<dt><strong><strong>--program</strong> <em>program</em> (alpha testing)</strong></dt>
+
+<dd>
+<p>Name of running program to suspend. You can specify multiple programs
+with multiple <strong>--prg</strong> <em>program</em>.</p>
 </dd>
 <dt><strong><a name="quote" class="item"><strong>--quote</strong></a></strong></dt>
 
@@ -167,6 +176,17 @@ $, &gt;, and &quot; that should not be interpreted by the shell.</p>
 <dd>
 <p>Run limit. The running program will be slowed down if the system is
 above the limit. See: <strong>--io</strong>, <strong>--load</strong>, <strong>--mem</strong>, <strong>--noswap</strong>.</p>
+</dd>
+<dt><strong><strong>--sensor</strong> <em>sensor program</em> (alpha testing)</strong></dt>
+
+<dd>
+<p>Read sensor. Use <em>sensor program</em> to read a sensor.</p>
+<p>This will keep the CPU temperature below 80 deg C on GNU/Linux:</p>
+<pre>
+  niceload -l 80000 -f 0.001 --sensor 'sort -n /sys/devices/platform/coretemp*/temp*_input' gzip *</pre>
+<p>This will stop if the disk space &lt; 100000.</p>
+<pre>
+  niceload -H -l -100000 --sensor &quot;df . | awk '{ print \$4 }'&quot; echo</pre>
 </dd>
 <dt><strong><a name="start_io_iolimit" class="item"><strong>--start-io</strong> <em>iolimit</em></a></strong></dt>
 
@@ -224,7 +244,7 @@ you know what your are doing.</p>
 <h1><a name="example__see_niceload_in_action">EXAMPLE: See niceload in action</a></h1>
 <p>In terminal 1 run: top</p>
 <p>In terminal 2 run:</p>
-<p><strong>niceload perl -e '$|=1;do{$l==$r or print &quot;.&quot;; $l=$r}until(($r=time-$^T)</strong>&gt;<strong>50)'</strong></p>
+<p><strong>niceload -q perl -e '$|=1;do{$l==$r or print &quot;.&quot;; $l=$r}until(($r=time-$^T)</strong>&gt;<strong>50)'</strong></p>
 <p>This will print a '.' every second for 50 seconds and eat a lot of
 CPU. When the load rises to 1.0 the process is suspended.</p>
 <p>
@@ -275,13 +295,13 @@ is too low.</p>
 <h1><a name="author">AUTHOR</a></h1>
 <p>Copyright (C) 2004-11-19 Ole Tange, <a href="http://ole.tange.dk">http://ole.tange.dk</a></p>
 <p>Copyright (C) 2005,2006,2006,2008,2009,2010 Ole Tange, <a href="http://ole.tange.dk">http://ole.tange.dk</a></p>
-<p>Copyright (C) 2010,2011 Ole Tange, <a href="http://ole.tange.dk">http://ole.tange.dk</a> and Free
+<p>Copyright (C) 2010,2011,2012 Ole Tange, <a href="http://ole.tange.dk">http://ole.tange.dk</a> and Free
 Software Foundation, Inc.</p>
 <p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright (C) 2010 Free Software Foundation, Inc.</p>
+<p>Copyright (C) 2010,2011,2012 Free Software Foundation, Inc.</p>
 <p>This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or

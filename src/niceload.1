@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "NICELOAD 1"
-.TH NICELOAD 1 "2011-11-22" "20120422" "parallel"
+.TH NICELOAD 1 "2013-05-26" "20130622" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -134,7 +134,7 @@ niceload \- slow down a program when the load average is above a certain limit
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 \&\fBniceload\fR [\-v] [\-h] [\-n nice] [\-I io] [\-L load] [\-M mem] [\-N]
-[\-t time] [\-s time|\-f factor] ( command | \-p \s-1PID\s0 )
+[\-\-sensor program] [\-t time] [\-s time|\-f factor] ( command | \-p \s-1PID\s0 [\-p \s-1PID\s0 ...] )
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 \&\s-1GNU\s0 \fBniceload\fR will slow down a program when the load average (or
@@ -176,7 +176,7 @@ under the limits. The default is \fB\-\-soft\fR.
 .IX Item "-I iolimit"
 .PD
 Limit for I/O. The amount of disk I/O will be computed as a value 0 \-
-10, where 0 is no I/O and 10 is at least one disk is 100% satuated.
+10, where 0 is no I/O and 10 is at least one disk is 100% saturated.
 .Sp
 \&\fB\-\-io\fR will set both \fB\-\-start\-io\fR and \fBrun-io\fR.
 .IP "\fB\-\-load\fR \fIloadlimit\fR" 9
@@ -223,13 +223,22 @@ indication that the system is memory stressed.
 .IX Item "--nice niceness"
 .PD
 Sets niceness. See \fBnice\fR(1).
-.IP "\fB\-p\fR \fI\s-1PID\s0\fR" 9
-.IX Item "-p PID"
+.IP "\fB\-p\fR \fI\s-1PID\s0\fR (alpha testing)" 9
+.IX Item "-p PID (alpha testing)"
 .PD 0
-.IP "\fB\-\-pid\fR \fI\s-1PID\s0\fR" 9
-.IX Item "--pid PID"
+.IP "\fB\-\-pid\fR \fI\s-1PID\s0\fR (alpha testing)" 9
+.IX Item "--pid PID (alpha testing)"
 .PD
-Process \s-1ID\s0 of process to suspend.
+Process \s-1ID\s0 of process to suspend. You can specify multiple process IDs
+with multiple \fB\-p\fR \fI\s-1PID\s0\fR.
+.IP "\fB\-\-prg\fR \fIprogram\fR (alpha testing)" 9
+.IX Item "--prg program (alpha testing)"
+.PD 0
+.IP "\fB\-\-program\fR \fIprogram\fR (alpha testing)" 9
+.IX Item "--program program (alpha testing)"
+.PD
+Name of running program to suspend. You can specify multiple programs
+with multiple \fB\-\-prg\fR \fIprogram\fR.
 .IP "\fB\-\-quote\fR" 9
 .IX Item "--quote"
 .PD 0
@@ -254,6 +263,21 @@ $, >, and " that should not be interpreted by the shell.
 .PD
 Run limit. The running program will be slowed down if the system is
 above the limit. See: \fB\-\-io\fR, \fB\-\-load\fR, \fB\-\-mem\fR, \fB\-\-noswap\fR.
+.IP "\fB\-\-sensor\fR \fIsensor program\fR (alpha testing)" 9
+.IX Item "--sensor sensor program (alpha testing)"
+Read sensor. Use \fIsensor program\fR to read a sensor.
+.Sp
+This will keep the \s-1CPU\s0 temperature below 80 deg C on GNU/Linux:
+.Sp
+.Vb 1
+\&  niceload \-l 80000 \-f 0.001 \-\-sensor \*(Aqsort \-n /sys/devices/platform/coretemp*/temp*_input\*(Aq gzip *
+.Ve
+.Sp
+This will stop if the disk space < 100000.
+.Sp
+.Vb 1
+\&  niceload \-H \-l \-100000 \-\-sensor "df . | awk \*(Aq{ print \e$4 }\*(Aq" echo
+.Ve
 .IP "\fB\-\-start\-io\fR \fIiolimit\fR" 9
 .IX Item "--start-io iolimit"
 .PD 0
@@ -309,7 +333,7 @@ In terminal 1 run: top
 .PP
 In terminal 2 run:
 .PP
-\&\fBniceload perl \-e '$|=1;do{$l==$r or print \*(L".\*(R"; \f(CB$l\fB=$r}until(($r=time\-$^T)\fR>\fB50)'\fR
+\&\fBniceload \-q perl \-e '$|=1;do{$l==$r or print \*(L".\*(R"; \f(CB$l\fB=$r}until(($r=time\-$^T)\fR>\fB50)'\fR
 .PP
 This will print a '.' every second for 50 seconds and eat a lot of
 \&\s-1CPU\s0. When the load rises to 1.0 the process is suspended.
@@ -356,11 +380,11 @@ Copyright (C) 2004\-11\-19 Ole Tange, http://ole.tange.dk
 .PP
 Copyright (C) 2005,2006,2006,2008,2009,2010 Ole Tange, http://ole.tange.dk
 .PP
-Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 .SH "LICENSE"
 .IX Header "LICENSE"
-Copyright (C) 2010 Free Software Foundation, Inc.
+Copyright (C) 2010,2011,2012 Free Software Foundation, Inc.
 .PP
 This program is free software; you can redistribute it and/or modify
 it under the terms of the \s-1GNU\s0 General Public License as published by

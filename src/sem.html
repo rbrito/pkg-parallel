@@ -188,7 +188,7 @@ are often a good value.</p>
 <p>Run one gzip process per CPU core. Block until a CPU core becomes
 available.</p>
 <pre>
-  for i in `ls *.log` ; do
+  for i in *.log ; do
     echo $i
     sem -j+0 gzip $i &quot;;&quot; echo done
   done
@@ -219,13 +219,13 @@ time. <strong>sem</strong> running as a mutex will do just that:</p>
 </p>
 <hr />
 <h1><a name="author">AUTHOR</a></h1>
-<p>Copyright (C) 2010,2011 Ole Tange, <a href="http://ole.tange.dk">http://ole.tange.dk</a> and Free
+<p>Copyright (C) 2010,2011,2012,2013 Ole Tange, <a href="http://ole.tange.dk">http://ole.tange.dk</a> and Free
 Software Foundation, Inc.</p>
 <p>
 </p>
 <hr />
 <h1><a name="license">LICENSE</a></h1>
-<p>Copyright (C) 2010,2011 Free Software Foundation, Inc.</p>
+<p>Copyright (C) 2010,2011,2012,2013 Free Software Foundation, Inc.</p>
 <p>This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 3 of the License, or
