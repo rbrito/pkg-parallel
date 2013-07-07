@@ -1,3 +1,17 @@
+parallel (20130622-1~1.gbp759988) UNRELEASED; urgency=low
+
+  ** SNAPSHOT build @759988415912b503c89b0dc36184e1acff90a24f **
+
+  * Imported Upstream version 20130622
+  * debian/watch:
+    + Track only versions that begin with digits.
+  * debian/copyright:
+    + Update copyright years.
+  * debian/{compat,control}:
+    + Use debhelper compat version 9.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 05:51:00 -0300
+
 parallel (20120422-1) unstable; urgency=low
 
   * Imported Upstream version 20120422
