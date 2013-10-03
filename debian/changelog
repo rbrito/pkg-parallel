@@ -1,11 +1,9 @@
-parallel (20130922-1~1.gbpba1502) UNRELEASED; urgency=low
-
-  ** SNAPSHOT build @ba15021c98725b1d1f2ffb93e958451feb6c79f5 **
+parallel (20130922-1) unstable; urgency=low
 
   * Imported Upstream version 20130922. (Closes: #724123)
   * debian/patches: Remove, applied upstream. (Closes: #671006)
 
- -- Rogério Brito <rbrito@ime.usp.br>  Thu, 03 Oct 2013 01:32:59 -0300
+ -- Rogério Brito <rbrito@ime.usp.br>  Thu, 03 Oct 2013 01:38:20 -0300
 
 parallel (20130622-1) unstable; urgency=low
 
