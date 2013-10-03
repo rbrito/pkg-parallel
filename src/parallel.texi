@@ -59,8 +59,6 @@ after the list of options. That will give you an idea of what GNU
 @strong{parallel} is capable of.
 
 You can also watch the intro video for a quick introduction:
-http://tinyogg.com/watch/TORaR/ http://tinyogg.com/watch/hfxKj/ and
-http://tinyogg.com/watch/YQuXd/ or
 http://www.youtube.com/playlist?list=PL284C9FF2488BC6D1
 
 @chapter OPTIONS
@@ -79,8 +77,8 @@ If @emph{command} is given, GNU @strong{parallel} solve the same tasks as
 similar to @strong{cat | sh}.
 
 The @emph{command} must be an executable, a script, a composed command, or
-a function. If it is a function you need to @strong{export -f} the function
-first. An alias will, however, not work (see why
+a function. If it is a Bash function you need to @strong{export -f} the
+function first. An alias will, however, not work (see why
 http://www.perlmonks.org/index.pl?node_id=484296).
 
 @item @strong{@{@}}
@@ -355,7 +353,7 @@ Run command in background thus GNU @strong{parallel} will not wait for
 completion of the command before exiting. This is the default if
 @strong{--semaphore} is set.
 
-See also: @strong{--fg}, @strong{man sem}
+See also: @strong{--fg}, @strong{man sem}.
 
 Implies @strong{--semaphore}.
 
@@ -420,8 +418,8 @@ separating the columns. The n'th column can be access using
 @emph{regexp} is a Perl Regular Expression:
 http://perldoc.perl.org/perlre.html
 
-@item @strong{--ctrlc} (beta testing)
-@anchor{@strong{--ctrlc} (beta testing)}
+@item @strong{--ctrlc}
+@anchor{@strong{--ctrlc}}
 
 Sends SIGINT to tasks running on remote computers thus killing them.
 
@@ -458,8 +456,8 @@ Set the end of file string to eof-str.  If the end of file string
 occurs as a line of input, the rest of the input is ignored.  If
 neither @strong{-E} nor @strong{-e} is used, no end of file string is used.
 
-@item @strong{--delay} @emph{secs}
-@anchor{@strong{--delay} @emph{secs}}
+@item @strong{--delay} @emph{secs} (alpha testing)
+@anchor{@strong{--delay} @emph{secs} (alpha testing)}
 
 Delay starting next job @emph{secs} seconds. GNU @strong{parallel} will pause
 @emph{secs} seconds after starting each job. @emph{secs} can be less than 1
@@ -485,14 +483,20 @@ because it is POSIX compliant for @strong{xargs} while this option is not.
 If @emph{eof-str} is omitted, there is no end of file string.  If neither
 @strong{-E} nor @strong{-e} is used, no end of file string is used.
 
-@item @strong{--env} @emph{var}
-@anchor{@strong{--env} @emph{var}}
+@item @strong{--env} @emph{var} (alpha testing)
+@anchor{@strong{--env} @emph{var} (alpha testing)}
 
 Copy environment variable @emph{var}. This will copy @emph{var} to the
 environment that the command is run in. This is especially useful for
-remote environments.
+remote execution.
 
-Caveat: If @emph{var} contains newline ('\n') the value is messed up.
+In Bash @emph{var} can also be a Bash function - just remember to @strong{export
+-f} the function.
+
+The variable '_' is special. It will copy all enviroment variables
+except for the ones mentioned in ~/.parallel/ignored_vars.
+
+See also: @strong{--record-env}.
 
 @item @strong{--eta}
 @anchor{@strong{--eta}}
@@ -508,7 +512,7 @@ Implies @strong{--progress}.
 Run command in foreground thus GNU @strong{parallel} will wait for
 completion of the command before exiting.
 
-See also: @strong{--bg}, @strong{man sem}
+See also @strong{--bg}, @strong{man sem}.
 
 Implies @strong{--semaphore}.
 
@@ -578,16 +582,19 @@ status will be the exit status from the failing job.
 
 @end table
 
-@item @strong{--header} @emph{regexp}
-@anchor{@strong{--header} @emph{regexp}}
+@item @strong{--header} @emph{regexp} (alpha testing)
+@anchor{@strong{--header} @emph{regexp} (alpha testing)}
 
-Use upto regexp as header. For normal usage the matched header
-(typically the first line: @strong{--header '\n'}) will be split using
-@strong{--colsep} (which will default to '\t') and column names can be used
-as replacement variables: @strong{@{column name@}}. For @strong{--pipe} the matched
-header will be prepended to each output.
+Use regexp as header. For normal usage the matched header (typically
+the first line: @strong{--header '.*\n'}) will be split using @strong{--colsep}
+(which will default to '\t') and column names can be used as
+replacement variables: @strong{@{column name@}}.
 
-@strong{--header :} is an alias for @strong{--header '\n'}.
+For @strong{--pipe} the matched header will be prepended to each output.
+
+@strong{--header :} is an alias for @strong{--header '.*\n'}.
+
+If @emph{regexp} is a number, it will match that many lines.
 
 @item @strong{-I} @emph{replace-str}
 @anchor{@strong{-I} @emph{replace-str}}
@@ -604,8 +611,8 @@ This option is a synonym for @strong{-I}@emph{replace-str} if @emph{replace-str}
 specified, and for @strong{-I}@{@} otherwise.  This option is deprecated;
 use @strong{-I} instead.
 
-@item @strong{--joblog} @emph{logfile}
-@anchor{@strong{--joblog} @emph{logfile}}
+@item @strong{--joblog} @emph{logfile} (alpha testing)
+@anchor{@strong{--joblog} @emph{logfile} (alpha testing)}
 
 Logfile for executed jobs. Save a list of the executed jobs to
 @emph{logfile} in the following TAB separated format: sequence number,
@@ -750,6 +757,17 @@ standard specifies @strong{-L} instead.
 
 Implies @strong{-X} unless @strong{-m}, @strong{--xargs}, or @strong{--pipe} is set.
 
+@item @strong{--line-buffer} (alpha testing)
+@anchor{@strong{--line-buffer} (alpha testing)}
+
+Buffer output on line basis. @strong{--group} will keep the output together
+for a whole job. @strong{--ungroup} allows output to mixup with half a line
+coming from one job and half a line coming from another
+job. @strong{--line-buffer} fits between these two: GNU @strong{parallel} will
+print a full line, but will allow for mixing lines of different jobs.
+
+@strong{--line-buffer} is slower than both @strong{--group} and @strong{--ungroup}.
+
 @item @strong{--load} @emph{max-load}
 @anchor{@strong{--load} @emph{max-load}}
 
@@ -832,23 +850,23 @@ adjusts how many computers to log into in parallel.
 When using @strong{--group} the output will be grouped by each server, so
 all the output from one server will be grouped together.
 
-@item @strong{--output-as-files}
-@anchor{@strong{--output-as-files}}
+@item @strong{--output-as-files} (alpha testing)
+@anchor{@strong{--output-as-files} (alpha testing)}
 
-@item @strong{--outputasfiles}
-@anchor{@strong{--outputasfiles}}
+@item @strong{--outputasfiles} (alpha testing)
+@anchor{@strong{--outputasfiles} (alpha testing)}
 
-@item @strong{--files}
-@anchor{@strong{--files}}
+@item @strong{--files} (alpha testing)
+@anchor{@strong{--files} (alpha testing)}
 
 Instead of printing the output to stdout (standard output) the output
 of each job is saved in a file and the filename is then printed.
 
-@item @strong{--pipe}
-@anchor{@strong{--pipe}}
+@item @strong{--pipe} (alpha testing)
+@anchor{@strong{--pipe} (alpha testing)}
 
-@item @strong{--spreadstdin}
-@anchor{@strong{--spreadstdin}}
+@item @strong{--spreadstdin} (alpha testing)
+@anchor{@strong{--spreadstdin} (alpha testing)}
 
 Spread input to jobs on stdin (standard input). Read a block of data
 from stdin (standard input) and give one block of data as input to one
@@ -894,7 +912,7 @@ reading everything at startup.
 By sending GNU @strong{parallel} SIGUSR2 you can toggle turning on/off
 @strong{--progress} on a running GNU @strong{parallel} process.
 
-See also: @strong{--eta}
+See also @strong{--eta}.
 
 @item @strong{--max-args}=@emph{max-args}
 @anchor{@strong{--max-args}=@emph{max-args}}
@@ -1011,6 +1029,14 @@ If the stdin (standard input) only contains whitespace, do not run the command.
 
 If used with @strong{--pipe} this is slow.
 
+@item @strong{--record-env} (alpha testing)
+@anchor{@strong{--record-env} (alpha testing)}
+
+Record current environment variables in ~/.parallel/ignored_vars. This
+is useful before using @strong{--env _}.
+
+See also @strong{--env}.
+
 @item @strong{--recstart} @emph{startstring}
 @anchor{@strong{--recstart} @emph{startstring}}
 
@@ -1054,11 +1080,11 @@ it to the command.
 
 Only used with @strong{--pipe}.
 
-@item @strong{--results} @emph{prefix}
-@anchor{@strong{--results} @emph{prefix}}
+@item @strong{--results} @emph{prefix} (alpha testing)
+@anchor{@strong{--results} @emph{prefix} (alpha testing)}
 
-@item @strong{--res} @emph{prefix}
-@anchor{@strong{--res} @emph{prefix}}
+@item @strong{--res} @emph{prefix} (alpha testing)
+@anchor{@strong{--res} @emph{prefix} (alpha testing)}
 
 Save the output into files. The files will be stored in a directory tree
 rooted at @emph{prefix}.  Within this directory tree, each command will result
@@ -1116,7 +1142,7 @@ there. As GNU @strong{parallel} only looks at the sequence numbers in
 @strong{--joblog} then the input, the command, and @strong{--joblog} all have to
 remain unchanged; otherwise GNU @strong{parallel} may run wrong commands.
 
-See also: @strong{--joblog}, @strong{--resume-failed}.
+See also @strong{--joblog}, @strong{--resume-failed}.
 
 @item @strong{--resume-failed}
 @anchor{@strong{--resume-failed}}
@@ -1129,7 +1155,7 @@ numbers in @strong{--joblog} then the input, the command, and @strong{--joblog}
 all have to remain unchanged; otherwise GNU @strong{parallel} may run wrong
 commands.
 
-See also: @strong{--joblog}, @strong{--resume}.
+See also @strong{--joblog}, @strong{--resume}.
 
 @item @strong{--retries} @emph{n}
 @anchor{@strong{--retries} @emph{n}}
@@ -1180,6 +1206,20 @@ times:
 @strong{--return} is ignored when used with @strong{--sshlogin :} or when not used
 with @strong{--sshlogin}.
 
+@item @strong{--round-robin} (alpha testing)
+@anchor{@strong{--round-robin} (alpha testing)}
+
+@item @strong{--round} (alpha testing)
+@anchor{@strong{--round} (alpha testing)}
+
+Normally @strong{--pipe} will give a single block to each instance of the
+command. With @strong{--round-robin} all blocks will at random be written to
+commands already running. This is useful if the command takes a long
+time to initialize.
+
+@strong{--keep-order} will not work with @strong{--round-robin} as it is
+impossible to track which input block corresponds to which output.
+
 @item @strong{--max-chars}=@emph{max-chars}
 @anchor{@strong{--max-chars}=@emph{max-chars}}
 
@@ -1219,7 +1259,7 @@ Used with @strong{--fg}, @strong{--wait}, and @strong{--semaphorename}.
 
 The command @strong{sem} is an alias for @strong{parallel --semaphore}.
 
-See also: @strong{man sem}
+See also @strong{man sem}.
 
 @item @strong{--semaphorename} @emph{name}
 @anchor{@strong{--semaphorename} @emph{name}}
@@ -1238,7 +1278,7 @@ The semaphore is stored in ~/.parallel/semaphores/
 
 Implies @strong{--semaphore}.
 
-See also: @strong{man sem}
+See also @strong{man sem}.
 
 @item @strong{--semaphoretimeout} @emph{secs} (not implemented)
 @anchor{@strong{--semaphoretimeout} @emph{secs} (not implemented)}
@@ -1247,7 +1287,7 @@ If the semaphore is not released within secs seconds, take it anyway.
 
 Implies @strong{--semaphore}.
 
-See also: @strong{man sem}
+See also @strong{man sem}.
 
 @item @strong{--seqreplace} @emph{replace-str}
 @anchor{@strong{--seqreplace} @emph{replace-str}}
@@ -1379,11 +1419,11 @@ The remote host must have GNU @strong{parallel} installed.
 @strong{--sshlogin} is often used with @strong{--transfer}, @strong{--return},
 @strong{--cleanup}, and @strong{--trc}.
 
-@item @strong{--sshloginfile} @emph{filename}
-@anchor{@strong{--sshloginfile} @emph{filename}}
+@item @strong{--sshloginfile} @emph{filename} (alpha testing)
+@anchor{@strong{--sshloginfile} @emph{filename} (alpha testing)}
 
-@item @strong{--slf} @emph{filename}
-@anchor{@strong{--slf} @emph{filename}}
+@item @strong{--slf} @emph{filename} (alpha testing)
+@anchor{@strong{--slf} @emph{filename} (alpha testing)}
 
 File with sshlogins. The file consists of sshlogins on separate
 lines. Empty lines and lines starting with '#' are ignored. Example:
@@ -1409,6 +1449,9 @@ lines. Empty lines and lines starting with '#' are ignored. Example:
 When using a different ssh program the last argument must be the hostname.
 
 Multiple @strong{--sshloginfile} are allowed.
+
+GNU @strong{parallel} will first look for the file in current dir; if that
+fails it look for the file in ~/.parallel.
 
 The sshloginfile '..' is special, it read sshlogins from
 ~/.parallel/sshloginfile
@@ -1473,15 +1516,15 @@ into temporary files in /tmp. By setting @strong{--tmpdir} you can use a
 different dir for the files. Setting @strong{--tmpdir} is equivalent to
 setting $TMPDIR.
 
-@item @strong{--timeout} @emph{val} (beta testing)
-@anchor{@strong{--timeout} @emph{val} (beta testing)}
+@item @strong{--timeout} @emph{val} (alpha testing)
+@anchor{@strong{--timeout} @emph{val} (alpha testing)}
 
 Time out for command. If the command runs for longer than @emph{val}
 seconds it will get killed with SIGTERM, followed by SIGTERM 200 ms
 later, followed by SIGKILL 200 ms later.
 
 If @emph{val} is followed by a % then the timeout will dynamically be
-computed as a percentage of the smoothed average runtime. Only values
+computed as a percentage of the median average runtime. Only values
 > 100% will make sense.
 
 @item @strong{--tollef} (obsolete - will be retired 20140222)
@@ -1505,7 +1548,7 @@ To override use @strong{--gnu}.
 
 Print the job to be run on stderr (standard error).
 
-See also @strong{-v} and @strong{-p}.
+See also @strong{-v}, @strong{-p}.
 
 @item @strong{--transfer}
 @anchor{@strong{--transfer}}
@@ -1630,11 +1673,11 @@ Use @strong{-v} @strong{-v} to print the wrapping ssh command when running remot
 
 Print the version GNU @strong{parallel} and exit.
 
-@item @strong{--workdir} @emph{mydir}
-@anchor{@strong{--workdir} @emph{mydir}}
+@item @strong{--workdir} @emph{mydir} (alpha testing)
+@anchor{@strong{--workdir} @emph{mydir} (alpha testing)}
 
-@item @strong{--wd} @emph{mydir}
-@anchor{@strong{--wd} @emph{mydir}}
+@item @strong{--wd} @emph{mydir} (alpha testing)
+@anchor{@strong{--wd} @emph{mydir} (alpha testing)}
 
 Files transferred using @strong{--transfer} and @strong{--return} will be relative
 to @emph{mydir} on remote computers, and the command will be executed in
@@ -1665,7 +1708,7 @@ Wait for all commands to complete.
 
 Implies @strong{--semaphore}.
 
-See also: @strong{man sem}
+See also @strong{man sem}.
 
 @item @strong{-X}
 @anchor{@strong{-X}}
@@ -1695,8 +1738,8 @@ See also @strong{-m}.
 
 Exit if the size (see the @strong{-s} option) is exceeded.
 
-@item @strong{--xapply} (alpha testing)
-@anchor{@strong{--xapply} (alpha testing)}
+@item @strong{--xapply}
+@anchor{@strong{--xapply}}
 
 Read multiple input sources like @strong{xapply}. If multiple input sources
 are given, one argument will be read from each of the input
@@ -1866,6 +1909,31 @@ Find the files in a list that do not exist
 
 @strong{cat file_list | parallel 'if [ ! -e @{@} ] ; then echo @{@}; fi'}
 
+@chapter EXAMPLE: Calling Bash functions
+@anchor{EXAMPLE: Calling Bash functions}
+
+If the composed command is longer than a line, it becomes hard to
+read. In Bash you can use functions. Just remember to @strong{export -f} the
+function.
+
+@verbatim
+  doit() {
+    echo Doing it for $1
+    sleep 2
+    echo Done with $1
+  }
+  export -f doit
+  parallel doit ::: 1 2 3
+
+  doubleit() {
+    echo Doing it for $1 $2
+    sleep 2
+    echo Done with $1 $2
+  }
+  export -f doubleit
+  parallel doubleit ::: 1 2 3 ::: a b
+@end verbatim
+
 @chapter EXAMPLE: Removing file extension when processing files
 @anchor{EXAMPLE: Removing file extension when processing files}
 
@@ -1904,7 +1972,7 @@ foo) you can do:
 Let us assume a website stores images like:
 
 @verbatim
-   http://www.example.com/path/to/YYYYMMDD_##.jpg
+  http://www.example.com/path/to/YYYYMMDD_##.jpg
 @end verbatim
 
 where YYYYMMDD is the date and ## is the number 01-10. This will
@@ -2055,6 +2123,18 @@ Nested for-loops like this:
 can be written like this:
 
 @strong{parallel echo @{1@} @{2@} ::: M F ::: S M L XL XXL | sort}
+
+@chapter EXAMPLE: Finding the lowest difference between files
+@anchor{EXAMPLE: Finding the lowest difference between files}
+
+@strong{diff} is good for finding differences in text files. @strong{diff | wc -l}
+gives an indication of the size of the difference. To find the
+differences between all files in the current dir do:
+
+@strong{parallel --tag 'diff @{1@} @{2@} | wc -l' ::: * ::: * | sort -nk3}
+
+This way it is possible to see if some files are closer to other
+files.
 
 @chapter EXAMPLE: for-loops with column names
 @anchor{EXAMPLE: for-loops with column names}
@@ -2434,7 +2514,7 @@ are not being transferred. To fix those run @strong{rsync} a final time:
 If you are unable to push data, but need to pull them and the files
 are called digits.png (e.g. 000000.png) you might be able to do:
 
-<seq -w 0 99 | parallel rsync -Havessh fooserver:src-path/*@{@}.png destdir/>
+@strong{seq -w 0 99 | parallel rsync -Havessh fooserver:src-path/*@{@}.png destdir/}
 
 @chapter EXAMPLE: Use multiple inputs in one command
 @anchor{EXAMPLE: Use multiple inputs in one command}
@@ -2795,7 +2875,8 @@ This is particularly useful if you have lots of quoting. If you want to run a pe
 
 It needs to be quoted like this:
 
-@strong{ls | parallel  perl -ne '/^\\S+\\s+\\S+\$/\ and\ print\ \$ARGV,\"\\n\"'}
+@strong{ls | parallel perl -ne '/^\\S+\\s+\\S+\$/\ and\ print\ \$ARGV,\"\\n\"'}
+@strong{ls | parallel perl -ne \''/^\S+\s+\S+$/ and print $ARGV,"\n"'\'}
 
 Notice how spaces, \'s, "'s, and $'s need to be quoted. GNU @strong{parallel}
 can do the quoting by using option -q:
@@ -2832,8 +2913,8 @@ Or for substituting output:
 @strong{ls | parallel -q bash -c 'tar c @{@} | tee }>@strong{(gzip }>@strong{@{@}.tar.gz) | bzip2 }>@strong{@{@}.tar.bz2'}
 
 @strong{Conclusion}: To avoid dealing with the quoting problems it may be
-easier just to write a small script and have GNU @strong{parallel} call that
-script.
+easier just to write a small script or a function (remember to
+@strong{export -f} the function) and have GNU @strong{parallel} call that.
 
 @chapter LIST RUNNING JOBS
 @anchor{LIST RUNNING JOBS}
@@ -3870,8 +3951,8 @@ it also uses rsync with ssh.
 @chapter SEE ALSO
 @anchor{SEE ALSO}
 
-@strong{ssh}(1), @strong{rsync}(1), @strong{find}(1), @strong{xargs}(1), @strong{dirname},
+@strong{ssh}(1), @strong{rsync}(1), @strong{find}(1), @strong{xargs}(1), @strong{dirname}(1),
 @strong{make}(1), @strong{pexec}(1), @strong{ppss}(1), @strong{xjobs}(1), @strong{prll}(1),
-@strong{dxargs}(1), @strong{mdm}(1),
+@strong{dxargs}(1), @strong{mdm}(1)
 
 @bye

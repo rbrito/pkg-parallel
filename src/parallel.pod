@@ -49,8 +49,6 @@ after the list of options. That will give you an idea of what GNU
 B<parallel> is capable of.
 
 You can also watch the intro video for a quick introduction:
-http://tinyogg.com/watch/TORaR/ http://tinyogg.com/watch/hfxKj/ and
-http://tinyogg.com/watch/YQuXd/ or
 http://www.youtube.com/playlist?list=PL284C9FF2488BC6D1
 
 =head1 OPTIONS
@@ -68,8 +66,8 @@ B<xargs>. If I<command> is not given GNU B<parallel> will behave
 similar to B<cat | sh>.
 
 The I<command> must be an executable, a script, a composed command, or
-a function. If it is a function you need to B<export -f> the function
-first. An alias will, however, not work (see why
+a function. If it is a Bash function you need to B<export -f> the
+function first. An alias will, however, not work (see why
 http://www.perlmonks.org/index.pl?node_id=484296).
 
 
@@ -335,7 +333,7 @@ Run command in background thus GNU B<parallel> will not wait for
 completion of the command before exiting. This is the default if
 B<--semaphore> is set.
 
-See also: B<--fg>, B<man sem>
+See also: B<--fg>, B<man sem>.
 
 Implies B<--semaphore>.
 
@@ -397,7 +395,7 @@ I<regexp> is a Perl Regular Expression:
 http://perldoc.perl.org/perlre.html
 
 
-=item B<--ctrlc> (beta testing)
+=item B<--ctrlc>
 
 Sends SIGINT to tasks running on remote computers thus killing them.
 
@@ -432,7 +430,7 @@ occurs as a line of input, the rest of the input is ignored.  If
 neither B<-E> nor B<-e> is used, no end of file string is used.
 
 
-=item B<--delay> I<secs>
+=item B<--delay> I<secs> (alpha testing)
 
 Delay starting next job I<secs> seconds. GNU B<parallel> will pause
 I<secs> seconds after starting each job. I<secs> can be less than 1
@@ -458,13 +456,19 @@ If I<eof-str> is omitted, there is no end of file string.  If neither
 B<-E> nor B<-e> is used, no end of file string is used.
 
 
-=item B<--env> I<var>
+=item B<--env> I<var> (alpha testing)
 
 Copy environment variable I<var>. This will copy I<var> to the
 environment that the command is run in. This is especially useful for
-remote environments.
+remote execution.
 
-Caveat: If I<var> contains newline ('\n') the value is messed up.
+In Bash I<var> can also be a Bash function - just remember to B<export
+-f> the function.
+
+The variable '_' is special. It will copy all enviroment variables
+except for the ones mentioned in ~/.parallel/ignored_vars.
+
+See also: B<--record-env>.
 
 
 =item B<--eta>
@@ -480,7 +484,7 @@ Implies B<--progress>.
 Run command in foreground thus GNU B<parallel> will wait for
 completion of the command before exiting.
 
-See also: B<--bg>, B<man sem>
+See also B<--bg>, B<man sem>.
 
 Implies B<--semaphore>.
 
@@ -528,18 +532,18 @@ Print a summary of the options to GNU B<parallel> and exit.
 
 =over 3
 
-=item 0
+=item Z<>0
 
 Do not halt if a job fails. Exit status will be the number of jobs
 failed. This is the default.
 
-=item 1
+=item Z<>1
 
 Do not start new jobs if a job fails, but complete the running jobs
 including cleanup. The exit status will be the exit status from the
 last failing job.
 
-=item 2
+=item Z<>2
 
 Kill off all jobs immediately and exit without cleanup. The exit
 status will be the exit status from the failing job.
@@ -547,15 +551,18 @@ status will be the exit status from the failing job.
 =back
 
 
-=item B<--header> I<regexp>
+=item B<--header> I<regexp> (alpha testing)
 
-Use upto regexp as header. For normal usage the matched header
-(typically the first line: B<--header '\n'>) will be split using
-B<--colsep> (which will default to '\t') and column names can be used
-as replacement variables: B<{column name}>. For B<--pipe> the matched
-header will be prepended to each output.
+Use regexp as header. For normal usage the matched header (typically
+the first line: B<--header '.*\n'>) will be split using B<--colsep>
+(which will default to '\t') and column names can be used as
+replacement variables: B<{column name}>.
 
-B<--header :> is an alias for B<--header '\n'>.
+For B<--pipe> the matched header will be prepended to each output.
+
+B<--header :> is an alias for B<--header '.*\n'>.
+
+If I<regexp> is a number, it will match that many lines.
 
 
 =item B<-I> I<replace-str>
@@ -572,7 +579,7 @@ specified, and for B<-I>{} otherwise.  This option is deprecated;
 use B<-I> instead.
 
 
-=item B<--joblog> I<logfile>
+=item B<--joblog> I<logfile> (alpha testing)
 
 Logfile for executed jobs. Save a list of the executed jobs to
 I<logfile> in the following TAB separated format: sequence number,
@@ -698,6 +705,17 @@ B<-l 0> is an alias for B<-l 1>.
 Implies B<-X> unless B<-m>, B<--xargs>, or B<--pipe> is set.
 
 
+=item B<--line-buffer> (alpha testing)
+
+Buffer output on line basis. B<--group> will keep the output together
+for a whole job. B<--ungroup> allows output to mixup with half a line
+coming from one job and half a line coming from another
+job. B<--line-buffer> fits between these two: GNU B<parallel> will
+print a full line, but will allow for mixing lines of different jobs.
+
+B<--line-buffer> is slower than both B<--group> and B<--ungroup>.
+
+
 =item B<--load> I<max-load>
 
 Do not start new jobs on a given computer unless the number of running
@@ -779,19 +797,19 @@ When using B<--group> the output will be grouped by each server, so
 all the output from one server will be grouped together.
 
 
-=item B<--output-as-files>
+=item B<--output-as-files> (alpha testing)
 
-=item B<--outputasfiles>
+=item B<--outputasfiles> (alpha testing)
 
-=item B<--files>
+=item B<--files> (alpha testing)
 
 Instead of printing the output to stdout (standard output) the output
 of each job is saved in a file and the filename is then printed.
 
 
-=item B<--pipe>
+=item B<--pipe> (alpha testing)
 
-=item B<--spreadstdin>
+=item B<--spreadstdin> (alpha testing)
 
 Spread input to jobs on stdin (standard input). Read a block of data
 from stdin (standard input) and give one block of data as input to one
@@ -837,7 +855,7 @@ reading everything at startup.
 By sending GNU B<parallel> SIGUSR2 you can toggle turning on/off
 B<--progress> on a running GNU B<parallel> process.
 
-See also: B<--eta>
+See also B<--eta>.
 
 
 =item B<--max-args>=I<max-args>
@@ -949,6 +967,14 @@ If the stdin (standard input) only contains whitespace, do not run the command.
 If used with B<--pipe> this is slow.
 
 
+=item B<--record-env> (alpha testing)
+
+Record current environment variables in ~/.parallel/ignored_vars. This
+is useful before using B<--env _>.
+
+See also B<--env>.
+
+
 =item B<--recstart> I<startstring>
 
 =item B<--recend> I<endstring>
@@ -989,9 +1015,9 @@ it to the command.
 Only used with B<--pipe>.
 
 
-=item B<--results> I<prefix>
+=item B<--results> I<prefix> (alpha testing)
 
-=item B<--res> I<prefix>
+=item B<--res> I<prefix> (alpha testing)
 
 Save the output into files. The files will be stored in a directory tree
 rooted at I<prefix>.  Within this directory tree, each command will result
@@ -1041,7 +1067,7 @@ there. As GNU B<parallel> only looks at the sequence numbers in
 B<--joblog> then the input, the command, and B<--joblog> all have to
 remain unchanged; otherwise GNU B<parallel> may run wrong commands.
 
-See also: B<--joblog>, B<--resume-failed>.
+See also B<--joblog>, B<--resume-failed>.
 
 
 =item B<--resume-failed>
@@ -1054,7 +1080,7 @@ numbers in B<--joblog> then the input, the command, and B<--joblog>
 all have to remain unchanged; otherwise GNU B<parallel> may run wrong
 commands.
 
-See also: B<--joblog>, B<--resume>.
+See also B<--joblog>, B<--resume>.
 
 
 =item B<--retries> I<n>
@@ -1100,6 +1126,19 @@ B<--return> is ignored when used with B<--sshlogin :> or when not used
 with B<--sshlogin>.
 
 
+=item B<--round-robin> (alpha testing)
+
+=item B<--round> (alpha testing)
+
+Normally B<--pipe> will give a single block to each instance of the
+command. With B<--round-robin> all blocks will at random be written to
+commands already running. This is useful if the command takes a long
+time to initialize.
+
+B<--keep-order> will not work with B<--round-robin> as it is
+impossible to track which input block corresponds to which output.
+
+
 =item B<--max-chars>=I<max-chars>
 
 =item B<-s> I<max-chars>
@@ -1137,7 +1176,7 @@ Used with B<--fg>, B<--wait>, and B<--semaphorename>.
 
 The command B<sem> is an alias for B<parallel --semaphore>.
 
-See also: B<man sem>
+See also B<man sem>.
 
 
 =item B<--semaphorename> I<name>
@@ -1155,7 +1194,7 @@ The semaphore is stored in ~/.parallel/semaphores/
 
 Implies B<--semaphore>.
 
-See also: B<man sem>
+See also B<man sem>.
 
 
 =item B<--semaphoretimeout> I<secs> (not implemented)
@@ -1164,7 +1203,7 @@ If the semaphore is not released within secs seconds, take it anyway.
 
 Implies B<--semaphore>.
 
-See also: B<man sem>
+See also B<man sem>.
 
 
 =item B<--seqreplace> I<replace-str>
@@ -1279,9 +1318,9 @@ B<--sshlogin> is often used with B<--transfer>, B<--return>,
 B<--cleanup>, and B<--trc>.
 
 
-=item B<--sshloginfile> I<filename>
+=item B<--sshloginfile> I<filename> (alpha testing)
 
-=item B<--slf> I<filename>
+=item B<--slf> I<filename> (alpha testing)
 
 File with sshlogins. The file consists of sshlogins on separate
 lines. Empty lines and lines starting with '#' are ignored. Example:
@@ -1305,6 +1344,9 @@ lines. Empty lines and lines starting with '#' are ignored. Example:
 When using a different ssh program the last argument must be the hostname.
 
 Multiple B<--sshloginfile> are allowed.
+
+GNU B<parallel> will first look for the file in current dir; if that
+fails it look for the file in ~/.parallel.
 
 The sshloginfile '..' is special, it read sshlogins from
 ~/.parallel/sshloginfile
@@ -1370,14 +1412,14 @@ different dir for the files. Setting B<--tmpdir> is equivalent to
 setting $TMPDIR.
 
 
-=item B<--timeout> I<val> (beta testing)
+=item B<--timeout> I<val> (alpha testing)
 
 Time out for command. If the command runs for longer than I<val>
 seconds it will get killed with SIGTERM, followed by SIGTERM 200 ms
 later, followed by SIGKILL 200 ms later.
 
 If I<val> is followed by a % then the timeout will dynamically be
-computed as a percentage of the smoothed average runtime. Only values
+computed as a percentage of the median average runtime. Only values
 > 100% will make sense.
 
 
@@ -1400,7 +1442,7 @@ To override use B<--gnu>.
 
 Print the job to be run on stderr (standard error).
 
-See also B<-v> and B<-p>.
+See also B<-v>, B<-p>.
 
 
 =item B<--transfer>
@@ -1515,9 +1557,9 @@ Use B<-v> B<-v> to print the wrapping ssh command when running remotely.
 Print the version GNU B<parallel> and exit.
 
 
-=item B<--workdir> I<mydir>
+=item B<--workdir> I<mydir> (alpha testing)
 
-=item B<--wd> I<mydir>
+=item B<--wd> I<mydir> (alpha testing)
 
 Files transferred using B<--transfer> and B<--return> will be relative
 to I<mydir> on remote computers, and the command will be executed in
@@ -1549,7 +1591,7 @@ Wait for all commands to complete.
 
 Implies B<--semaphore>.
 
-See also: B<man sem>
+See also B<man sem>.
 
 
 =item B<-X>
@@ -1579,7 +1621,7 @@ See also B<-m>.
 Exit if the size (see the B<-s> option) is exceeded.
 
 
-=item B<--xapply> (alpha testing)
+=item B<--xapply>
 
 Read multiple input sources like B<xapply>. If multiple input sources
 are given, one argument will be read from each of the input
@@ -1745,6 +1787,31 @@ Find the files in a list that do not exist
 
 B<cat file_list | parallel 'if [ ! -e {} ] ; then echo {}; fi'>
 
+
+=head1 EXAMPLE: Calling Bash functions
+
+If the composed command is longer than a line, it becomes hard to
+read. In Bash you can use functions. Just remember to B<export -f> the
+function.
+
+  doit() {
+    echo Doing it for $1
+    sleep 2
+    echo Done with $1
+  }
+  export -f doit
+  parallel doit ::: 1 2 3
+
+  doubleit() {
+    echo Doing it for $1 $2
+    sleep 2
+    echo Done with $1 $2
+  }
+  export -f doubleit
+  parallel doubleit ::: 1 2 3 ::: a b
+
+
+
 =head1 EXAMPLE: Removing file extension when processing files
 
 When processing files removing the file extension using B<{.}> is
@@ -1782,7 +1849,7 @@ B<ls *.tar.gz| parallel --er {tar} 'echo {tar}|parallel "mkdir -p {.} ; tar -C {
 
 Let us assume a website stores images like:
 
-   http://www.example.com/path/to/YYYYMMDD_##.jpg
+  http://www.example.com/path/to/YYYYMMDD_##.jpg
 
 where YYYYMMDD is the date and ## is the number 01-10. This will
 download images for the past 30 days:
@@ -1918,6 +1985,18 @@ Nested for-loops like this:
 can be written like this:
 
 B<parallel echo {1} {2} ::: M F ::: S M L XL XXL | sort>
+
+
+=head1 EXAMPLE: Finding the lowest difference between files
+
+B<diff> is good for finding differences in text files. B<diff | wc -l>
+gives an indication of the size of the difference. To find the
+differences between all files in the current dir do:
+
+B<parallel --tag 'diff {1} {2} | wc -l' ::: * ::: * | sort -nk3>
+
+This way it is possible to see if some files are closer to other
+files.
 
 
 =head1 EXAMPLE: for-loops with column names
@@ -2247,7 +2326,7 @@ B<rsync -Havessh src-dir/ fooserver:/dest-dir/>
 If you are unable to push data, but need to pull them and the files
 are called digits.png (e.g. 000000.png) you might be able to do:
 
-<seq -w 0 99 | parallel rsync -Havessh fooserver:src-path/*{}.png destdir/>
+B<seq -w 0 99 | parallel rsync -Havessh fooserver:src-path/*{}.png destdir/>
 
 
 =head1 EXAMPLE: Use multiple inputs in one command
@@ -2591,7 +2670,8 @@ B<perl -ne '/^\S+\s+\S+$/ and print $ARGV,"\n"' file>
 
 It needs to be quoted like this:
 
-B<ls | parallel  perl -ne '/^\\S+\\s+\\S+\$/\ and\ print\ \$ARGV,\"\\n\"'>
+B<ls | parallel perl -ne '/^\\S+\\s+\\S+\$/\ and\ print\ \$ARGV,\"\\n\"'>
+B<ls | parallel perl -ne \''/^\S+\s+\S+$/ and print $ARGV,"\n"'\'>
 
 Notice how spaces, \'s, "'s, and $'s need to be quoted. GNU B<parallel>
 can do the quoting by using option -q:
@@ -2626,8 +2706,8 @@ Or for substituting output:
 B<ls | parallel -q bash -c 'tar c {} | tee >>B<(gzip >>B<{}.tar.gz) | bzip2 >>B<{}.tar.bz2'>
 
 B<Conclusion>: To avoid dealing with the quoting problems it may be
-easier just to write a small script and have GNU B<parallel> call that
-script.
+easier just to write a small script or a function (remember to
+B<export -f> the function) and have GNU B<parallel> call that.
 
 
 =head1 LIST RUNNING JOBS
@@ -2760,19 +2840,19 @@ If B<--halt-on-error> 0 or not specified:
 
 =over 6
 
-=item 0
+=item Z<>0
 
 All jobs ran without error.
 
-=item 1-253
+=item Z<>1-253
 
 Some of the jobs failed. The exit status gives the number of failed jobs
 
-=item 254
+=item Z<>254
 
 More than 253 jobs failed.
 
-=item 255
+=item Z<>255
 
 Other error.
 
@@ -3632,8 +3712,8 @@ it also uses rsync with ssh.
 
 =head1 SEE ALSO
 
-B<ssh>(1), B<rsync>(1), B<find>(1), B<xargs>(1), B<dirname>,
+B<ssh>(1), B<rsync>(1), B<find>(1), B<xargs>(1), B<dirname>(1),
 B<make>(1), B<pexec>(1), B<ppss>(1), B<xjobs>(1), B<prll>(1),
-B<dxargs>(1), B<mdm>(1),
+B<dxargs>(1), B<mdm>(1)
 
 =cut
