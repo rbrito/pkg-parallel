@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PARALLEL 1"
-.TH PARALLEL 1 "2013-06-22" "20130622" "parallel"
+.TH PARALLEL 1 "2013-09-18" "20130922" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -172,8 +172,6 @@ after the list of options. That will give you an idea of what \s-1GNU\s0
 \&\fBparallel\fR is capable of.
 .PP
 You can also watch the intro video for a quick introduction:
-http://tinyogg.com/watch/TORaR/ http://tinyogg.com/watch/hfxKj/ and
-http://tinyogg.com/watch/YQuXd/ or
 http://www.youtube.com/playlist?list=PL284C9FF2488BC6D1
 .SH "OPTIONS"
 .IX Header "OPTIONS"
@@ -188,8 +186,8 @@ If \fIcommand\fR is given, \s-1GNU\s0 \fBparallel\fR solve the same tasks as
 similar to \fBcat | sh\fR.
 .Sp
 The \fIcommand\fR must be an executable, a script, a composed command, or
-a function. If it is a function you need to \fBexport \-f\fR the function
-first. An alias will, however, not work (see why
+a function. If it is a Bash function you need to \fBexport \-f\fR the
+function first. An alias will, however, not work (see why
 http://www.perlmonks.org/index.pl?node_id=484296).
 .IP "\fB{}\fR" 9
 .IX Item "{}"
@@ -427,7 +425,7 @@ Run command in background thus \s-1GNU\s0 \fBparallel\fR will not wait for
 completion of the command before exiting. This is the default if
 \&\fB\-\-semaphore\fR is set.
 .Sp
-See also: \fB\-\-fg\fR, \fBman sem\fR
+See also: \fB\-\-fg\fR, \fBman sem\fR.
 .Sp
 Implies \fB\-\-semaphore\fR.
 .IP "\fB\-\-bibtex\fR" 9
@@ -485,8 +483,8 @@ separating the columns. The n'th column can be access using
 .Sp
 \&\fIregexp\fR is a Perl Regular Expression:
 http://perldoc.perl.org/perlre.html
-.IP "\fB\-\-ctrlc\fR (beta testing)" 9
-.IX Item "--ctrlc (beta testing)"
+.IP "\fB\-\-ctrlc\fR" 9
+.IX Item "--ctrlc"
 Sends \s-1SIGINT\s0 to tasks running on remote computers thus killing them.
 .IP "\fB\-\-delimiter\fR \fIdelim\fR" 9
 .IX Item "--delimiter delim"
@@ -517,8 +515,8 @@ dirname of input line.
 Set the end of file string to eof-str.  If the end of file string
 occurs as a line of input, the rest of the input is ignored.  If
 neither \fB\-E\fR nor \fB\-e\fR is used, no end of file string is used.
-.IP "\fB\-\-delay\fR \fIsecs\fR" 9
-.IX Item "--delay secs"
+.IP "\fB\-\-delay\fR \fIsecs\fR (alpha testing)" 9
+.IX Item "--delay secs (alpha testing)"
 Delay starting next job \fIsecs\fR seconds. \s-1GNU\s0 \fBparallel\fR will pause
 \&\fIsecs\fR seconds after starting each job. \fIsecs\fR can be less than 1
 seconds.
@@ -539,13 +537,19 @@ This option is a synonym for the \fB\-E\fR option.  Use \fB\-E\fR instead,
 because it is \s-1POSIX\s0 compliant for \fBxargs\fR while this option is not.
 If \fIeof-str\fR is omitted, there is no end of file string.  If neither
 \&\fB\-E\fR nor \fB\-e\fR is used, no end of file string is used.
-.IP "\fB\-\-env\fR \fIvar\fR" 9
-.IX Item "--env var"
+.IP "\fB\-\-env\fR \fIvar\fR (alpha testing)" 9
+.IX Item "--env var (alpha testing)"
 Copy environment variable \fIvar\fR. This will copy \fIvar\fR to the
 environment that the command is run in. This is especially useful for
-remote environments.
+remote execution.
 .Sp
-Caveat: If \fIvar\fR contains newline ('\en') the value is messed up.
+In Bash \fIvar\fR can also be a Bash function \- just remember to \fBexport
+\&\-f\fR the function.
+.Sp
+The variable '_' is special. It will copy all enviroment variables
+except for the ones mentioned in ~/.parallel/ignored_vars.
+.Sp
+See also: \fB\-\-record\-env\fR.
 .IP "\fB\-\-eta\fR" 9
 .IX Item "--eta"
 Show the estimated number of seconds before finishing. This forces \s-1GNU\s0
@@ -557,7 +561,7 @@ Implies \fB\-\-progress\fR.
 Run command in foreground thus \s-1GNU\s0 \fBparallel\fR will wait for
 completion of the command before exiting.
 .Sp
-See also: \fB\-\-bg\fR, \fBman sem\fR
+See also \fB\-\-bg\fR, \fBman sem\fR.
 .Sp
 Implies \fB\-\-semaphore\fR.
 .IP "\fB\-\-filter\-hosts\fR (alpha testing)" 9
@@ -613,15 +617,18 @@ status will be the exit status from the failing job.
 .RE
 .RS 9
 .RE
-.IP "\fB\-\-header\fR \fIregexp\fR" 9
-.IX Item "--header regexp"
-Use upto regexp as header. For normal usage the matched header
-(typically the first line: \fB\-\-header '\en'\fR) will be split using
-\&\fB\-\-colsep\fR (which will default to '\et') and column names can be used
-as replacement variables: \fB{column name}\fR. For \fB\-\-pipe\fR the matched
-header will be prepended to each output.
+.IP "\fB\-\-header\fR \fIregexp\fR (alpha testing)" 9
+.IX Item "--header regexp (alpha testing)"
+Use regexp as header. For normal usage the matched header (typically
+the first line: \fB\-\-header '.*\en'\fR) will be split using \fB\-\-colsep\fR
+(which will default to '\et') and column names can be used as
+replacement variables: \fB{column name}\fR.
 .Sp
-\&\fB\-\-header :\fR is an alias for \fB\-\-header '\en'\fR.
+For \fB\-\-pipe\fR the matched header will be prepended to each output.
+.Sp
+\&\fB\-\-header :\fR is an alias for \fB\-\-header '.*\en'\fR.
+.Sp
+If \fIregexp\fR is a number, it will match that many lines.
 .IP "\fB\-I\fR \fIreplace-str\fR" 9
 .IX Item "-I replace-str"
 Use the replacement string \fIreplace-str\fR instead of {}.
@@ -634,8 +641,8 @@ Use the replacement string \fIreplace-str\fR instead of {}.
 This option is a synonym for \fB\-I\fR\fIreplace-str\fR if \fIreplace-str\fR is
 specified, and for \fB\-I\fR{} otherwise.  This option is deprecated;
 use \fB\-I\fR instead.
-.IP "\fB\-\-joblog\fR \fIlogfile\fR" 9
-.IX Item "--joblog logfile"
+.IP "\fB\-\-joblog\fR \fIlogfile\fR (alpha testing)" 9
+.IX Item "--joblog logfile (alpha testing)"
 Logfile for executed jobs. Save a list of the executed jobs to
 \&\fIlogfile\fR in the following \s-1TAB\s0 separated format: sequence number,
 sshlogin, start time as seconds since epoch, run time in seconds,
@@ -759,6 +766,15 @@ standard specifies \fB\-L\fR instead.
 \&\fB\-l 0\fR is an alias for \fB\-l 1\fR.
 .Sp
 Implies \fB\-X\fR unless \fB\-m\fR, \fB\-\-xargs\fR, or \fB\-\-pipe\fR is set.
+.IP "\fB\-\-line\-buffer\fR (alpha testing)" 9
+.IX Item "--line-buffer (alpha testing)"
+Buffer output on line basis. \fB\-\-group\fR will keep the output together
+for a whole job. \fB\-\-ungroup\fR allows output to mixup with half a line
+coming from one job and half a line coming from another
+job. \fB\-\-line\-buffer\fR fits between these two: \s-1GNU\s0 \fBparallel\fR will
+print a full line, but will allow for mixing lines of different jobs.
+.Sp
+\&\fB\-\-line\-buffer\fR is slower than both \fB\-\-group\fR and \fB\-\-ungroup\fR.
 .IP "\fB\-\-load\fR \fImax-load\fR" 9
 .IX Item "--load max-load"
 Do not start new jobs on a given computer unless the number of running
@@ -828,21 +844,21 @@ adjusts how many computers to log into in parallel.
 .Sp
 When using \fB\-\-group\fR the output will be grouped by each server, so
 all the output from one server will be grouped together.
-.IP "\fB\-\-output\-as\-files\fR" 9
-.IX Item "--output-as-files"
+.IP "\fB\-\-output\-as\-files\fR (alpha testing)" 9
+.IX Item "--output-as-files (alpha testing)"
 .PD 0
-.IP "\fB\-\-outputasfiles\fR" 9
-.IX Item "--outputasfiles"
-.IP "\fB\-\-files\fR" 9
-.IX Item "--files"
+.IP "\fB\-\-outputasfiles\fR (alpha testing)" 9
+.IX Item "--outputasfiles (alpha testing)"
+.IP "\fB\-\-files\fR (alpha testing)" 9
+.IX Item "--files (alpha testing)"
 .PD
 Instead of printing the output to stdout (standard output) the output
 of each job is saved in a file and the filename is then printed.
-.IP "\fB\-\-pipe\fR" 9
-.IX Item "--pipe"
+.IP "\fB\-\-pipe\fR (alpha testing)" 9
+.IX Item "--pipe (alpha testing)"
 .PD 0
-.IP "\fB\-\-spreadstdin\fR" 9
-.IX Item "--spreadstdin"
+.IP "\fB\-\-spreadstdin\fR (alpha testing)" 9
+.IX Item "--spreadstdin (alpha testing)"
 .PD
 Spread input to jobs on stdin (standard input). Read a block of data
 from stdin (standard input) and give one block of data as input to one
@@ -884,7 +900,7 @@ reading everything at startup.
 By sending \s-1GNU\s0 \fBparallel\fR \s-1SIGUSR2\s0 you can toggle turning on/off
 \&\fB\-\-progress\fR on a running \s-1GNU\s0 \fBparallel\fR process.
 .Sp
-See also: \fB\-\-eta\fR
+See also \fB\-\-eta\fR.
 .IP "\fB\-\-max\-args\fR=\fImax-args\fR" 9
 .IX Item "--max-args=max-args"
 .PD 0
@@ -986,6 +1002,12 @@ default.
 If the stdin (standard input) only contains whitespace, do not run the command.
 .Sp
 If used with \fB\-\-pipe\fR this is slow.
+.IP "\fB\-\-record\-env\fR (alpha testing)" 9
+.IX Item "--record-env (alpha testing)"
+Record current environment variables in ~/.parallel/ignored_vars. This
+is useful before using \fB\-\-env _\fR.
+.Sp
+See also \fB\-\-env\fR.
 .IP "\fB\-\-recstart\fR \fIstartstring\fR" 9
 .IX Item "--recstart startstring"
 .PD 0
@@ -1024,11 +1046,11 @@ Remove the text matched by \fB\-\-recstart\fR and \fB\-\-recend\fR before piping
 it to the command.
 .Sp
 Only used with \fB\-\-pipe\fR.
-.IP "\fB\-\-results\fR \fIprefix\fR" 9
-.IX Item "--results prefix"
+.IP "\fB\-\-results\fR \fIprefix\fR (alpha testing)" 9
+.IX Item "--results prefix (alpha testing)"
 .PD 0
-.IP "\fB\-\-res\fR \fIprefix\fR" 9
-.IX Item "--res prefix"
+.IP "\fB\-\-res\fR \fIprefix\fR (alpha testing)" 9
+.IX Item "--res prefix (alpha testing)"
 .PD
 Save the output into files. The files will be stored in a directory tree
 rooted at \fIprefix\fR.  Within this directory tree, each command will result
@@ -1084,7 +1106,7 @@ there. As \s-1GNU\s0 \fBparallel\fR only looks at the sequence numbers in
 \&\fB\-\-joblog\fR then the input, the command, and \fB\-\-joblog\fR all have to
 remain unchanged; otherwise \s-1GNU\s0 \fBparallel\fR may run wrong commands.
 .Sp
-See also: \fB\-\-joblog\fR, \fB\-\-resume\-failed\fR.
+See also \fB\-\-joblog\fR, \fB\-\-resume\-failed\fR.
 .IP "\fB\-\-resume\-failed\fR" 9
 .IX Item "--resume-failed"
 Retry all failed and resume from the last unfinished job. By reading
@@ -1095,7 +1117,7 @@ numbers in \fB\-\-joblog\fR then the input, the command, and \fB\-\-joblog\fR
 all have to remain unchanged; otherwise \s-1GNU\s0 \fBparallel\fR may run wrong
 commands.
 .Sp
-See also: \fB\-\-joblog\fR, \fB\-\-resume\fR.
+See also \fB\-\-joblog\fR, \fB\-\-resume\fR.
 .IP "\fB\-\-retries\fR \fIn\fR" 9
 .IX Item "--retries n"
 If a job fails, retry it on another computer. Do this \fIn\fR times. If
@@ -1141,6 +1163,19 @@ times:
 .Sp
 \&\fB\-\-return\fR is ignored when used with \fB\-\-sshlogin :\fR or when not used
 with \fB\-\-sshlogin\fR.
+.IP "\fB\-\-round\-robin\fR (alpha testing)" 9
+.IX Item "--round-robin (alpha testing)"
+.PD 0
+.IP "\fB\-\-round\fR (alpha testing)" 9
+.IX Item "--round (alpha testing)"
+.PD
+Normally \fB\-\-pipe\fR will give a single block to each instance of the
+command. With \fB\-\-round\-robin\fR all blocks will at random be written to
+commands already running. This is useful if the command takes a long
+time to initialize.
+.Sp
+\&\fB\-\-keep\-order\fR will not work with \fB\-\-round\-robin\fR as it is
+impossible to track which input block corresponds to which output.
 .IP "\fB\-\-max\-chars\fR=\fImax-chars\fR" 9
 .IX Item "--max-chars=max-chars"
 .PD 0
@@ -1176,7 +1211,7 @@ Used with \fB\-\-fg\fR, \fB\-\-wait\fR, and \fB\-\-semaphorename\fR.
 .Sp
 The command \fBsem\fR is an alias for \fBparallel \-\-semaphore\fR.
 .Sp
-See also: \fBman sem\fR
+See also \fBman sem\fR.
 .IP "\fB\-\-semaphorename\fR \fIname\fR" 9
 .IX Item "--semaphorename name"
 .PD 0
@@ -1194,14 +1229,14 @@ The semaphore is stored in ~/.parallel/semaphores/
 .Sp
 Implies \fB\-\-semaphore\fR.
 .Sp
-See also: \fBman sem\fR
+See also \fBman sem\fR.
 .IP "\fB\-\-semaphoretimeout\fR \fIsecs\fR (not implemented)" 9
 .IX Item "--semaphoretimeout secs (not implemented)"
 If the semaphore is not released within secs seconds, take it anyway.
 .Sp
 Implies \fB\-\-semaphore\fR.
 .Sp
-See also: \fBman sem\fR
+See also \fBman sem\fR.
 .IP "\fB\-\-seqreplace\fR \fIreplace-str\fR" 9
 .IX Item "--seqreplace replace-str"
 Use the replacement string \fIreplace-str\fR instead of \fB{#}\fR for
@@ -1320,11 +1355,11 @@ The remote host must have \s-1GNU\s0 \fBparallel\fR installed.
 .Sp
 \&\fB\-\-sshlogin\fR is often used with \fB\-\-transfer\fR, \fB\-\-return\fR,
 \&\fB\-\-cleanup\fR, and \fB\-\-trc\fR.
-.IP "\fB\-\-sshloginfile\fR \fIfilename\fR" 9
-.IX Item "--sshloginfile filename"
+.IP "\fB\-\-sshloginfile\fR \fIfilename\fR (alpha testing)" 9
+.IX Item "--sshloginfile filename (alpha testing)"
 .PD 0
-.IP "\fB\-\-slf\fR \fIfilename\fR" 9
-.IX Item "--slf filename"
+.IP "\fB\-\-slf\fR \fIfilename\fR (alpha testing)" 9
+.IX Item "--slf filename (alpha testing)"
 .PD
 File with sshlogins. The file consists of sshlogins on separate
 lines. Empty lines and lines starting with '#' are ignored. Example:
@@ -1350,6 +1385,9 @@ lines. Empty lines and lines starting with '#' are ignored. Example:
 When using a different ssh program the last argument must be the hostname.
 .Sp
 Multiple \fB\-\-sshloginfile\fR are allowed.
+.Sp
+\&\s-1GNU\s0 \fBparallel\fR will first look for the file in current dir; if that
+fails it look for the file in ~/.parallel.
 .Sp
 The sshloginfile '..' is special, it read sshlogins from
 ~/.parallel/sshloginfile
@@ -1401,14 +1439,14 @@ Directory for temporary files. \s-1GNU\s0 \fBparallel\fR normally buffers output
 into temporary files in /tmp. By setting \fB\-\-tmpdir\fR you can use a
 different dir for the files. Setting \fB\-\-tmpdir\fR is equivalent to
 setting \f(CW$TMPDIR\fR.
-.IP "\fB\-\-timeout\fR \fIval\fR (beta testing)" 9
-.IX Item "--timeout val (beta testing)"
+.IP "\fB\-\-timeout\fR \fIval\fR (alpha testing)" 9
+.IX Item "--timeout val (alpha testing)"
 Time out for command. If the command runs for longer than \fIval\fR
 seconds it will get killed with \s-1SIGTERM\s0, followed by \s-1SIGTERM\s0 200 ms
 later, followed by \s-1SIGKILL\s0 200 ms later.
 .Sp
 If \fIval\fR is followed by a % then the timeout will dynamically be
-computed as a percentage of the smoothed average runtime. Only values
+computed as a percentage of the median average runtime. Only values
 > 100% will make sense.
 .IP "\fB\-\-tollef\fR (obsolete \- will be retired 20140222)" 9
 .IX Item "--tollef (obsolete - will be retired 20140222)"
@@ -1429,7 +1467,7 @@ To override use \fB\-\-gnu\fR.
 .PD
 Print the job to be run on stderr (standard error).
 .Sp
-See also \fB\-v\fR and \fB\-p\fR.
+See also \fB\-v\fR, \fB\-p\fR.
 .IP "\fB\-\-transfer\fR" 9
 .IX Item "--transfer"
 Transfer files to remote computers. \fB\-\-transfer\fR is used with
@@ -1534,11 +1572,11 @@ Use \fB\-v\fR \fB\-v\fR to print the wrapping ssh command when running remotely.
 .IX Item "-V"
 .PD
 Print the version \s-1GNU\s0 \fBparallel\fR and exit.
-.IP "\fB\-\-workdir\fR \fImydir\fR" 9
-.IX Item "--workdir mydir"
+.IP "\fB\-\-workdir\fR \fImydir\fR (alpha testing)" 9
+.IX Item "--workdir mydir (alpha testing)"
 .PD 0
-.IP "\fB\-\-wd\fR \fImydir\fR" 9
-.IX Item "--wd mydir"
+.IP "\fB\-\-wd\fR \fImydir\fR (alpha testing)" 9
+.IX Item "--wd mydir (alpha testing)"
 .PD
 Files transferred using \fB\-\-transfer\fR and \fB\-\-return\fR will be relative
 to \fImydir\fR on remote computers, and the command will be executed in
@@ -1567,7 +1605,7 @@ Wait for all commands to complete.
 .Sp
 Implies \fB\-\-semaphore\fR.
 .Sp
-See also: \fBman sem\fR
+See also \fBman sem\fR.
 .IP "\fB\-X\fR" 9
 .IX Item "-X"
 Multiple arguments with context replace. Insert as many arguments as
@@ -1593,8 +1631,8 @@ See also \fB\-m\fR.
 .IX Item "-x"
 .PD
 Exit if the size (see the \fB\-s\fR option) is exceeded.
-.IP "\fB\-\-xapply\fR (alpha testing)" 9
-.IX Item "--xapply (alpha testing)"
+.IP "\fB\-\-xapply\fR" 9
+.IX Item "--xapply"
 Read multiple input sources like \fBxapply\fR. If multiple input sources
 are given, one argument will be read from each of the input
 sources. The arguments can be accessed in the command as \fB{1}\fR
@@ -1746,6 +1784,29 @@ symlinks are empty files.
 Find the files in a list that do not exist
 .PP
 \&\fBcat file_list | parallel 'if [ ! \-e {} ] ; then echo {}; fi'\fR
+.SH "EXAMPLE: Calling Bash functions"
+.IX Header "EXAMPLE: Calling Bash functions"
+If the composed command is longer than a line, it becomes hard to
+read. In Bash you can use functions. Just remember to \fBexport \-f\fR the
+function.
+.PP
+.Vb 7
+\&  doit() {
+\&    echo Doing it for $1
+\&    sleep 2
+\&    echo Done with $1
+\&  }
+\&  export \-f doit
+\&  parallel doit ::: 1 2 3
+\&
+\&  doubleit() {
+\&    echo Doing it for $1 $2
+\&    sleep 2
+\&    echo Done with $1 $2
+\&  }
+\&  export \-f doubleit
+\&  parallel doubleit ::: 1 2 3 ::: a b
+.Ve
 .SH "EXAMPLE: Removing file extension when processing files"
 .IX Header "EXAMPLE: Removing file extension when processing files"
 When processing files removing the file extension using \fB{.}\fR is
@@ -1779,7 +1840,7 @@ foo) you can do:
 Let us assume a website stores images like:
 .PP
 .Vb 1
-\&   http://www.example.com/path/to/YYYYMMDD_##.jpg
+\&  http://www.example.com/path/to/YYYYMMDD_##.jpg
 .Ve
 .PP
 where \s-1YYYYMMDD\s0 is the date and ## is the number 01\-10. This will
@@ -1922,6 +1983,16 @@ Nested for-loops like this:
 can be written like this:
 .PP
 \&\fBparallel echo {1} {2} ::: M F ::: S M L \s-1XL\s0 \s-1XXL\s0 | sort\fR
+.SH "EXAMPLE: Finding the lowest difference between files"
+.IX Header "EXAMPLE: Finding the lowest difference between files"
+\&\fBdiff\fR is good for finding differences in text files. \fBdiff | wc \-l\fR
+gives an indication of the size of the difference. To find the
+differences between all files in the current dir do:
+.PP
+\&\fBparallel \-\-tag 'diff {1} {2} | wc \-l' ::: * ::: * | sort \-nk3\fR
+.PP
+This way it is possible to see if some files are closer to other
+files.
 .SH "EXAMPLE: for-loops with column names"
 .IX Header "EXAMPLE: for-loops with column names"
 When doing multiple nested for-loops it can be easier to keep track of
@@ -2275,7 +2346,7 @@ are not being transferred. To fix those run \fBrsync\fR a final time:
 If you are unable to push data, but need to pull them and the files
 are called digits.png (e.g. 000000.png) you might be able to do:
 .PP
-<seq \-w 0 99 | parallel rsync \-Havessh fooserver:src\-path/*{}.png destdir/>
+\&\fBseq \-w 0 99 | parallel rsync \-Havessh fooserver:src\-path/*{}.png destdir/\fR
 .SH "EXAMPLE: Use multiple inputs in one command"
 .IX Header "EXAMPLE: Use multiple inputs in one command"
 Copy files like foo.es.ext to foo.ext:
@@ -2611,7 +2682,8 @@ This is particularly useful if you have lots of quoting. If you want to run a pe
 .PP
 It needs to be quoted like this:
 .PP
-\&\fBls | parallel  perl \-ne '/^\e\eS+\e\es+\e\eS+\e$/\e and\e print\e \e$ARGV,\e\*(L"\e\en\e\*(R"'\fR
+\&\fBls | parallel perl \-ne '/^\e\eS+\e\es+\e\eS+\e$/\e and\e print\e \e$ARGV,\e\*(L"\e\en\e\*(R"'\fR
+\&\fBls | parallel perl \-ne \e''/^\eS+\es+\eS+$/ and print \f(CB$ARGV\fB,\*(L"\en\*(R"'\e'\fR
 .PP
 Notice how spaces, \e's, "'s, and $'s need to be quoted. \s-1GNU\s0 \fBparallel\fR
 can do the quoting by using option \-q:
@@ -2648,8 +2720,8 @@ Or for substituting output:
 \&\fBls | parallel \-q bash \-c 'tar c {} | tee \fR>\fB(gzip \fR>\fB{}.tar.gz) | bzip2 \fR>\fB{}.tar.bz2'\fR
 .PP
 \&\fBConclusion\fR: To avoid dealing with the quoting problems it may be
-easier just to write a small script and have \s-1GNU\s0 \fBparallel\fR call that
-script.
+easier just to write a small script or a function (remember to
+\&\fBexport \-f\fR the function) and have \s-1GNU\s0 \fBparallel\fR call that.
 .SH "LIST RUNNING JOBS"
 .IX Header "LIST RUNNING JOBS"
 If you want a list of the jobs currently running you can run:
@@ -3564,6 +3636,6 @@ IPC::Open3, Symbol, IO::File, \s-1POSIX\s0, and File::Temp. For remote usage
 it also uses rsync with ssh.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
-\&\fBssh\fR(1), \fBrsync\fR(1), \fBfind\fR(1), \fBxargs\fR(1), \fBdirname\fR,
+\&\fBssh\fR(1), \fBrsync\fR(1), \fBfind\fR(1), \fBxargs\fR(1), \fBdirname\fR(1),
 \&\fBmake\fR(1), \fBpexec\fR(1), \fBppss\fR(1), \fBxjobs\fR(1), \fBprll\fR(1),
-\&\fBdxargs\fR(1), \fBmdm\fR(1),
+\&\fBdxargs\fR(1), \fBmdm\fR(1)

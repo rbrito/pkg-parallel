@@ -30,7 +30,7 @@ The 10 seconds installation will try do to a full installation; if
 that fails, a personal installation; if that fails, a minimal
 installation.
 
-  wget -O - pi.dk/3 | sh
+  (wget -O - pi.dk/3 || curl pi.dk/3/) | bash
 
 This will literally install faster than reading the rest of this
 document.
@@ -40,9 +40,9 @@ document.
 
 Full installation of GNU Parallel is as simple as:
 
-  wget http://ftpmirror.gnu.org/parallel/parallel-20130622.tar.bz2
-  bzip2 -dc parallel-20130622.tar.bz2 | tar xvf -
-  cd parallel-20130622
+  wget http://ftpmirror.gnu.org/parallel/parallel-20130922.tar.bz2
+  bzip2 -dc parallel-20130922.tar.bz2 | tar xvf -
+  cd parallel-20130922
   ./configure && make && make install
 
 
@@ -51,9 +51,9 @@ Full installation of GNU Parallel is as simple as:
 If you are not root you can add ~/bin to your path and install in
 ~/bin and ~/share:
 
-  wget http://ftpmirror.gnu.org/parallel/parallel-20130622.tar.bz2
-  bzip2 -dc parallel-20130622.tar.bz2 | tar xvf -
-  cd parallel-20130622
+  wget http://ftpmirror.gnu.org/parallel/parallel-20130922.tar.bz2
+  bzip2 -dc parallel-20130922.tar.bz2 | tar xvf -
+  cd parallel-20130922
   ./configure --prefix=$HOME && make && make install
 
 Or if your system lacks 'make' you can simply copy src/parallel
@@ -81,8 +81,10 @@ This will send 3 ping packets to 3 different hosts in parallel and print
 the output when they complete.
 
 Watch the intro video for a quick introduction:
-https://www.youtube.com/playlist?list=PL284C9FF2488BC6D1 or at
-http://tinyogg.com/watch/TORaR/ and http://tinyogg.com/watch/hfxKj/
+https://www.youtube.com/playlist?list=PL284C9FF2488BC6D1
+
+Walk through the tutorial (man parallel_tutorial). You command line
+with love you for it.
 
 
 = New versions =
