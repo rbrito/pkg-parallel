@@ -1,3 +1,12 @@
+parallel (20130922+ds1-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * debian/rules:
+    + Remove documentation files in dh_clean.
+    + Add get-orig-source target to remove precompiled documentation files.
+
+ -- Michele Orru` <maker@python.it>  Thu, 12 Jun 2014 19:41:10 +0200
+
 parallel (20130922-1) unstable; urgency=low
 
   * Imported Upstream version 20130922. (Closes: #724123)
