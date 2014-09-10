@@ -5,9 +5,15 @@
 override_dh_installchangelogs:
 	dh_installchangelogs NEWS
 
-
 override_dh_auto_install:
 	dh_auto_install --destdir=debian/tmp
 
 override_dh_install:
 	dh_install --list-missing
+
+override_dh_clean:
+	dh_clean
+	find src/ -name '*.pdf' -delete
+	find src/ -name '*.texi' -delete
+	find src/ -name '*.1' -delete
+	find src/ -name '*.html' -delete
