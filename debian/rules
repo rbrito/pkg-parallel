@@ -27,7 +27,7 @@ override_dh_clean:
 get-orig-source:
 	uscan --verbose \
 		--download-version $(UPVER) \
-	    --no-symlink \
+		--no-symlink \
 		--force-download \
 		--destdir .
 	tar xvf	parallel-$(UPVER).tar.bz2
