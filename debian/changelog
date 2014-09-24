@@ -1,9 +1,15 @@
-parallel (20130922+ds1-1.1) unstable; urgency=low
+parallel (20130922+ds1-2~1.gbp35a104) UNRELEASED; urgency=medium
 
-  * Non-maintainer upload.
+  ** SNAPSHOT build @35a10482e1b44bf6fe57b7390a05aa6277e12488 **
+
+  [ Michele Orru` ]
   * debian/rules:
     + Remove documentation files in dh_clean.
     + Add get-orig-source target to remove precompiled documentation files.
+
+  [ Rogério Brito ]
+  * Integrate changes from Michele to make the package compilable twice in
+    a row. (Closes: #751508)
 
  -- Michele Orru` <maker@python.it>  Thu, 12 Jun 2014 19:41:10 +0200
 
