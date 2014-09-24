@@ -9,7 +9,7 @@ Build-Depends:
  perl,
  pod2pdf,
  texinfo
-Standards-Version: 3.9.3
+Standards-Version: 3.9.6
 Homepage: https://www.gnu.org/software/parallel/
 Vcs-Git: git://anonscm.debian.org/collab-maint/parallel.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/parallel.git
