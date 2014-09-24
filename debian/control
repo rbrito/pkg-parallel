@@ -5,7 +5,10 @@ Maintainer: Rogério Brito <rbrito@ime.usp.br>
 Uploaders:
  Ondřej Surý <ondrej@debian.org>
 Build-Depends:
- debhelper (>= 9), perl, pod2pdf, texinfo
+ debhelper (>= 9),
+ perl,
+ pod2pdf,
+ texinfo
 Standards-Version: 3.9.3
 Homepage: https://www.gnu.org/software/parallel/
 Vcs-Git: git://anonscm.debian.org/collab-maint/parallel.git
