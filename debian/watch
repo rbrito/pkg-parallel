@@ -1,4 +1,4 @@
 version=3
 
-opts=dversionmangle=s/\+ds\d+$// \
+opts=dversionmangle=s/\+ds\d+$//,pgpsigurlmangle=s/$/.sig/ \
   ftp://ftp.gnu.org/gnu/parallel/parallel-(\d.*).tar.bz2
