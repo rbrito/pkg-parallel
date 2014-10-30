@@ -15,7 +15,7 @@ To run this tutorial you must have the following:
 
 =over 9
 
-=item parallel >= version 20140622
+=item parallel >= version 20130814
 
 Install the newest version with:
 
@@ -285,7 +285,6 @@ Output (the order may be different):
 The command can be a script, a binary or a Bash function if the function is
 exported using 'export -f':
 
-  # Only works in Bash and only if $SHELL=.../bash
   my_func() {
     echo in my_func $1
   }
@@ -300,7 +299,7 @@ Output (the order may be different):
 
 =head2 Replacement strings
 
-=head3 The 7 predefined replacement strings
+=head3 The 5 replacement strings
 
 GNU Parallel has several replacement strings. If no replacement
 strings are used the default is to append {}:
@@ -361,18 +360,7 @@ Output (the order may be different):
   2
   3
 
-The replacement string {%} gives the job slot number (between 1 and
-number of jobs to run in parallel):
-
-  parallel -j 2 echo {%} ::: A B C
-
-Output (the order may be different):
-
-  1
-  2
-  1
-
-=head3 Changing the replacement strings
+=head2 Changing the replacement strings
 
 The replacement string {} can be changed with -I:
 
@@ -424,58 +412,7 @@ Output (the order may be different):
   2
   3
 
-The replacement string {%} can be changed with --slotreplace:
-
-  parallel -j2 --slotreplace ,, echo ,, ::: A B C
-
-Output (the order may be different):
-
-  1
-  2
-  1
-
-=head3 Perl expression replacement string
-
-When predefined replacement strings are not flexible enough a perl
-expression can be used instead. One example is to remove two
-extensions: foo.tar.gz -> foo
-
-   parallel echo '{= s:\.[^.]+$::;s:\.[^.]+$::; =}' ::: foo.tar.gz
-
-Output:
-
-   foo
-
-If the strings B<{=> and B<=}> cause problems they can be replaced with --parens:
-
-   parallel --parens ,,,, echo ',, s:\.[^.]+$::;s:\.[^.]+$::; ,,' ::: foo.tar.gz
-
-Output: Same as above.
-
-To define a short hand replacement string use B<--rpl>:
-
-   parallel --rpl '.. s:\.[^.]+$::;s:\.[^.]+$::;' echo '..' ::: foo.tar.gz
-
-Output: Same as above.
-
-If the short hand starts with '{' it can be used as a positional
-replacement string, too:
-
-   parallel --rpl '{..} s:\.[^.]+$::;s:\.[^.]+$::;' echo '{..}' ::: foo.tar.gz
-
-Output: Same as above.
-
-GNU B<parallel>'s 7 replacement strings are implemented as:
-
-  --rpl '{} '
-  --rpl '{#} $_=$job->seq()'
-  --rpl '{%} $_=$job->slot()'
-  --rpl '{/} s:.*/::'
-  --rpl '{//} $Global::use{"File::Basename"} ||= eval "use File::Basename; 1;"; $_ = dirname($_);'
-  --rpl '{/.} s:.*/::; s:\.[^/.]+$::;'
-  --rpl '{.} s:\.[^/.]+$::'
-
-=head3 Positional replacement strings
+=head2 Positional replacement strings
 
 With multiple input sources the argument from the individual input
 sources can be access with {number}:
@@ -514,27 +451,7 @@ Output (the order may be different):
   1=B 2=D 3=E -1=E -2=D -3=B
   1=B 2=D 3=F -1=F -2=D -3=B
 
-
-=head3 Positional perl expression replacement string
-
-To use a perl expression as a positional replacement string simply
-prepend the perl expression with number and space:
-
-   parallel echo '{=2 s:\.[^.]+$::;s:\.[^.]+$::; =} {1}' ::: bar ::: foo.tar.gz
-
-Output:
-
-   foo bar
-
-If a defined short hand starts with '{' it can be used as a positional
-replacement string, too:
-
-   parallel --rpl '{..} s:\.[^.]+$::;s:\.[^.]+$::;' echo '{2..} {1}' ::: bar ::: foo.tar.gz
-
-Output: Same as above.
-
-
-=head3 Input from columns
+=head2 Input from columns
 
 The columns in a file can be bound to positional replacement strings
 using --colsep. Here the columns are separated with TAB (\t):
@@ -547,7 +464,7 @@ Output (the order may be different):
   1=A 2=B
   1=C 2=D
 
-=head3 Header defined replacement strings
+=head2 Header defined replacement strings
 
 With --header GNU Parallel will use the first value of the input
 source as the name of the replacement string. Only the non-modified
@@ -596,32 +513,14 @@ Output:
 For better parallelism GNU Parallel can distribute the arguments
 between all the parallel jobs when end of file is met.
 
-Below GNU Parallel reads the last argument when generating the second
-job. When GNU Parallel reads the last argument, it spreads all the
-arguments for the second job over 4 jobs instead, as 4 parallel jobs
-are requested.
-
-The first job will be the same as the --xargs example above, but the
-second job will be split into 4 evenly sized jobs, resulting in a
-total of 5 jobs:
+Running 4 jobs in parallel will split the last line of arguments into
+4 jobs resulting in a total of 5 jobs:
 
   cat num30000 | parallel --jobs 4 -m echo | wc -l
 
 Output:
 
   5
-
-This is even more visible when running 4 jobs with 10 arguments. The
-10 arguments are being spread over 4 jobs:
-
-  parallel --jobs 4 -m echo ::: {1..10}
-
-Output:
-
-  1 2 3
-  4 5 6
-  7 8 9
-  10
 
 A replacement string can be part of a word. -m will not repeat the context:
 
@@ -844,7 +743,7 @@ Output:
 with half a line of another job. That has happend in the second line,
 where the line '4-middle' is mixed with '2-start'.
 
-To avoid this use --linebuffer:
+To avoid this use --linebuffer (which, however, is much slower):
 
   parallel -j2 --linebuffer 'printf "%s-start\n%s" {} {};sleep {};printf "%s\n" -middle;echo {}-end' ::: 4 2 1
 
@@ -880,7 +779,7 @@ Output:
 
 GNU Parallel can save the output of each job into files:
 
-  parallel --files echo ::: A B C
+  parallel --files ::: A B C
 
 Output will be similar to:
 
@@ -891,7 +790,7 @@ Output will be similar to:
 By default GNU Parallel will cache the output in files in /tmp. This
 can be changed by setting $TMPDIR or --tmpdir:
 
-  parallel --tmpdir /var/tmp --files echo ::: A B C
+  parallel --tmpdir /var/tmp --files ::: A B C
 
 Output will be similar to:
 
@@ -901,7 +800,7 @@ Output will be similar to:
 
 Or:
 
-  TMPDIR=/var/tmp parallel --files echo ::: A B C
+  TMPDIR=/var/tmp parallel --files ::: A B C
 
 Output: Same as above.
 
@@ -984,7 +883,7 @@ GNU Parallel can base it on the number of CPUs:
 
   parallel --use-cpus-instead-of-cores -N0 sleep 1 ::: {1..128}
 
-=head2 Interactivity
+=head2 Interactiveness
 
 GNU Parallel can ask the user if a command should be run using --interactive:
 
@@ -1170,25 +1069,6 @@ Output:
   parallel: This job failed:
   echo 1; exit 1
 
-If --halt is given a percentage this percentage of the jobs must fail
-(though minimum 3) before GNU Parallel stops spawning more jobs:
-
-  parallel -j2 --halt 20% echo {}\; exit {} ::: 0 0 1 2 3 4 5 6 7
-
-Output:
-
-  0
-  0
-  1
-  2
-  3
-  4
-  parallel: Starting no more jobs. Waiting for 2 jobs to finish. This job failed:
-      echo 4; exit 4
-  5
-  parallel: Starting no more jobs. Waiting for 1 jobs to finish. This job failed:
-      echo 5; exit 5
-
 GNU Parallel can retry the command with --retries. This is useful if a
 command fails for unkown reasons now and then.
 
@@ -1209,7 +1089,7 @@ Output:
   tried 2
   tried 0
 
-Note how job 1 and 2 were tried 3 times, but 0 was not retried because it had exit code 0.
+Note how job 1 and 2 was tried 3 times, but 0 was not retried because it had exit code 0.
 
 =head2 Limiting the ressources
 
@@ -1478,9 +1358,8 @@ Output:
 
   foo bar baz
 
-This works for functions too if your shell is Bash:
+This works for functions too:
 
-  # This only works in Bash
   my_func() {
     echo in my_func $1
   }
@@ -1492,7 +1371,7 @@ Output:
   in my_func baz
 
 GNU Parallel can copy all defined variables and functions to the
-remote system. It just needs to record which ones to ignore in
+remote system. It just need to record which ones to ignore in
 ~/.parallel/ignored_vars. Do that by running this once:
 
   parallel --record-env
@@ -1505,7 +1384,6 @@ Output:
 Now all new variables and functions defined will be copied when using
 --env _:
 
-  # The function is only copied if using Bash
   my_func2() {
     echo in my_func2 $VAR $1
   }
@@ -1513,11 +1391,10 @@ Now all new variables and functions defined will be copied when using
   VAR=foo
   export VAR
 
-  parallel --env _ -S $SERVER1 'echo $VAR; my_func2' ::: bar
+  parallel --env _ -S $SERVER1 my_func2 ::: bar
 
 Output:
 
-  foo
   in my_func2 foo bar
 
 =head2 Showing what is actually run
@@ -1634,8 +1511,7 @@ Output (the order may be different):
   140000  140000  980000
    20000   20000  140001
 
-Notice that the last job could not get the full 140000 lines, but only
-20000 lines.
+Notice that the last jobs could not get the full 140000 lines.
 
 If a record is 75 lines -L can be used:
 
@@ -1751,7 +1627,6 @@ job by matching the header with --header. If headers start with %:
 
 Output (the order may be different):
 
-  JOB1
   %head1
   %head2
   1
@@ -2118,11 +1993,6 @@ If you like GNU Parallel:
 
 =item *
 
-(Re-)walk through the tutorial if you have not done so in the past year
-(http://www.gnu.org/software/parallel/parallel_tutorial.html)
-
-=item *
-
 Give a demo at your local user group/team/colleagues
 
 =item *
@@ -2157,12 +2027,11 @@ If GNU Parallel saves you money:
 
 =item *
 
-(Have your company) donate to FSF or become a member
-https://my.fsf.org/donate/
+(Have your company) donate to FSF https://my.fsf.org/donate/
 
 =back
 
-(C) 2013,2014 Ole Tange, GPLv3
+(C) 20130822 Ole Tange GPLv3
 
 
 =cut
