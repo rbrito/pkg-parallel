@@ -1,6 +1,6 @@
-parallel (20130922+ds1-2~1.gbp35a104) UNRELEASED; urgency=medium
+parallel (20141022+ds1-2~2.gbp25db9c) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @35a10482e1b44bf6fe57b7390a05aa6277e12488 **
+  ** SNAPSHOT build @25db9cadee5d38e8e52426be6b19870f72ada2cf **
 
   [ Michele Orru` ]
   * debian/rules:
@@ -10,6 +10,15 @@ parallel (20130922+ds1-2~1.gbp35a104) UNRELEASED; urgency=medium
   [ Rogério Brito ]
   * Integrate changes from Michele to make the package compilable twice in
     a row. (Closes: #751508)
+  * Credit Michele Orrù for patches to build twice in a row.
+  * debian/control: Normalize with wrap-and-sort.
+  * debian/control: Verified compliance with Policy version 3.9.6.
+  * Imported Upstream version 20130922+ds1
+  * debian/watch: Deal with version mangling, as we repack the upstream source.
+  * debian/rules: Minor cosmetic indenting.
+  * debian/upstream: Add signing key.
+  * debian/watch: Add mangling of names for upstream signatures.
+  * Imported Upstream version 20141022
 
  -- Michele Orru` <maker@python.it>  Thu, 12 Jun 2014 19:41:10 +0200
 
