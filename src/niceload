@@ -3,8 +3,8 @@
 # Copyright (C) 2004,2005,2006,2006,2008,2009,2010 Ole Tange,
 # http://ole.tange.dk
 #
-# Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
-# Software Foundation, Inc.
+# Copyright (C) 2010,2011,2012,2013,2014 Ole Tange,
+# http://ole.tange.dk and Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 use strict;
 use Getopt::Long;
 $Global::progname="niceload";
-$Global::version = 20130922;
+$Global::version = 20141022;
 Getopt::Long::Configure("bundling","require_order");
 get_options_from_array(\@ARGV) || die_usage();
 if($opt::version) {
@@ -69,8 +69,12 @@ if(@opt::prg) {
     # Find all pids of prg
     my $out = `pidof -x @opt::prg`;
     $process->set_pid(split /\s+/,$out);
+    $::resume_process = $process;
+    $SIG{TERM} = $SIG{INT} = \&resume;
 } elsif(@opt::pid) {
     $process->set_pid(@opt::pid);
+    $::resume_process = $process;
+    $SIG{TERM} = $SIG{INT} = \&resume;
 } elsif (@ARGV) {
     # Wait until limit is below start_limit and run_limit
     while($limit->over_start_limit()
@@ -96,6 +100,11 @@ while($process->is_alive()) {
 }
 
 exit($::exitstatus);
+
+sub resume {
+    $::resume_process->resume();
+    exit(0);
+}
 
 sub uniq {
     # Remove duplicates and return unique values
@@ -171,6 +180,9 @@ sub get_options_from_array {
 	 "rn|runnoswap|run-noswap|run-no-swap" => \$opt::run_noswap,
 	 "noswap|N" => \$opt::noswap,
 
+	 # niceload -l -1 --sensor 'cat /sys/class/power_supply/BAT0/status /proc/acpi/battery/BAT0/state 2>/dev/null |grep -i -q discharging; echo $?'
+	 "battery|B" => \$opt::battery,
+
 	 "nice|n=i" => \$opt::nice,
 	 "program|prg=s" => \@opt::prg,
 	 "process|pid|p=s" => \@opt::pid,
@@ -227,6 +239,13 @@ sub usleep {
     select(undef, undef, undef, $secs/1000);
 }
 
+sub deepusleep {
+    # Sleep this many milliseconds. Dont let children wake us up
+    my $sigchld = $SIG{'CHLD'};
+    $SIG{'CHLD'} = undef;
+    usleep(@_);
+    $SIG{'CHLD'} = $sigchld;
+}
 
 sub debug {
     if($opt::debug) {
@@ -462,11 +481,12 @@ sub new {
     my $startmem = $opt::start_mem ? ::multiply_binary_prefix($opt::start_mem) : 0;
     my $runnoswap = $opt::run_noswap ? ::multiply_binary_prefix($opt::run_noswap) : 0;
     my $startnoswap = $opt::start_noswap ? ::multiply_binary_prefix($opt::start_noswap) : 0;
+    my $recheck = $opt::recheck ? ::multiply_binary_prefix($opt::recheck) : 1; # Default
+    my $runtime = $opt::suspend ? ::multiply_binary_prefix($opt::suspend) : 1; # Default
 
     return bless {
 	'hard' => $hard,
-	'recheck' => 1, # Default
-	'runtime' => 1, # Default
+	'recheck' => $recheck,
 	'runio' => $runio,
 	'startio' => $startio,
 	'runload' => $runload,
@@ -476,8 +496,8 @@ sub new {
 	'runnoswap' => $runnoswap,
 	'startnoswap' => $startnoswap,
 	'factor' => $opt::factor || 1,
-	'recheck' => $opt::recheck || 1,
-	'runtime' => $opt::recheck || 1,
+	'recheck' => $recheck,
+	'runtime' => $runtime,
 	'over_run_limit' => 1,
 	'over_start_limit' => 1,
 	'verbose' => $opt::verbose,
@@ -593,11 +613,10 @@ sub sleep_for_recheck {
     }
     if($self->verbose()) {
 	$self->{'recheck'} = int($self->{'recheck'}*100)/100;
-	print "Sleeping $self->{'recheck'}s\n";
+	print STDERR "Sleeping $self->{'recheck'}s\n";
     }
     ::debug("recheck in $self->{'recheck'}s\n");
-    ::usleep(1); # For some reason this gets interrupted
-    ::usleep(1000*$self->{'recheck'});
+    ::deepusleep(1000*$self->{'recheck'});
 }
 
 
@@ -606,10 +625,9 @@ sub sleep_while_running {
     ::debug("check in $self->{'runtime'}s\n");
     if($self->verbose()) {
 	$self->{'runtime'} = int($self->{'runtime'}*100)/100;
-	print "Running $self->{'runtime'}s\n";
+	print STDERR "Running $self->{'runtime'}s\n";
     }
-    ::usleep(1); # For some reason this gets interrupted
-    ::usleep(1000*$self->{'runtime'});
+    ::deepusleep(1000*$self->{'runtime'});
 }
 
 
