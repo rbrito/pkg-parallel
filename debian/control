@@ -5,6 +5,7 @@ Maintainer: Rogério Brito <rbrito@ime.usp.br>
 Uploaders:
  Ondřej Surý <ondrej@debian.org>
 Build-Depends:
+ autoconf,
  debhelper (>= 9),
  perl,
  pod2pdf,
