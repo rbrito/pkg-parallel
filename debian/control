@@ -21,6 +21,7 @@ Conflicts:
  moreutils
 Depends:
  perl-modules,
+ sysstat,
  ${misc:Depends},
  ${perl:Depends}
 Description: build and execute command lines from standard input in parallel
