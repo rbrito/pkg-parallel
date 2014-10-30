@@ -1,8 +1,6 @@
-parallel (20141022+ds1-2~2.gbp25db9c) UNRELEASED; urgency=medium
+parallel (20141022+ds1-1) unstable; urgency=medium
 
-  ** SNAPSHOT build @25db9cadee5d38e8e52426be6b19870f72ada2cf **
-
-  [ Michele Orru` ]
+  [ Michele Orrù ]
   * debian/rules:
     + Remove documentation files in dh_clean.
     + Add get-orig-source target to remove precompiled documentation files.
@@ -19,8 +17,12 @@ parallel (20141022+ds1-2~2.gbp25db9c) UNRELEASED; urgency=medium
   * debian/upstream: Add signing key.
   * debian/watch: Add mangling of names for upstream signatures.
   * Imported Upstream version 20141022
+  * Imported Upstream version 20141022+ds1 (Closes: #747217)
+  * debian/control: Add autoconf to Build-Depends.
+  * debian/rules: Disable running the testsuite, as it is not present.
+  * debian/control: Add Depends on sysstat. (Closes: #765036)
 
- -- Michele Orru` <maker@python.it>  Thu, 12 Jun 2014 19:41:10 +0200
+ -- Rogério Brito <rbrito@ime.usp.br>  Thu, 30 Oct 2014 20:01:29 -0200
 
 parallel (20130922-1) unstable; urgency=low
 
