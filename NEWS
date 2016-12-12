@@ -1,3 +1,1355 @@
+20161122
+
+* --record-env can now be used with env_parallel for bash, ksh, pdksh, and zsh.
+
+* GNU Parallel was cited in: An improved implementation of Conditional Reciprocal Best Hits with LAST and Python https://pypi.python.org/pypi/shmlast/1.0.3
+
+* GNU Parallel was cited in: miRPathDB: a new dictionary on microRNAs and target pathways http://nar.oxfordjournals.org/content/early/2016/10/13/nar.gkw926.full
+
+* GNU/Parallel – Run multiple commands simultaneously https://vinusumi.wordpress.com/2016/11/08/gnuparallel-run-multiple-commands-simultaneously/
+
+* Tutorial: Parallel web scraping with CasperJS and GNU Parallel http://g-liu.com/blog/2016/10/tutorial-parallel-web-scraping-with-casperjs-and-gnu-parallel/
+
+
+20161022
+
+* First command no longer gets stdin as it causes unpredictable issues.
+
+* GNU Parallel was cited in: Efficiently parallelized modeling of
+  tightly focused, large bandwidth laser pulses
+  https://arxiv.org/pdf/1609.08146v1.pdf
+
+* How to crunch lots of geodata in parallel
+  http://blog.faraday.io/how-to-crunch-lots-of-geodata-in-parallel/
+
+* GNU parallel is my new toaster
+  http://amedee.me/gnu-parallel-is-my-new-toaster/index.html
+
+* Bug fixes and man page updates.
+
+
+20160922
+
+* parcat - cat files or fifos in parallel
+
+* GNU Parallel was cited in: Velocity: A Netflow Based Optimized
+  Geo-IP Lookup Tool
+  https://mospace.umsystem.edu/xmlui/bitstream/handle/10355/50842/Thesis_2016_Pakhare.pdf?sequence=1&isAllowed=y
+
+* GNU Parallel was cited in: Viral deep sequencing needs an adaptive
+  approach: IRMA, the iterative refinement meta-assembler
+  http://www.ncbi.nlm.nih.gov/pmc/articles/PMC5011931/
+
+* GNU Parallel is used in Gene Set Omic Analysis:
+  https://bitbucket.org/srp33/gsoa
+
+* Using GNU Parallel and ImageMagick for Conversions
+  https://blog.fractalcomic.com/tutorials/using-gnu-parallel-and-imagemagick-for-conversions/
+
+* Training in GNU Parallel
+  http://www.cism.ucl.ac.be/Services/Formations/parcomp.pdf
+
+* Chown Ceph OSD data directory using GNU Parallel
+  http://blog.widodh.nl/2016/08/chown-ceph-osd-data-directory-using-gnu-parallel/
+
+* FastGBS uses GNU Parallel https://bitbucket.org/jerlar73/fastgbs
+
+* dDocent: A guide to ddRAD sequencing
+  https://ddocent.wordpress.com/ddocent-pipeline-user-guide/
+
+* SOFTWARE GNU Parallel
+  http://msi-riss.readthedocs.io/en/latest/software/gnu-parallel.html
+
+* Bug fixes and man page updates.
+
+
+20160822
+
+* --tmuxpane opens jobs in panes in tmux. Useful if you want to
+  monitor progress of less than 100 simultaneous jobs.
+
+* --linebuffer now treats \r as line ending, too.
+
+* Perl changes forces use of floats to be given with leading zero, so
+  0.1 and not .1
+
+* --xapply renamed to --link.
+
+* Support for pdksh will fade until someone packages it for Ubuntu 16.
+
+* GNU Parallel was cited in: Exome sequencing of geographically
+  diverse barley landraces and wild relatives gives insights into
+  environmental adaptation
+  http://www.nature.com/ng/journal/vaop/ncurrent/full/ng.3612.html?WT.feed_name=subjects_genetics#references
+
+* GNU Parallel was cited in: Vision-Enhanced Lidar Odometry and
+  Mapping https://www.ri.cmu.edu/pub_files/2016/8/DLL-thesis.pdf
+
+* Easy parallelization with GNU parallel
+  http://mpharrigan.com/2016/08/02/parallel.html
+
+* Facebook V: Predicting Check Ins, Winner's Interview: 2nd Place,
+  Markus Kliegl
+  http://blog.kaggle.com/2016/08/02/facebook-v-predicting-check-ins-winners-interview-2nd-place-markus-kliegl/
+
+* Parallel import
+  http://www.manitou-mail.org/blog/2016/07/parallel-import/
+
+* Large file batch processing using NodeJs and GNU Parallel
+  http://www.zacorndorff.com/2016/07/27/large-file-batch-processing-using-nodejs-and-gnu-parallel/
+
+* Bug fixes and man page updates.
+
+
+20160722
+
+* env_parallel is now ready for wider testing. It is still beta
+  quality.
+
+* env_parallel is heavily modified for all shells and testing has been
+  increased.
+
+* Selectively choosing what to export using --env now works for
+  env_parallel (bash, csh, fish, ksh, pdksh, tcsh, zsh).
+
+* --round-robin now gives more work to a job that processes faster
+  instead of same amount to all jobs.
+
+* --pipepart works on block devices on GNU/Linux.
+
+* GNU Parallel was cited in: HybPiper: Extracting Coding Sequence and
+  Introns for Phylogenetics from High-Throughput Sequencing Reads
+  Using Target Enrichment
+  http://www.bioone.org/doi/full/10.3732/apps.1600016
+
+* GNU Parallel was cited in: StrAuto - Automation and Parallelization
+  of STRUCTURE Analysis
+  http://www.crypticlineage.net/download/strauto/strauto_doc.pdf
+
+* GNU Parallel was cited in: Tools and techniques for computational
+  reproducibility
+  http://gigascience.biomedcentral.com/articles/10.1186/s13742-016-0135-4
+
+* GNU Parallel was cited in: FlashPCA: fast sparse canonical correlation analysis of genomic data http://biorxiv.org/content/biorxiv/suppl/2016/04/06/047217.DC1/047217-1.pdf
+
+* GNU Parallel was cited in: Computational Design of DNA-Binding
+  Proteins
+  http://link.springer.com/protocol/10.1007/978-1-4939-3569-7_16
+
+* GNU Parallel was cited in: Math Indexer and Searcher under the Hood:
+  Fine-tuning Query Expansion and Unification Strategies
+  http://research.nii.ac.jp/ntcir/workshop/OnlineProceedings12/pdf/ntcir/MathIR/05-NTCIR12-MathIR-RuzickaM.pdf
+
+* GNU Parallel was cited in: The Evolution and Fate of
+  Super-Chandrasekhar Mass White Dwarf Merger Remnants
+  http://arxiv.org/pdf/1606.02300.pdf
+
+* GNU Parallel was cited in: Evaluation of Coastal Scatterometer
+  Products
+  https://mdc.coaps.fsu.edu/scatterometry/meeting/docs/2016/Thu_AM/coastal-poster.pdf
+
+* GNU Parallel was used in: https://github.com/splitice/bulkdnsblcheck
+
+* The iconv slurp misfeature
+  http://www.openfusion.net/linux/iconv_slurp_misfeature
+
+* แบบว่า CPU เหลือ https://veer66.wordpress.com/2016/06/15/gnu-parallel/
+
+* Bug fixes and man page updates.
+
+
+20160622
+
+* $PATH can now be exported using --env PATH. Useful if GNU Parallel
+  is not in your path on remote machines.
+
+* If --block is left out, --pipepart will use a block size that will
+  result in 10 jobs per jobslot.
+
+* The cookie from 2016-01-04 was won by Morgan Rodgers on the
+  2016-06-06 after 5 months.
+
+* Vote for GNU Parallel's community ad on
+  https://meta.askubuntu.com/questions/14925/community-promotion-ads-2016/15046#15046
+
+* GNU Parallel was cited in: Genotypic Resistance Tests Sequences
+  Reveal the Role of Marginalized Populations in HIV-1 Transmission in
+  Switzerland http://www.nature.com/articles/srep27580
+
+* GNU Parallel was cited in: A Deep-Learning Approach for Operation of
+  an Automated Realtime Flare Forecast
+  https://arxiv.org/pdf/1606.01587.pdf
+
+* Unix parallel: Populating all the USB sticks
+  http://www.markhneedham.com/blog/2016/06/01/unix-parallel-populating-all-the-usb-sticks/
+
+* GNU Parallel is a fantastic utility https://www.dray.be/parallel/
+
+* Combining a large number of VCF files
+  https://gtamazian.com/2016/06/16/combining-a-large-number-of-vcf-files/
+
+* Useful Scraping Techniques
+  http://blog.apps.npr.org/2016/06/17/scraping-tips.html
+
+* Tools of the trade
+  http://onox.com.br/2015/05/tools-of-the-trade/#more-198
+
+* Armslist scraper https://github.com/nprapps/armslist-scraper/
+
+* Bug fixes and man page updates.
+
+
+20160522
+
+* niceload --net pauses the program if the internet connection is
+  overloaded.
+
+* Vote for GNU Parallel's community ad on
+  https://meta.askubuntu.com/questions/14925/community-promotion-ads-2016/15046#15046
+
+* Updated speed comparison between versions
+  https://www.gnu.org/software/parallel/process-time-j2-1700MHz-3000-1000.pdf
+
+* GNU Parallel was cited in: Improving computation efficiency by
+  parallel programming
+  http://www.irbis-nbuv.gov.ua/cgi-bin/irbis_nbuv/cgiirbis_64.exe?C21COM=2&I21DBN=UJRN&P21DBN=UJRN&IMAGE_FILE_DOWNLOAD=1&Image_file_name=PDF/ape_2013_3_44.pdf
+
+* GNU Parallel was cited in: A supernova feedback implementation for
+  the astrophysical simulation software Arepo
+  https://arxiv.org/abs/1604.06071
+
+* GNU Parallel was cited in: Lorenz-Mie theory for 2D scattering and
+  resonance calculations https://arxiv.org/pdf/1505.07691v2.pdf
+
+* GNU Parallel was cited in: Host-pathogen co-evolution and the
+  emergence of broadly neutralizing antibodies in chronic infections
+  https://arxiv.org/abs/1512.06296
+
+* GNU Parallel was cited in: Pacific People, Metabolic Disease and
+  Evolutionary Processes: a mitochondrial DNA study
+  https://otago.ourarchive.ac.nz/handle/10523/6340
+
+* GNU Parallel was cited in: The effect of domain modeling on
+  efficiency of planning: Lessons from the Nomystery domain
+  http://ieeexplore.ieee.org/xpls/abs_all.jsp?arnumber=7407131
+
+* GNU Parallel was cited in: Oops, my tests broke the build: An
+  analysis of Travis CI buildswith GitHub
+  https://peerj.com/preprints/1984/
+
+* GNU Parallel was cited in: Drosophila Muller F Elements Maintain a
+  Distinct Set of Genomic Properties Over 40 Million Years of
+  Evolution http://www.g3journal.org/content/5/5/719.full.pdf+html
+
+* GNU Parallel was cited in: An Empirical Comparison of Neural
+  Architectures for Reinforcement Learning in Partially Observable
+  Environments
+  http://biorxiv.org/content/biorxiv/early/2016/03/24/022707.full.pdf
+
+* GNU Parallel was cited in: Functional enrichments of disease
+  variants across thousands of independent loci in eight diseases
+  http://biorxiv.org/content/early/2016/04/11/048066.abstract
+
+* GNU Parallel was cited in: PleaseTM: Enabling Transaction Conflict
+  Management in Requester-wins Hardware Transactional Memory
+  http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7446072
+
+* GNU Parallel was cited in: EASE-MM: Sequence-Based Prediction of
+  Mutation-Induced Stability Changes with Feature-Based Multiple
+  Models
+  http://www.sciencedirect.com/science/article/pii/S0022283616000310
+
+* GNU Parallel was cited in: A new orthology assessment method for
+  phylogenomic data: Unrooted Phylogenetic Orthology
+  http://mbe.oxfordjournals.org/content/early/2016/04/06/molbev.msw069.short
+  https://github.com/ballesterus/UPhO
+
+* GNU Parallel was cited in: Distinctive Interest Point Selection for
+  Efficient Near-duplicate Image Retrieval
+  http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7459172
+
+* GNU Parallel was cited in: The Evolution of C Programming Practices:
+  A Study of the Unix Operating System 1973–2015
+  https://dl.acm.org/citation.cfm?id=2884799 (It has the cutest
+  thumbnail graphs I have ever seen scattered all over the text)
+
+* GNU Parallel was cited in: StrAuto: Automation and Parallelization
+  of STRUCTURE Analysis
+  http://vchhatre.w3.uvm.edu/download/strauto/strauto_doc.pdf
+
+* GNU Parallel was cited in: Data processing pipeline for serial
+  femtosecond crystallography at SACLA
+  http://journals.iucr.org/j/issues/2016/03/00/zw5001/index.html
+
+* GNU Parallel was cited in: Reconstruction of Fine-Scale Auroral
+  Dynamics http://arxiv.org/pdf/1512.01460.pdf
+
+* GNU Parallel was cited in: The Outer Solar System Origins Survey:
+  I. Design and First-Quarter Discoveries
+  http://arxiv.org/pdf/1511.02895.pdf
+
+* GNU Parallel was cited in: Multiscale Estimation of Binding Kinetics
+  Using Brownian Dynamics, Molecular Dynamics and Milestoning
+  http://journals.plos.org/ploscompbiol/article/asset?id=10.1371%2Fjournal.pcbi.1004381.PDF
+
+* GNU Parallel was cited in: Genomic legacy of the African cheetah,
+  Acinonyx jubatus
+  https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4676127/pdf/13059_2015_Article_837.pdf
+
+* GNU Parallel was cited in: Don’t Forget to Lock the Back Door! A
+  Characterization of IPv6 Network Security Policy
+  http://benign-research-probe2.eecs.umich.edu/ndss16_ipv6_final.pdf
+
+* GNU Parallel was cited in: Comprehensive Annotation of the
+  Parastagonospora nodorum Reference Genome Using Next-Generation
+  Genomics, Transcriptomics and Proteogenomics
+  http://journals.plos.org/plosone/article/asset?id=10.1371%2Fjournal.pone.0147221.PDF
+
+* GNU Parallel was cited in: Stride Search: a general algorithm for
+  storm detection in high-resolution climate data
+  http://www.geosci-model-dev-discuss.net/8/7727/2015/gmdd-8-7727-2015.pdf
+
+* GNU Parallel was cited in: How attention influences perceptual
+  decision making: Single-trial EEG correlates of drift-diffusion
+  model parameters http://www.cidlab.com/prints/nunez2016attention.pdf
+
+* GNU Parallel was cited in: Telomere And Proximal Sequence Analysis
+  Using High-Throughput Sequencing Reads
+  http://repository.upenn.edu/edissertations/1460/
+
+* GNU Parallel was cited in: AT-GIS: Highly Parallel Spatial Query
+  Processing with Associative Transducers
+  http://lsds.doc.ic.ac.uk/sites/default/files/ATGIS-SIGMOD16.pdf
+
+* GNU Parallel was cited in: PVAIR: Partial Variable Assignment
+  InterpolatoR http://verify.inf.usi.ch/sites/default/files/main-2.pdf
+
+* GNU Parallel was cited in: Comparative Cladistics: Fossils,
+  Morphological Data Partitions and Lost Branches in the Fossil Tree
+  of Life http://opus.bath.ac.uk/43955/
+
+* GNU Parallel was cited in: Shannon: An Information-Optimal de
+  NovoRNA-Seq Assembler
+  http://biorxiv.org/content/biorxiv/early/2016/02/09/039230.full.pdf
+
+* GNU Parallel was cited in: Adaptive Measure-Theoretic Parameter
+  Estimation for Coastal Ocean Modeling
+  https://repositories.lib.utexas.edu/handle/2152/32435
+
+* GNU Parallel was cited in: Computational Design of DNA-Binding
+  Proteins
+  http://link.springer.com/protocol/10.1007/978-1-4939-3569-7_16
+
+* GNU Parallel was cited in: Reference genotype and exome data from an
+  Australian Aboriginal population for health-based research
+  http://www.nature.com/articles/sdata201623
+
+* GNU Parallel was cited in: Computational Design of DNA-Binding
+  Proteins
+  http://link.springer.com/protocol/10.1007/978-1-4939-3569-7_16
+
+* GNU Parallel was cited in: Do aye-ayes echolocate?
+  http://biorxiv.org/content/biorxiv/early/2016/04/11/048165.full.pdf
+
+* GNU Parallel was cited in: Functional enrichments of disease
+  variants across thousands of independent loci in eight diseases
+  http://biorxiv.org/content/biorxiv/early/2016/04/11/048066.full.pdf
+
+* GNU Parallel was cited in: From genomes to phenotypes: Traitar, the
+  microbial trait analyzer
+  http://biorxiv.org/content/biorxiv/early/2016/03/12/043315.full.pdf
+
+* GNU Parallel was mentioned in: Fast Playback Framework for Analysis
+  of Ground-Based Doppler Radar Observations Using MapReduce
+  Technology
+  http://journals.ametsoc.org/doi/pdf/10.1175/JTECH-D-15-0118.1
+
+* NCBI blast tutorial
+  https://github.com/enormandeau/ncbi_blast_tutorial
+
+* Distributed Preservation Made Simple
+  https://blog.archive.org/2016/02/26/distributed-preservation-made-simple/
+
+* Parallel Jobs in Luigi http://rjbaxley.com/posts/2016/03/13/parallel_jobs_in_luigi.html
+
+* Bug fixes and man page updates.
+
+
+20160422
+
+* :::+ and ::::+ work like ::: and :::: but links this input source to
+  the previous input source in a --xapply fashion. Contrary to
+  --xapply values do not wrap: The shortest input source determines
+  the length.
+
+* --line-buffer --keep-order now outputs continously from the oldest
+  job still running. This is more what you would expect than the
+  earlier behaviour where --keep-order had no effect with
+  --line-buffer.
+
+* env_parallel supports tcsh, csh, pdksh. In fish it now supports
+  arrays. In csh/tcsh it now supports variables, aliases, and arrays
+  with no special chars. In pdksh it supports aliases, functions,
+  variables, and arrays.
+
+* Function exporting on Mac OS X works around old Bash version.
+
+* Better CPU detection on OpenIndiana.
+
+* GNU Parallel was cited in: How Can We Measure the Similarity Between
+  Resumes of Selected Candidates for a Job?
+  https://www.researchgate.net/publication/275954089_How_can_we_measure_the_similarity_between_resumes_of_selected_candidates_for_a_job
+
+* GNU Parallel was cited in: Automatic Methods for Assisted
+  Recruitment
+  https://www.researchgate.net/publication/297738658_Automatic_Methods_for_Assisted_Recruitment
+
+* GNU Parallel was cited in: Tools and techniques for computational
+  reproducibility
+  http://biorxiv.org/content/biorxiv/early/2016/03/17/022707.full.pdf
+
+* GNU Parallel was cited in: Reinterpretation of ATLAS 8 TeV searches
+  for Natural SUSY with a R-Sneutrino LSP
+  http://arxiv.org/pdf/1603.06130.pdf
+
+* GNU Parallel was cited in: An Operational Radiometric Landsat
+  Preprocessing Framework for Large-Area Time Series Applications
+  https://www.uni-trier.de/fileadmin/fb6/prof/FER/Publikationen/frantz_et_al_ieee-tgrs-2016-post-print.pdf
+
+* A basic demo of how GNU Parallel can speed up execution of commands
+  https://www.youtube.com/watch?v=kl8LO2jcvMc
+
+* Downloading a list of URLs
+  http://blog.gypsydave5.com/2016/02/04/xargs-and-curl/
+
+* qbatch uses GNU Parallel: https://pypi.python.org/pypi/qbatch/1.0rc2
+
+* FaceCrop uses GNU Parallel: https://github.com/EderSantana/FaceCrop
+
+* Parallel Processing with Catmandu
+  https://librecatproject.wordpress.com/2016/04/20/parallel-processing-with-catmandu/
+
+* GNU parallel 應用範例
+  http://staypython.blogspot.dk/2016/04/gnu-parallel.html
+
+* Bug fixes and man page updates.
+
+
+20160322
+
+* env_parallel is a function that exports the environment (functions,
+  aliases, variables, and arrays) to GNU Parallel. Run 'man
+  env_parallel' for details.
+
+* niceload --prg now searches for substrings if no process with the
+  name is found.
+
+* GNU Parallel was cited in: Random Forest DBSCAN for USPTO Inventor
+  Name Disambiguation http://arxiv.org/pdf/1602.01792.pdf
+
+* GNU Parallel was mentioned (with wrong citation) in: Dual Level
+  Parallel Computations for LargeScale High-Fidelity Database to
+  Design Aerospace Vehicles
+  http://www.nas.nasa.gov/assets/pdf/papers/Guruswamy_2013_DualLevelParallelComputations.pdf
+
+* Using ‘Parallel’ in Unix
+  https://shearnrylan.wordpress.com/2016/02/22/using-parallel-in-unix/
+
+* JPEG Squish uses (and co-distributes) GNU Parallel:
+  http://dantidswell.co.uk/jpeg-squish/
+
+* Bug fixes and man page updates.
+
+
+20160222
+
+* Vote for new community on Superuser, Ask Ubuntu, Unix&Linux
+  http://meta.superuser.com/questions/11127/community-promotion-ads-2016/11225#11225
+  http://meta.askubuntu.com/questions/14925/community-promotion-ads-2016/15046#15046
+  http://meta.unix.stackexchange.com/questions/3854/community-promotion-ads-2016/3893#3893
+
+* Daily Quick Tip: parallel
+  https://medium.com/@jacaetevha/daily-quick-tip-parallel-8772435f6582
+
+* Downloading a list of URLs
+  http://blog.gypsydave5.com/2016/02/04/xargs-and-curl/
+
+* Using GNU Parallel and ImageMagick for Conversions
+  http://blog.fractalcomic.com/tutorials/using-gnu-parallel-and-imagemagick-for-conversions/
+
+* Running bash commands in parallel
+  http://linuxcommando.blogspot.dk/2016/01/running-bash-commands-in-parallel.html
+
+* parallel processing in PDAL
+  https://smathermather.wordpress.com/2016/01/28/parallel-processing-in-pdal/
+
+* A Million Text Files And A Single Laptop
+  http://randyzwitch.com/gnu-parallel-medium-data/
+
+* 「今日から使い切る」ための GNU Parallelによる並列処理入門
+  http://www.slideshare.net/koji_matsuda/gnu-parallel
+
+* Bug fixes and man page updates.
+
+
+20160122
+
+* --sql DBURL uses DBURL as storage for jobs and output. It does not
+  run any jobs so it requires at least one --sqlworker. DBURL must
+  point to a table.
+
+* --sqlworker DBURL gets jobs from DBURL and stores the result back to
+  DBURL.
+
+* --sqlandworker is a shorthand for --sql and --sqlworker.
+
+* --sqlworker requires the output of a single job to fit in memory.
+
+* --results now also saves a file called 'seq' containing the sequence
+  number.
+
+* If $PARALLEL_ENV is a file, then that file will be read into
+  $PARALLEL_ENV.
+
+* man parallel_tutorial has been given an overhaul.
+
+* --workdir now accepts replacementstrings.
+
+* GNU Parallel was cited in: Possum - A Framework for
+  Three-Dimensional Reconstruction of Brain Images from Serial
+  Sections http://link.springer.com/article/10.1007/s12021-015-9286-1
+
+* GNU Parallel was cited in: A Genetic Algorithm for the selection of
+  structural MRI features for classification of Mild Cognitive
+  Impairment and Alzheimer's Disease
+  http://ieeexplore.ieee.org/xpl/abstractReferences.jsp?tp=&arnumber=7359909&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D7359909
+
+* GNU Parallel was cited in: The Effect of Domain Modeling on
+  Performance of Planning Algorithms
+  http://isaim2016.cs.virginia.edu/papers/ISAIM2016_Bartak_Vodrazka.pdf
+
+* Plotting time tables for jobs run by GNU Parallel
+  https://github.com/ziotom78/plot_joblog
+
+* GNU Parallel was used in: Mission Impossible: you have 1 minute to
+  analyze the Ebola Genome https://www.biostars.org/p/119397
+
+* GNU Parallel is used in LAST: http://last.cbrc.jp/
+
+* Distributed Log Search Using GNU Parallel
+  http://codehate.com/blog/2015/12/01/distributed-log-search-using-gnu-parallel/
+
+* Bug fixes and man page updates.
+
+
+20151222
+
+* --transfer is now an alias for --transferfile {}.
+
+* --transferfile works like --transfer, but takes an argument like
+  --return. This makes it possible to combine transferring files
+  with multiple input sources: parallel -S server --tf {1} wc {2}
+  {1} ::: * ::: -l -w -c
+
+* total_jobs() can now be used in {= =}: parallel echo job {#} of '{=
+  $_=total_jobs() =}' ::: {1..50}
+
+* GNU Parallel was cited in: Evolution and Learning in Heterogeneous
+  Environments
+  http://research.gold.ac.uk/15078/1/COM_thesis_JonesD_2015.pdf
+
+* GNU Parallel was cited in: Contrasting genetic architectures of
+  schizophrenia and other complex diseases using fast
+  variance-components analysis
+  http://www.nature.com/ng/journal/v47/n12/full/ng.3431.html
+
+* GNU Parallel was cited in: Efficient Retrieval of Key Material for
+  Inspecting Potentially Malicious Traffic in the Cloud
+  http://www.cs.bham.ac.uk/~bxb/Papres/2015.1.pdf
+
+* GNU Parallel was cited in: Achieving Consistent Doppler Measurements
+  from SDO/HMI Vector Field Inversions
+  http://arxiv.org/pdf/1511.06500.pdf
+
+* Flo uses GNU Parallel: https://github.com/wurmlab/flo
+
+* 使用 GNU parallel 來平行運算
+  http://mutolisp.logdown.com/posts/316959-using-gnu-parallel-to-parallel-computing
+
+* Bug fixes and man page updates.
+
+
+20151122
+
+* GNU Parallel packaged for CERN CentOS:
+  http://linuxsoft.cern.ch/cern/centos/7/cern/x86_64/repoview/parallel.html
+
+* GNU Parallel was cited in: The Outer Solar System Origins Survey:
+  I. Design and First-Quarter Discoveries
+  http://arxiv.org/pdf/1511.02895.pdf
+
+* GNU Parallel was cited in: Contrasting genetic architectures of
+  schizophrenia and other complex diseases using fast
+  variance-components analysis
+  http://www.nature.com/ng/journal/vaop/ncurrent/full/ng.3431.html
+
+* GNU Parallel was cited in: Named-Entity Chunking for Norwegian Text
+  using Support Vector Machines
+  http://ojs.bibsys.no/index.php/NIK/article/viewFile/248/211
+
+* GNU Parallel was cited in: Multiscale Estimation of Binding Kinetics
+  Using Brownian Dynamics, Molecular Dynamics and Milestoning
+  http://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1004381#pcbi.1004381.ref072
+
+* GNU Parallel was cited in: A Detailed Characterization of Errors in
+  Logic Circuits due to Single-Event Transients
+  http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=7302348&url=http%3A%2F%2Fieeexplore.ieee.org%2Fxpls%2Fabs_all.jsp%3Farnumber%3D7302348
+
+* GNU Parallel was cited in: Arabic Speaker Emotion Classification
+  Using Rhythm Metrics and Neural Networks
+  http://www.eurasip.org/Proceedings/Eusipco/Eusipco2015/papers/1570104855.pdf
+
+* GNU Parallel was cited in: Stride Search: a general algorithm for
+  storm detection in high resolution climate data
+  http://www.geosci-model-dev-discuss.net/8/7727/2015/gmdd-8-7727-2015.pdf
+
+* GNU Parallel was cited in: Decomposing Digital Paintings into Layers
+  via RGB-space Geometry http://arxiv.org/pdf/1509.03335.pdf
+
+* GNU Parallel was cited in: Structure and evolutionary history of a
+  large family of NLR proteins in the zebrafish
+  http://www.biorxiv.org/content/biorxiv/early/2015/09/18/027151.full.pdf
+
+* GNU Parallel was cited in: Evolution of movement strategies under
+  competitive interactions
+  http://digital.csic.es/bitstream/10261/115973/1/evolution_movement_strategies_Kiziridis.pdf
+
+* Automating large numbers of tasks
+  https://rcc.uchicago.edu/docs/tutorials/kicp-tutorials/running-jobs.html
+
+* Max out your IOPs with GNU Parallel
+  http://blog.bitratchet.com/2015/11/11/max-out-your-iops-with-gnu-parallel/
+
+* Bug fixes and man page updates.
+
+
+20151022
+
+* --plus makes it possible to use {##} as a shorthand for
+  {= $_=$Global::JobQueue->total_jobs() =} which gives the the number
+  of jobs to run in total.
+
+* {= $_=$Global::JobQueue->total_jobs() =} is incompatible with -X,
+  -m, and --xargs.
+
+* GNU Parallel is now mostly compatible with lsh
+  (http://www.lysator.liu.se/~nisse/lsh/) and somewhat compatible with
+  autossh (http://www.harding.motd.ca/autossh/).
+
+* --workdir ... now also works when run locally.
+
+* GNU Parallel was cited in: There is no (75, 32, 10, 16) strongly
+  regular graph http://arxiv.org/pdf/1509.05933.pdf
+
+* GNU Parallel was cited in: Roary: rapid large-scale prokaryote pan
+  genome analysis
+  http://bioinformatics.oxfordjournals.org/content/early/2015/08/05/bioinformatics.btv421.full.pdf+html
+
+* GNU Parallel is used in TraitAR:
+  https://testpypi.python.org/pypi/traitar/0.1.4
+
+* GNU Parallel is used in youtube-dl-parallel:
+  https://github.com/dlh/youtube-dl-parallel
+
+* A parallel and fast way to download multiple files
+  http://onetipperday.blogspot.com/2015/10/a-parallel-and-fast-way-to-download.html
+
+* Usar GNU Parallel para aumentar el rendimiento de tus scripts
+  http://adrianarroyocalle.github.io/blog/2015/10/20/usar-gnu-parallel/
+
+* Bug fixes and man page updates.
+
+
+20150922
+
+* GNU Parallel was cited in: Flexible Modeling of Epidemics with an
+  Empirical Bayes Framework
+  http://journals.plos.org/ploscompbiol/article?id=10.1371%2Fjournal.pcbi.1004382
+
+* GNU Parallel was cited in: BL1: 2D Potts Model with a Twist
+  https://sucs.swan.ac.uk/~rjames93/Dissertation.pdf
+
+* GNU Parallel was cited in: DockBench: An Integrated Informatic
+  Platform Bridging the Gap between the Robust Validation of Docking
+  Protocols and Virtual Screening Simulations
+  http://www.mdpi.com/1420-3049/20/6/9977/pdf
+
+* GNU Parallel was cited in: A Scalable Parallel Implementation of
+  Evolutionary Algorithms for Multi-Objective Optimization on GPUs
+  http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=7257074
+
+* GNU Parallel was cited in: Tools and techniques for computational
+  reproducibility
+  http://biorxiv.org/content/biorxiv/early/2015/07/17/022707.full.pdf
+
+* GNU Parallel was cited in: How Can We Measure the Similarity Between
+  Résumés of Selected Candidates for a Job?
+  http://www.researchgate.net/publication/275954089_How_can_we_measure_the_similarity_between_rsums_of_selected_candidates_for_a_job
+
+* GNU Parallel was cited in: Interplay of cell dynamics and epithelial
+  tension during morphogenesis of the Drosophila pupal wing
+  http://www.researchgate.net/profile/Raphael_Etournay/publication/279061859_Interplay_of_cell_dynamics_and_epithelial_tension_during_morphogenesis_of_the_Drosophila_pupal_wing/links/558a95ad08aeae8413bcceea.pdf
+
+* Third-party selling GNU Parallel T-shirts
+  http://www.aliexpress.com/item/2015F-BSO-GNU-LOGO-GNU-PARALLEL-men-s-shirt-sleeve-visual-illusion-error/32464827966.html
+
+* Joys of gnu parallel
+  http://scottolesen.com/index.php/2015/08/26/joys-of-gnu-parallel/
+
+* Crop and resize images with bash and ImageMagick
+  https://www.simonholywell.com/post/2015/08/image-resize-crop-bash-imagemagick/
+
+* Three Ways to Script Processes in Parallel
+  http://www.codeword.xyz/2015/09/02/three-ways-to-script-processes-in-parallel/
+
+* What It Looks Like to Process 3.5 Million Books
+  http://blog.gdeltproject.org/what-it-looks-like-to-process-3-5-million-books/
+
+* Bug fixes and man page updates.
+
+
+20150822
+
+* If $job->skip() is called in {= =} the job will not be run.
+
+* @arg can now be used in {= =}: parallel echo '{= $arg[2] < 5 and
+  $_="j" =}' ::: 1 2 3 ::: 4 5 6
+
+* Version of GNU Parallel that uses PostgreSQL as backend
+  https://github.com/stephen-fralich/parallel-sql/
+
+* A composite genome approach to identify phylogenetically informative
+  data from next-generation sequencing
+  http://www.biomedcentral.com/content/pdf/s12859-015-0632-y.pdf
+
+* SpeedSeq: ultra-fast personal genome analysis and interpretation
+  http://www.nature.com/nmeth/journal/vaop/ncurrent/full/nmeth.3505.html
+
+* GNU Parallel is used in elPrep: https://github.com/ExaScience/elprep
+
+* Who actually reads the code?
+  http://www.fsf.org/blogs/community/who-actually-reads-the-code
+
+* Introduction to GNU Parallel
+  http://erictleung.com/2015/08/06/intro-to-gnu-parallel/
+
+* ¿Alguien se lee el código?
+  http://www.taringa.net/post/linux/18854759/Alguien-se-lee-el-codigo.html
+
+* ¿Quién se lee el código fuente?
+  https://victorhckinthefreeworld.wordpress.com/2015/08/12/quien-se-lee-el-codigo-fuente/
+
+* Distribution des traitements avec GNU Parallel
+  http://blog.inovia-conseil.fr/?p=226#4
+
+* Эксперимент по проверке, читают ли код открытых проектов
+  http://www.opennet.ru/opennews/art.shtml?num=42718
+
+* 多核心主機搭配 GNU parallel
+  http://blog.zeroplex.tw/2015/08/gnu-parallel.html
+
+* Bug fixes and man page updates.
+
+
+20150722
+
+* If a record fits in a block, --block only reads upto the size of
+  --block. If not: --block reads a full --block more.
+
+* Due to widely spread distributions still using --tollef even after a
+  year of being retired following a year of being obsolete, --tollef
+  now gives an error unless used with --gnu.
+
+* --nice now uses a perl wrapper instead of the nice command.
+
+* Cookie 2013-08-18 was won by Mark Maimone, 1 year and 11 months
+  after release.
+
+* A parser for GNU Parallel --joblog files:
+  https://github.com/harryjubb/joblog
+
+* GNU Parallel was cited in: Dynamical formation & scattering of
+  hierarchical triples: Cross sections, Kozai-Lidov oscillations, and
+  collisions http://arxiv.org/pdf/1507.03593.pdf
+
+* GNU Parallel was cited in: A Fast Compiler for NetKAT
+  http://arxiv.org/pdf/1506.06378.pdf
+
+* GNU Parallel was cited in: Flexible Modeling of Epidemics with an
+  Empirical Bayes Framework
+  http://www.stat.cmu.edu/~ryantibs/papers/empbayes.pdf
+
+* GNU Parallel was cited in: Decomposing Time-Lapse Paintings into
+  Layers
+  http://cs.gmu.edu/~ygingold/timemap/Decomposing%20Time-Lapse%20Paintings%20into%20Layers%20(Tan%20et%20al%202015%20SIGGRAPH)%20600dpi.pdf
+
+* GNU Parallel was used in: Somatic mutation calling from the matched
+  tumor-normal exome-sequencing
+  http://fafner.meb.ki.se/biostatwiki/somac/
+
+* Parallel Processing from the Command Line
+  https://www.perpetual-beta.org/weblog/parallel-processing-from-the-command-line.html
+
+* Using GNU Parallel to speed up network operations
+  http://vielmetti.typepad.com/vacuum/2015/06/using-gnu-parallel-to-speed-up-network-operations.html
+
+* Crawl faster with "parallel" - but how fast?
+  http://andreas-wpv.blogspot.com/2015/07/crawl-faster-with-parallel-but-how-fast.html
+
+* Simultaneously benchmark many URLs with ApacheBench and GNU parallel
+  https://www.simonholywell.com/post/2015/06/parallel-benchmark-many-urls-with-apachebench/
+
+* Bug fixes and man page updates.
+
+
+20150622
+
+* --halt has been rewritten completely. You can now combine
+  percentages with success or fail. See the man page.
+
+* Exit values 102..254 have been removed. 101 means more than 100 jobs
+  failed.
+
+* Killing through --timeout, --memfree, or --halt is now done as a
+  process group.
+
+* --termseq determines which signals are sent when a job is killed.
+
+* An empty argument would previously cause no string to be
+  inserted. This is now changed to '' being inserted, thus prepending
+  a space to the output of: parallel echo {} b ::: ''
+
+* $PARALLEL_ENV can now be set to an environment prepending the
+  command. Used in env_parallel as mentioned in the manpage.
+
+* --retry-failed will retry all failed jobs in a joblog. It will
+  ignore any command given.
+
+* --ssh and $PARALLEL_SSH can be used to set the command used for
+  ssh. The command is assumed to behave the same way as ssh.
+
+* --fifo now works in csh, too.
+
+* Q(...) can be used in {= =} to shell quote a string.
+
+* GNU Parallel was cited in: Contrasting regional architectures of
+  schizophrenia and other complex diseases using fast variance
+  components analysis
+  http://biorxiv.org/content/biorxiv/early/2015/06/05/016527.full.pdf
+
+* GNU Parallel was cited in: DockBench: An Integrated Informatic
+  Platform Bridging the Gap between the Robust Validation of Docking
+  Protocols and Virtual Screening Simulations
+  http://www.mdpi.com/1420-3049/20/6/9977
+
+* GNU Parallel was cited in: Swedes Online: You Are More Tracked Than
+  You Think
+  http://www.diva-portal.org/smash/get/diva2:807623/FULLTEXT01.pdf
+
+* GNU Parallel was cited in: Tutorial: Lorenz-Mie theory for 2D
+  scattering and resonance calculations
+  http://arxiv.org/pdf/1505.07691.pdf
+
+* GNU Parallel was cited in: A quantitative assessment of the Hadoop
+  framework for analyzing massively parallel DNA sequencing data
+  http://link.springer.com/article/10.1186/s13742-015-0058-5
+
+* GNU Parallel was cited in: A composite genome approach to identify
+  phylogenetically informative data from next-generation sequencing
+  http://www.biomedcentral.com/content/pdf/s12859-015-0632-y.pdf
+
+* GNU Parallel was cited in: Tutorial: Lorenz-Mie theory for 2D
+  scattering and resonance calculations
+  http://arxiv.org/pdf/1505.07691.pdf
+
+* GNU Parallel is used in: taxator-tk
+  http://algbio.cs.uni-duesseldorf.de/webapps/wa-download/
+
+* GNU Parallel is used in: https://github.com/d2207197/local-mapreduce
+
+* GNU Parallel is used in: wiki-edit-news https://github.com/albert-decatur/wiki-edit-news
+
+* GNU Parallel is used in: A Fingerprint Identification System
+  https://curve.carleton.ca/system/files/theses/28733.pdf
+
+* Job ad asking for GNU Parallel experience:
+  http://searchjobs.intel.com/gdansk-pol/software-validation-engineer/63A06826DAF24797AB414DC146201C2E/job/
+
+* Using BLAT http://wangzhengyuan.blogspot.dk/2015/06/using-blat.html
+
+* Bug fixes and man page updates.
+
+
+20150522
+
+* Security: The security issue for --sshlogin + --fifo/--cat has been
+  fixed. Thereby all issues with
+  http://lists.gnu.org/archive/html/parallel/2015-04/msg00045.html
+  have been fixed.
+
+* Security: After further security analysis the issue fixed in
+  20150422 also fixed the problem for --tmux.
+
+* GNU Parallel was cited in: CIDER: a pipeline for detecting waves of
+  coordinated transcriptional regulation in gene expression
+  time-course data
+  http://biorxiv.org/content/biorxiv/early/2015/03/17/012518.full.pdf
+
+* GNU Parallel was cited in: Building Genomic Analysis Pipelines in a
+  Hackathon Setting with Bioinformatician Teams: DNA-seq, Epigenomics,
+  Metagenomics and RNA-seq
+  http://biorxiv.org/content/biorxiv/early/2015/05/05/018085.full.pdf
+
+* GNU Parallel was cited in: Toward Enhanced Metadata Quality of
+  Large-Scale Digital Libraries: Estimating Volume Time Range
+  https://www.ideals.illinois.edu/bitstream/handle/2142/73656/186_ready.pdf
+
+* GNU Parallel was cited in: Sequencing the cap-snatching repertoire
+  of H1N1 influenza provides insight into the mechanism of viral
+  transcription initiation
+  http://nar.oxfordjournals.org/content/early/2015/04/20/nar.gkv333.full.pdf
+
+* GNU Parallel was cited in: Genome assembly using Nanopore-guided
+  long and error-free DNA reads
+  http://www.biomedcentral.com/content/pdf/s12864-015-1519-z.pdf
+
+* GNU Parallel was cited in: Contrasting regional architectures of
+  schizophrenia and other complex diseases using fast variance
+  components analysis
+  http://biorxiv.org/content/biorxiv/early/2015/03/13/016527.full.pdf
+
+* GNU Parallel was used (unfortunately with wrong citation) in:
+  Comparing the CarbonTracker and TM5-4DVar data assimilation systems
+  for CO2 surface flux inversions
+  http://www.atmos-chem-phys-discuss.net/15/8883/2015/acpd-15-8883-2015-discussion.html
+
+* GNU Parallel was used in: Gene Set Omic Analysis (GSOA) method
+  https://bitbucket.org/srp33/gsoa
+
+* A Quick and Neat :) Orchestrator using GNU Parallel
+  http://www.elsotanillo.net/2015/05/a-quick-and-neat-orchestrator-using-gnu-parallel/
+
+* Execute commands on multiple computers using GNU Parallel (setting
+  up a cluster on the cheap)
+  https://spectraldifferences.wordpress.com/2015/04/26/execute-commands-on-multiple-computers-using-gnu-parallel-setting-up-a-cluster-on-the-cheap/
+
+* Functions and GNU parallel for effective cluster load management
+  http://genomespot.blogspot.dk/2015/04/functions-and-gnu-parallel-for.html
+
+* Use parallel processing to save time importing databases
+  http://drupalsun.com/node/41854
+
+* Run multiple ssh commands in parallel with GNU Parallel
+  http://www.ameir.net/blog/archives/380-run-multiple-ssh-commands-in-parallel-with-gnu-parallel.html
+
+* Importing huge databases faster
+  https://www.lullabot.com/blog/article/importing-huge-databases-faster
+
+* Run multiple ssh commands in parallel with GNU Parallel
+  https://www.ameir.net/blog/archives/380-run-multiple-ssh-commands-in-parallel-with-gnu-parallel.html/comment-page-1
+
+* Parallel? Gnu parallel! https://debian.pro/1834
+
+* Bug fixes and man page updates.
+
+
+20150422
+
+New in this release:
+
+* Security fix. An attacker on the local system could make you
+  overwrite one of your own files with a single byte. The problem
+  exist when you use --compress or --tmux or --pipe or --cat or
+  --fifo. The attacker must figure out the randomly chosen file name
+  and create a symlink within a time window of 15 ms.
+
+* --shuf will generate all jobs, and shuffle them before running
+  them. This is useful to get a quick preview of the results before
+  running the full batch.
+
+* GNU Parallel now has a DOI: https://dx.doi.org/10.5281/zenodo.16303
+
+* GNU Parallel was cited in: Scaling Machine Learning for Target
+  Prediction in Drug Discovery using Apache Spark
+  https://cris.cumulus.vub.ac.be/portal/files/5147244/spark.pdf
+
+* GNU Parallel was cited in: Bayesian inference of protein structure
+  from chemical shift data https://peerj.com/articles/861/
+
+* GNU Parallel was cited in: Toward Enhanced Metadata Quality of
+  Large-Scale Digital Libraries: Estimating Volume Time Range
+  https://www.ideals.illinois.edu/bitstream/handle/2142/73656/186_ready.pdf
+
+* GNU Parallel was cited in: Contrasting regional architectures of
+  schizophrenia and other complex diseases using fast variance
+  components analysis
+  http://biorxiv.org/content/biorxiv/early/2015/03/13/016527.full.pdf
+
+* GNU Parallel was cited in: Experimental study on the Wind Farm
+  Substation Cable Installation Problem
+  http://i11www.iti.uni-karlsruhe.de/_media/teaching/theses/ma-schmitz-14.pdf
+
+* GNU Parallel was used in: landsat-gifworks
+  https://github.com/KAPPS-/landsat-gifworks
+
+* GNU Parallel was used in: https://github.com/exascience/elprep
+
+* GNU Parallel was used in:
+  http://search.cpan.org/~jillrowe/HPC-Runner-GnuParallel-0.01/
+
+* GNU Parallel was used in:
+  http://search.cpan.org/~ajpage/Bio-Roary-2.0.7/lib/Bio/Roary/JobRunner/Parallel.pm
+
+* GNU Parallel was used in: Rapid haploid SNP calling
+  https://github.com/tseemann/snippy
+
+* Pictures and Metadata
+  http://www.ozzy.no/2015/02/05/pictures-and-metadata/
+
+* Task automation with bash and parallel
+  https://biowize.wordpress.com/2015/03/23/task-automation-with-bash-and-parallel/
+
+* How To: Speed Up File Transfers in Linux using RSync with GNU
+  Parallel
+  http://www.yourownlinux.com/2015/04/speed-up-file-transfers-using-rsync-with-gnu-parallel.html
+
+* Mirroring a Git Repository
+  https://avacariu.me/articles/mirroring-a-git-repository.html
+
+* Add an ENVI header to JAXA Global Mangrove Watch PALSAR tiles
+  https://spectraldifferences.wordpress.com/2015/03/24/add-an-envi-header-to-jaxa-global-mangrove-watch-palsar-tiles/
+
+* GNU Parallel (Sebuah Uji Coba)
+  http://kaka.prakasa.my.id/2014/09/04/gnu-parallel-sebuah-uji-coba/
+
+* 你见过的最牛逼的命令行程序是什么？
+  http://www.zhihu.com/question/29257300
+
+* Bug fixes and man page updates.
+
+
+20150322
+
+New in this release:
+
+* --number-of-cores respects 'taskset' on GNU/Linux.
+
+* --joblog --pipe gives the data send and received in the log.
+
+* GNU Parallel was tested to support 100 GB sized records in --pipe. A
+  few bugs was fixed to support >2 GB records. It works, but is rather
+  slow.
+
+* GNU Parallel was cited in: RIG: Recalibration and Interrelation of
+  genomic sequence data with the GATK
+  http://www.g3journal.org/content/early/2015/02/13/g3.115.017012.full.pdf+html
+
+* GNU Parallel was cited in: MPI-blastn and NCBI-TaxCollector:
+  Improving metagenomic analysis with high performance classification
+  and wide taxonomic attachment
+  http://www.worldscientific.com/doi/abs/10.1142/S0219720014500139?af=R&
+
+* GNU Parallel was cited in: Recent evolution in Rattus norvegicus is
+  shaped by declining effective population size
+  http://biorxiv.org/content/biorxiv/early/2015/03/01/015818.full.pdf
+
+* GNU Parallel was cited in: Evidence for DCO+ as a probe of
+  ionization in the warm disk surface
+  http://arxiv.org/pdf/1503.02659.pdf
+
+* GNU Parallel was cited in: De novo assembly and annotation of the
+  Asian tiger mosquito (Aedes albopictus) repeatome with dnaPipeTE
+  from raw genomic reads and comparative analysis with the yellow
+  fever mosquito (Aedes aegypti)
+  http://gbe.oxfordjournals.org/content/early/2015/03/11/gbe.evv050.full.pdf
+
+* GNU Parallel was cited in: A General Approach to Network
+  Configuration Analysis
+  http://research.microsoft.com/en-us/um/people/ratul/papers/nsdi2015-batfish.pdf
+
+* GNU Parallel was cited in: Scrimer: designing primers from
+  transcriptome data
+  http://onlinelibrary.wiley.com/doi/10.1111/1755-0998.12403/pdf
+
+* GNU Parallel was cited in: Efficient Retrieval of Key Material for
+  Inspecting Potentially Malicious Traffic in the Cloud
+  http://sacko.uk/pdf/2015.1.pdf
+
+* GNU Parallel will be presented at Strataconf: Poor Man's Parallel
+  Pipelines
+  http://strataconf.com/big-data-conference-uk-2015/public/schedule/detail/40031
+
+* GNU Parallel was used in:
+  https://github.com/alexbyrnes/FCC-Political-Ads_The-Code
+
+* GNU Parallel was used in: https://github.com/martymac/fpart
+
+* GNU Parallel was used in:
+  https://github.com/hoytak/diabetic-retinopathy-code
+
+* GNU Parallel was used in:
+  https://github.com/mehmattski/HybSeqPipeline
+
+* GNU Parallel was used in:
+  http://search.cpan.org/~ajpage/Bio-Roary-2.0.0/lib/Bio/Roary/JobRunner/Parallel.pm
+
+* Using GNU Parallel on a Raspberry Pi cluster:
+  http://www.dcglug.org.uk/cluster-progress/
+
+* An introduction to vector tiling and map reduce in postgis:
+  http://dimensionaledge.com/intro-vector-tiling-map-reduce-postgis/
+
+* Running scripts in parallel with GNU Parallel:
+  http://code.jasonbhill.com/2015/03/
+
+* Mahout: Parallelising the creation of DecisionTrees:
+  http://www.markhneedham.com/blog/2012/12/27/mahout-parallelising-the-creation-of-decisiontrees/
+
+* High-Performance Scientific Computing: Running serial jobs in
+  parallel
+  https://support.scinet.utoronto.ca/education/staticpublic/course178/serial.pdf
+
+* Parallel cardinality on your laptop
+  https://highonscience.wordpress.com/2015/03/15/parallel-cardinality-on-your-laptop/
+
+* Experiments about a better locate using grep
+  http://a3nm.net/blog/better_locate.html
+
+* Homework with GNU Parallel:
+  https://support.scinet.utoronto.ca/education/staticpublic/course178content349.html
+
+* Parallel - Jobs in Skripten parallelisieren:
+  https://slzm.de/blog/linux-tool-des-tages-parallel-jobs-in-skripten-parallelisieren/#more-612
+
+* GNU Parallel, czyli 100% użycia procesora
+  http://matmatyk.blogspot.dk/2015/03/gnu-parallel-czyli-100-uzycia-procesora.html
+
+* Bug fixes and man page updates.
+
+
+20150222
+
+* --tmux has gotten a major overhaul.
+
+* GNU Parallel was cited in: RaftLib: A C++ Template Library for High
+  Performance Stream Parallel Processing
+  http://www.cs.wustl.edu/~lip/pubs/pmam15_jbeard.pdf
+
+* GNU Parallel was cited in: Quantifying properties of hot and dense
+  QCD matter through systematic model-to-data comparison
+  http://arxiv.org/pdf/1502.00339.pdf
+
+* GNU Parallel was cited in: Towards Collaborative Exploration and
+  Analysis of Big Data from Mars: A Noachis Terra Case Study
+  http://link.springer.com/chapter/10.1007/978-3-319-13865-7_25
+
+* GNU Parallel was cited in: Towards Recommender Engineering Tools and
+  Experiments for Identifying Recommender Differences
+  http://elehack.net/research/thesis/mde-thesis.pdf
+
+* GNU Parallel was used (unfortunately with wrong citation) in:
+  Performance and Scaling Comparison Study of RDBMS and NoSQL
+  (MongoDB)
+  http://ijact.in/wp-content/uploads/2014/11/COMPUSOFT-311-1270-1275.pdf
+
+* GNU Parallel was used (unfortunately without citation) in: Parallel
+  Implementation of Big Data Pre-Processing Algorithms for Sentiment
+  Analysis of Social Networking Data
+  http://www.researchmathsci.org/IJFMAart/ijfma-v6n2-7.pdf
+
+* GNU Parallel was used (unfortunately without citation) in: SpeedSeq:
+  Ultra-fast personal genome analysis and interpretation
+  http://biorxiv.org/content/biorxiv/early/2014/12/05/012179.full.pdf
+
+* Zip Folders with GNU Parallel
+  http://fazky.github.io/posts/Linux/2015-01-07-GNU-Parallel.html
+
+* Using GNU Parallel with Freesurfer
+  http://programminginadarkroom.blogspot.dk/2015/02/using-gnu-parallel-with-freesurfer.html
+
+* GNU Parallel is used in Velociraptor: https://github.com/ericwhyne/Velociraptor
+
+* Marcus Beach GNU Parallel http://marcusbeach.co/gnu-parallel/
+
+* Bug fixes and man page updates.
+
+
+20150122
+
+* Remote jobs now send stderr (standard error) to stderr (standard
+  error) instead of stdout (standard output).
+
+* Remote execution command is now packed using base64 encoded
+  bzip2. This means that big environments (app. 100 KB) can be
+  transferred. This change makes remote execution alpha quality.
+
+* --semaphoretimeout now takes a negative value. This means give up if
+  the semaphore is not gotten within the timeout.
+
+* --halt -1 and -2 now means halt if a job succeeds (so the opposite
+  of 1 and 2).
+
+* --no-keep-order will reverse --keep-order.
+
+* Bash's second fix of shellshock caused --env to break again when
+  exporting functions. This has been fixed again.
+
+* A semibig refactoring of big functions. All non-trivial functions
+  are now less than 100 lines. The refactoring makes this release beta
+  quality.
+
+* A description of the design decisions for GNU Parallel can be found
+  in 'man parallel_design'.
+
+* A bug fix in replacement strings caused rewrite of the replacement
+  function. This makes use of replacement strings alpha quality.
+
+* GNU Parallel was cited in: SlideToolkit: An Assistive Toolset for
+  the Histological Quantification of Whole Slide Images
+  http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0110289
+
+* GNU Parallel was cited in: Improving Energy and Performance with
+  Spintronics Caches in Multicore Systems
+  http://link.springer.com/chapter/10.1007/978-3-319-14313-2_24
+
+* GNU Parallel was cited in: Parallel post-processing with MPI-Bash
+  http://dl.acm.org/citation.cfm?id=2691137
+
+* GNU Parallel was cited in: Distinguishing cause from effect using
+  observational data: methods and benchmarks
+  http://arxiv-web3.library.cornell.edu/pdf/1412.3773.pdf
+
+* GNU Parallel was cited in: Data Science at the Command Line
+  http://cdn.oreillystatic.com/oreilly/booksamplers/9781491947852_sampler.pdf
+
+* GNU Parallel was cited in: Resolution of Genetic Map Expansion
+  Caused by Excess Heterozygosity in Plant Recombinant Inbred
+  Populations http://www.g3journal.org/content/4/10/1963.full.pdf
+
+* GNU Parallel was cited in: Bayesian Inference of Protein Structure
+  from Chemical Shift Data https://peerj.com/preprints/692v1.pdf
+
+* GNU Parallel was cited in: Clonal interference and Mullerʼs ratchet
+  in spatial habitats http://iopscience.iop.org/1478-3975/11/5/056003
+
+* GNU Parallel was cited in: Web-scale content reuse detection
+  ftp://info.isi.edu/isi-pubs/tr-692.pdf
+
+* GNU Parallel was cited in: Computação Verde na Camada de Aplicação
+  https://linux.ime.usp.br/~tpaiva/mac0499/files/monografia.pdf
+
+* GNU Parallel was cited in: Frameshift alignment: statistics and
+  post-genomic applications
+  http://bioinformatics.oxfordjournals.org/content/30/24/3575.full.pdf+html
+
+* GNU Parallel was cited in: Towards Recommender Engineering Tools and
+  Experiments for Identifying Recommender Differences
+  http://elehack.net/research/thesis/mde-thesis.pdf
+
+* GNU Parallel was cited in: Speaker Environment Classification Using
+  Rhythm Metrics in Levantine Arabic Dialect
+  http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=6923918
+
+* GNU Parallel was cited in: A Formal Proof Of The Kepler Conjecture
+  http://arxiv.org/pdf/1501.02155.pdf
+
+* GNU Parallel was cited in: Allocation Policy Analysis for Cache
+  Coherence Protocols for STT-MRAM-based caches
+  http://conservancy.umn.edu/bitstream/handle/11299/169362/Nandkar_umn_0130M_15551.pdf
+
+* GNU Parallel was cited in: Using Trusted Platform Module for
+  securing virtual environment access in Cloud
+  http://dar.aucegypt.edu:8080/bitstream/handle/10526/4237/Using%20Trusted%20Platform%20Module%20for%20Securing%20Virtual%20Environment%20Access%20in%20Cloud.pdf
+
+* GNU Parallel was cited in: Weakly Supervised Learning for
+  Compositional Sentiment Recognition
+  http://computerlinguist.org/static/downloads/ma-thesis/Master_Thesis-Michael_Haas-Weakly_Supervised_Learning_for_Compositional_Sentiment_Recognition.pdf
+
+* GNU Parallel was cited in: Agility and Performance in Elastic
+  Distributed Storage http://dl.acm.org/citation.cfm?id=2668129
+
+* GNU Parallel was used (unfortunately without citation) in: Large
+  Scale Author Name Disambiguation in Digital Libraries
+  http://semanticommunity.info/@api/deki/files/31523/P227_3546.pdf
+
+* GNU Parallel is used in BEDOPS:
+  https://media.readthedocs.org/pdf/bedops/v2p5p0/bedops.pdf
+
+* Job ad asking for GNU Parallel skills:
+  http://www.aplitrak.com/?adid=dXMzMTYxMjQuMzg0MTkuMTU1MEBtYW5wb3dlcmZveG5hLmFwbGl0cmFrLmNvbQ#sthash.kYCIhhty.KcoT6HnJ.dpbs
+
+* GNU Parallel: Open Source For You (OSFY) magazine, October 2013
+  edition
+  http://www.shakthimaan.com/posts/2014/11/27/gnu-parallel/news.html
+
+* Multithreaded Encryption and Compression
+  http://www.krazyworks.com/multithreaded-encryption-and-compression/
+
+* GNU Parallel on OSX and Linux
+  https://darknightelf.wordpress.com/2015/01/01/gnu-parallel-on-osx/
+
+* How to build gnu parallel from source on Ubuntu PC?
+  http://blog.ovidiuparvu.com/build-gnu-parallel-source-ubuntu-pc/
+
+* GNU parallel for openaddr-process-one
+  https://nelsonslog.wordpress.com/2015/01/09/gnu-parallel-for-openaddr-process-one/
+
+* From SRA Project to FastQ http://danielecook.com/sra-project-fastq/
+
+* Software Development Tooling
+  http://www.computer.org/csdl/mags/so/2014/06/mso2014060021.pdf
+
+* コマンドを並列に実行するGNU parallelがとても便利
+  http://bicycle1885.hatenablog.com/entry/2014/08/10/143612
+
+* Bug fixes and man page updates.
+
+
+20141122
+
+* Remote systems can be divided into hostgroups (e.g. web and db) by
+  prepending '@groupname/' to the sshlogin. Multiple groups can be
+  given by separating groups with '+'. E.g. @web/www1 @web+db/www2
+  @db/mariadb
+
+* Remote execution can be restricted to servers that are part of one
+  or more groups by '@groupname' as an sshlogin. Multiple groups can
+  be given by separating groups with '+'. E.g. -S @web or -S @db+web
+
+* With --hostgroup you can restrict arguments to certain hostgroups by
+  appending '@groupname' to the argument.  Multiple groups can be
+  given by separating groups with '+'. E.g. my_web_arg@web
+  db-or-web-arg@db+web db-only-arg@db Thanks to Michel Courtine for
+  developing a prototype for this.
+
+* GNU Parallel was cited in: HTSeq-Hadoop: Extending HTSeq for
+  Massively Parallel Sequencing Data Analysis using Hadoop
+  http://essenceofescience.se/wp-content/uploads/2014/11/Siretskiy.pdf
+
+* GNU Parallel was cited in: SlideToolkit: An Assistive Toolset for
+  the Histological Quantification of Whole Slide Images
+  http://www.plosone.org/article/info%3Adoi%2F10.1371%2Fjournal.pone.0110289#close
+
+* GNU Parallel was cited in: Exploring a multiprocessor design space
+  to analyze the impact of using STT-RAM in the memory hierarchy
+  http://conservancy.umn.edu/bitstream/handle/11299/167286/Borse_umn_0130M_15431.pdf
+
+* Command-Line OCR with Tesseract on Mac OS X
+  https://ryanfb.github.io/etc/2014/11/13/command_line_ocr_on_mac_os_x.html
+
+* Bug fixes and man page updates.
+
+
 20141022
 
 * --env was changed to deal with Bash's new way of exporting a function.
