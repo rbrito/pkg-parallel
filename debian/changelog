@@ -1,6 +1,6 @@
-parallel (20161122-1~1.gbp8d793d) UNRELEASED; urgency=medium
+parallel (20161122-1~2.gbpcef37c) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @8d793d27a674e93f46ce64f47fe7176faa9ff3c8 **
+  ** SNAPSHOT build @cef37cc76c88bfe97c57a79730a0c743bcc944c3 **
 
   * New upstream version 20161122.
     + Fixes CVE-2015-4155 and CVE-2015-4156. (Closes: #787954)
@@ -11,6 +11,8 @@ parallel (20161122-1~1.gbp8d793d) UNRELEASED; urgency=medium
     + Depend on procps. (Closes: 815952)
     + Remove conflicts with moreutils. Thanks to Ian Jackson for the
       suggestion and many others for the discussions.  (Closes: 749355)
+    + Substitute dependency on perl-modules with simple perl.
+    + Fix Vcs-* URLs to point to new, cgit HTTPS locations.
 
  -- Rogério Brito <rbrito@ime.usp.br>  Mon, 12 Dec 2016 15:33:18 -0200
 
