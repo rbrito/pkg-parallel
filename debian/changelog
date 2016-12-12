@@ -2,7 +2,8 @@ parallel (20161122-1~1.gbp8d793d) UNRELEASED; urgency=medium
 
   ** SNAPSHOT build @8d793d27a674e93f46ce64f47fe7176faa9ff3c8 **
 
-  * New upstream version 20161122
+  * New upstream version 20161122.
+    + Fixes CVE-2015-4155 and CVE-2015-4156. (Closes: #787954)
   * debian/gbp.conf:
     + Avoid warning by renaming section from git-import-orig to import-orig.
     + Avoid warning by renaming section from git-dch to dch.
