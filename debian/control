@@ -21,6 +21,7 @@ Conflicts:
  moreutils
 Depends:
  perl-modules,
+ procps,
  sysstat,
  ${misc:Depends},
  ${perl:Depends}
