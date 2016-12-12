@@ -1,3 +1,18 @@
+parallel (20161122-1~1.gbp8d793d) UNRELEASED; urgency=medium
+
+  ** SNAPSHOT build @8d793d27a674e93f46ce64f47fe7176faa9ff3c8 **
+
+  * New upstream version 20161122
+  * debian/gbp.conf:
+    + Avoid warning by renaming section from git-import-orig to import-orig.
+    + Avoid warning by renaming section from git-dch to dch.
+  * debian/control:
+    + Depend on procps. (Closes: 815952)
+    + Remove conflicts with moreutils. Thanks to Ian Jackson for the
+      suggestion and many others for the discussions.  (Closes: 749355)
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Mon, 12 Dec 2016 15:33:18 -0200
+
 parallel (20141022+ds1-1) unstable; urgency=medium
 
   [ Michele Orrù ]
