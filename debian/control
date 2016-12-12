@@ -12,8 +12,8 @@ Build-Depends:
  texinfo
 Standards-Version: 3.9.6
 Homepage: https://www.gnu.org/software/parallel/
-Vcs-Git: git://anonscm.debian.org/collab-maint/parallel.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/parallel.git
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/parallel.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/parallel.git
 
 Package: parallel
 Architecture: all
