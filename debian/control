@@ -18,7 +18,7 @@ Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/parallel.git
 Package: parallel
 Architecture: all
 Depends:
- perl-modules,
+ perl,
  procps,
  sysstat,
  ${misc:Depends},
