@@ -15,22 +15,26 @@
   <li><a href="#Design-of-GNU-Parallel">Design of GNU Parallel</a>
     <ul>
       <li><a href="#One-file-program">One file program</a></li>
+      <li><a href="#Choice-of-programming-language">Choice of programming language</a></li>
       <li><a href="#Old-Perl-style">Old Perl style</a></li>
+      <li><a href="#Scalability-up-and-down">Scalability up and down</a></li>
       <li><a href="#Exponentially-back-off">Exponentially back off</a></li>
       <li><a href="#Shell-compatibility">Shell compatibility</a></li>
       <li><a href="#env_parallel">env_parallel</a>
         <ul>
-          <li><a href="#env_parallel.bash-env_parallel.zsh-env_parallel.ksh-env_parallel.pdksh">env_parallel.bash / env_parallel.zsh / env_parallel.ksh / env_parallel.pdksh</a></li>
+          <li><a href="#env_parallel1">env_parallel.*</a></li>
+          <li><a href="#env_parallel.bash-env_parallel.sh-env_parallel.ash-env_parallel.dash-env_parallel.zsh-env_parallel.ksh-env_parallel.mksh">env_parallel.bash / env_parallel.sh / env_parallel.ash / env_parallel.dash / env_parallel.zsh / env_parallel.ksh / env_parallel.mksh</a></li>
           <li><a href="#env_parallel.csh">env_parallel.csh</a></li>
           <li><a href="#env_parallel.fish">env_parallel.fish</a></li>
         </ul>
       </li>
+      <li><a href="#parset-supported-in-sh-ash-dash-bash-zsh-ksh-mksh">parset (supported in sh, ash, dash, bash, zsh, ksh, mksh)</a></li>
       <li><a href="#Job-slots">Job slots</a></li>
       <li><a href="#Rsync-protocol-version">Rsync protocol version</a></li>
       <li><a href="#Compression">Compression</a></li>
       <li><a href="#Wrapping">Wrapping</a></li>
-      <li><a href="#Convenience-options---nice---basefile---transfer---return---cleanup---tmux---group---compress---cat---fifo---workdir">Convenience options --nice --basefile --transfer --return --cleanup --tmux --group --compress --cat --fifo --workdir</a></li>
-      <li><a href="#block-size-adjustment">--block-size adjustment</a></li>
+      <li><a href="#Convenience-options---nice---basefile---transfer---return---cleanup---tmux---group---compress---cat---fifo---workdir---tag---tagstring">Convenience options --nice --basefile --transfer --return --cleanup --tmux --group --compress --cat --fifo --workdir --tag --tagstring</a></li>
+      <li><a href="#shard">--shard</a></li>
       <li><a href="#Shell-shock">Shell shock</a></li>
       <li><a href="#The-remote-system-wrapper">The remote system wrapper</a>
         <ul>
@@ -43,23 +47,33 @@
       <li><a href="#Transferring-of-variables-and-functions">Transferring of variables and functions</a></li>
       <li><a href="#Base64-encoded-bzip2">Base64 encoded bzip2</a></li>
       <li><a href="#Which-shell-to-use">Which shell to use</a></li>
+      <li><a href="#Always-running-commands-in-a-shell">Always running commands in a shell</a></li>
       <li><a href="#Quoting">Quoting</a></li>
       <li><a href="#pipepart-vs.---pipe">--pipepart vs. --pipe</a></li>
+      <li><a href="#block-size-adjustment">--block-size adjustment</a></li>
+      <li><a href="#Automatic---block-size-computation">Automatic --block-size computation</a></li>
       <li><a href="#jobs-and---onall">--jobs and --onall</a></li>
+      <li><a href="#shuf">--shuf</a></li>
+      <li><a href="#csv">--csv</a></li>
       <li><a href="#Buffering-on-disk">Buffering on disk</a>
         <ul>
+          <li><a href="#Partly-buffering-in-memory">Partly buffering in memory</a></li>
           <li><a href="#Comparing-to-buffering-in-memory">Comparing to buffering in memory</a></li>
         </ul>
       </li>
       <li><a href="#Disk-full">Disk full</a></li>
+      <li><a href="#Memory-usage">Memory usage</a></li>
+      <li><a href="#Argument-separators">Argument separators ::: :::: :::+ ::::+</a></li>
       <li><a href="#Perl-replacement-strings-and---rpl">Perl replacement strings, {= =}, and --rpl</a></li>
       <li><a href="#Test-suite">Test suite</a></li>
       <li><a href="#Median-run-time">Median run time</a></li>
       <li><a href="#Error-messages-and-warnings">Error messages and warnings</a></li>
+      <li><a href="#Determine-number-of-CPUs">Determine number of CPUs</a></li>
       <li><a href="#Computation-of-load">Computation of load</a></li>
       <li><a href="#Killing-jobs">Killing jobs</a></li>
       <li><a href="#SQL-interface">SQL interface</a></li>
       <li><a href="#Logo">Logo</a></li>
+      <li><a href="#Citation-notice">Citation notice</a></li>
     </ul>
   </li>
   <li><a href="#Ideas-for-new-design">Ideas for new design</a>
@@ -76,17 +90,35 @@
   </li>
 </ul>
 
+<p>options as wrapper scripts</p>
+
 <h1 id="Design-of-GNU-Parallel">Design of GNU Parallel</h1>
 
 <p>This document describes design decisions made in the development of GNU <b>parallel</b> and the reasoning behind them. It will give an overview of why some of the code looks the way it does, and will help new maintainers understand the code better.</p>
 
 <h2 id="One-file-program">One file program</h2>
 
-<p>GNU <b>parallel</b> is a Perl script in a single file. It is object oriented, but contrary to normal Perl scripts each class is not in its own file. This is due to user experience: The goal is that in a pinch the user will be able to get GNU <b>parallel</b> working simply by copying a single file: No need messing around with environment variables like PERL5LIB.</p>
+<p>GNU <b>parallel</b> is a Perl script in a single file. It is object oriented, but contrary to normal Perl scripts each class is not in its own file. This is due to user experience: The goal is that in a pinch the user will be able to get GNU <b>parallel</b> working simply by copying a single file: No need to mess around with environment variables like PERL5LIB.</p>
+
+<h2 id="Choice-of-programming-language">Choice of programming language</h2>
+
+<p>GNU <b>parallel</b> is designed to be able to run on old systems. That means that it cannot depend on a compiler being installed - and especially not a compiler for a language that is younger than 20 years old.</p>
+
+<p>The goal is that you can use GNU <b>parallel</b> on any system, even if you are not allowed to install additional software.</p>
+
+<p>Of all the systems I have experienced, I have yet to see a system that had GCC installed that did not have Perl. The same goes for Rust, Go, Haskell, and other younger languages. I have, however, seen systems with Perl without any of the mentioned compilers.</p>
+
+<p>Most modern systems also have either Python2 or Python3 installed, but you still cannot be certain which version, and since Python2 cannot run under Python3, Python is not an option.</p>
+
+<p>Perl has the added benefit that implementing the {= perlexpr =} replacement string was fairly easy.</p>
 
 <h2 id="Old-Perl-style">Old Perl style</h2>
 
 <p>GNU <b>parallel</b> uses some old, deprecated constructs. This is due to a goal of being able to run on old installations. Currently the target is CentOS 3.9 and Perl 5.8.0.</p>
+
+<h2 id="Scalability-up-and-down">Scalability up and down</h2>
+
+<p>The smallest system GNU <b>parallel</b> is tested on is a 32 MB ASUS WL500gP. The largest is a 2 TB 128-core machine. It scales up to around 100 machines - depending on the duration of each job.</p>
 
 <h2 id="Exponentially-back-off">Exponentially back off</h2>
 
@@ -112,11 +144,17 @@
 
 <p>The only way to have access to the environment is directly from the shell, so the program must be written in a shell script that will be sourced and there has to deal with the dialect of the relevant shell.</p>
 
-<p>Dumping the environment into a format that can be activated again is easy in Bash: <b>typeset</b> and <b>alias</b> basically give you the commands you must run to re-create the environment. It is much harder in <b>csh</b> where there is no easy way to convert an environment into commands that generate the environment.</p>
+<h3 id="env_parallel1">env_parallel.*</h3>
 
-<h3 id="env_parallel.bash-env_parallel.zsh-env_parallel.ksh-env_parallel.pdksh">env_parallel.bash / env_parallel.zsh / env_parallel.ksh / env_parallel.pdksh</h3>
+<p>These are the files that implements the alias or function <b>env_parallel</b> for a given shell. It could be argued that these should be put in some obscure place under /usr/lib, but by putting them in your path it becomes trivial to find the path to them and <b>source</b> them:</p>
 
-<p><b>env_parallel.(bash|ksh|pdksh|zsh)</b> sets the function <b>env_parallel</b>. It uses <b>alias</b> and <b>typeset</b> to dump the configuration (with a few exceptions) into <b>$PARALLEL_ENV</b> before running GNU <b>parallel</b>.</p>
+<pre><code>  source `which env_parallel.foo`</code></pre>
+
+<p>The beauty is that they can be put anywhere in the path without the user having to know the location. So if the user&#39;s path includes /afs/bin/i386_fc5 or /usr/pkg/parallel/bin or /usr/local/parallel/20161222/sunos5.6/bin the files can be put in the dir that makes most sense for the sysadmin.</p>
+
+<h3 id="env_parallel.bash-env_parallel.sh-env_parallel.ash-env_parallel.dash-env_parallel.zsh-env_parallel.ksh-env_parallel.mksh">env_parallel.bash / env_parallel.sh / env_parallel.ash / env_parallel.dash / env_parallel.zsh / env_parallel.ksh / env_parallel.mksh</h3>
+
+<p><b>env_parallel.(bash|sh|ash|dash|ksh|mksh|zsh)</b> defines the function <b>env_parallel</b>. It uses <b>alias</b> and <b>typeset</b> to dump the configuration (with a few exceptions) into <b>$PARALLEL_ENV</b> before running GNU <b>parallel</b>.</p>
 
 <p>After GNU <b>parallel</b> is finished, <b>$PARALLEL_ENV</b> is deleted.</p>
 
@@ -148,6 +186,12 @@
 
 <p>GNU <b>parallel</b> is called, and <b>$PARALLEL_ENV</b> is deleted.</p>
 
+<h2 id="parset-supported-in-sh-ash-dash-bash-zsh-ksh-mksh">parset (supported in sh, ash, dash, bash, zsh, ksh, mksh)</h2>
+
+<p><b>parset</b> is a shell function. This is the reason why <b>parset</b> can set variables: It runs in the shell which is calling it.</p>
+
+<p>It is also the reason why <b>parset</b> does not work, when data is piped into it: <b>... | parset ...</b> makes <b>parset</b> start in a subshell, and any changes in environment can therefore not make it back to the calling shell.</p>
+
 <h2 id="Job-slots">Job slots</h2>
 
 <p>The easiest way to explain what GNU <b>parallel</b> does is to assume that there are a number of job slots, and when a slot becomes available a job from the queue will be run in that slot. But originally GNU <b>parallel</b> did not model job slots in the code. Job slots have been added to make it possible to use <b>{%}</b> as a replacement string.</p>
@@ -166,18 +210,18 @@
 
 <p>GNU <b>parallel</b> buffers output in temporary files. <b>--compress</b> compresses the buffered data. This is a bit tricky because there should be no files to clean up if GNU <b>parallel</b> is killed by a power outage.</p>
 
-<p>GNU <b>parallel</b> first selects a compression program. If the user has not selected one, the first of these that is in $PATH is used: <b>lz4 pigz lzop plzip pbzip2 pxz gzip lzma xz bzip2 lzip</b>. They are sorted by speed on a 16 core machine.</p>
+<p>GNU <b>parallel</b> first selects a compression program. If the user has not selected one, the first of these that is in $PATH is used: <b>pzstd lbzip2 pbzip2 zstd pixz lz4 pigz lzop plzip lzip gzip lrz pxz bzip2 lzma xz clzip</b>. They are sorted by speed on a 128 core machine.</p>
 
 <p>Schematically the setup is as follows:</p>
 
 <pre><code>  command started by parallel | compress &gt; tmpfile
-  cattail tmpfile | uncompress | parallel</code></pre>
+  cattail tmpfile | uncompress | parallel which reads the output</code></pre>
 
 <p>The setup is duplicated for both standard output (stdout) and standard error (stderr).</p>
 
-<p>GNU <b>parallel</b> pipes output from the command run into the compression program which saves to a tmpfile. GNU <b>parallel</b> records the pid of the compress program. At the same time a small perl script (called <b>cattail</b> above) is started: It basically does <b>cat</b> followed by <b>tail -f</b>, but it also removes the tmpfile as soon as the first byte is read, and it continously checks if the pid of the compression program is dead. If the compress program is dead, <b>cattail</b> reads the rest of tmpfile and exits.</p>
+<p>GNU <b>parallel</b> pipes output from the command run into the compression program which saves to a tmpfile. GNU <b>parallel</b> records the pid of the compress program. At the same time a small Perl script (called <b>cattail</b> above) is started: It basically does <b>cat</b> followed by <b>tail -f</b>, but it also removes the tmpfile as soon as the first byte is read, and it continuously checks if the pid of the compression program is dead. If the compress program is dead, <b>cattail</b> reads the rest of tmpfile and exits.</p>
 
-<p>As most compression programs write out a header when they start, the tmpfile in practice is unlinked after around 40 ms.</p>
+<p>As most compression programs write out a header when they start, the tmpfile in practice is removed by <b>cattail</b> after around 40 ms.</p>
 
 <h2 id="Wrapping">Wrapping</h2>
 
@@ -185,10 +229,58 @@
 
 <dl>
 
+<dt id="COMMAND"><b>$COMMAND</b></dt>
+<dd>
+
+<p>the command to run.</p>
+
+</dd>
+<dt id="INPUT"><b>$INPUT</b></dt>
+<dd>
+
+<p>the input to run.</p>
+
+</dd>
+<dt id="SHELL"><b>$SHELL</b></dt>
+<dd>
+
+<p>the shell that started GNU Parallel.</p>
+
+</dd>
+<dt id="SSHLOGIN"><b>$SSHLOGIN</b></dt>
+<dd>
+
+<p>the sshlogin.</p>
+
+</dd>
+<dt id="WORKDIR"><b>$WORKDIR</b></dt>
+<dd>
+
+<p>the working dir.</p>
+
+</dd>
+<dt id="FILE"><b>$FILE</b></dt>
+<dd>
+
+<p>the file to read parts from.</p>
+
+</dd>
+<dt id="STARTPOS"><b>$STARTPOS</b></dt>
+<dd>
+
+<p>the first byte position to read from <b>$FILE</b>.</p>
+
+</dd>
+<dt id="LENGTH"><b>$LENGTH</b></dt>
+<dd>
+
+<p>the number of bytes to read from <b>$FILE</b>.</p>
+
+</dd>
 <dt id="shellquote">--shellquote</dt>
 <dd>
 
-<p>echo <i>shell double quoted input</i></p>
+<p>echo <i>Double quoted $INPUT</i></p>
 
 </dd>
 <dt id="nice-pri">--nice <i>pri</i></dt>
@@ -202,7 +294,7 @@
 <dt id="cat">--cat</dt>
 <dd>
 
-<pre><code>  cat &gt; {}; &lt;&lt;command&gt;&gt; {};
+<pre><code>  cat &gt; {}; $COMMAND {};
   perl -e &#39;$bash = shift;
     $csh = shift;
     for(@ARGV) { unlink;rmdir; }
@@ -230,9 +322,9 @@
     waitpid $pid,0;
     # Cleanup
     unlink $f;
-    exit $?/256;&#39; &lt;&lt;shell&gt;&gt; -c &lt;&lt;command&gt;&gt; $PARALLEL_TMP</code></pre>
+    exit $?/256;&#39; $SHELL -c $COMMAND $PARALLEL_TMP</code></pre>
 
-<p>This is an elaborate way of: mkfifo {}; run <i>&lt;&lt;command</i>&gt;&gt; in the background using <i>&lt;&lt;shell</i>&gt;&gt;; copying STDIN to {}; waiting for background to complete; remove {} and exit with the exit code from <i>&lt;&lt;command</i>&gt;&gt;.</p>
+<p>This is an elaborate way of: mkfifo {}; run <b>$COMMAND</b> in the background using <b>$SHELL</b>; copying STDIN to {}; waiting for background to complete; remove {} and exit with the exit code from <b>$COMMAND</b>.</p>
 
 <p>It is made this way to be compatible with <b>*csh</b>/<b>fish</b>.</p>
 
@@ -240,30 +332,33 @@
 <dt id="pipepart">--pipepart</dt>
 <dd>
 
-<pre><code>  &lt; &lt;&lt;file&gt;&gt; perl -e &#39;while(@ARGV) {
+<pre><code>  &lt; $FILE perl -e &#39;while(@ARGV) {
       sysseek(STDIN,shift,0) || die;
       $left = shift;
-      while($read = sysread(STDIN,$buf, ($left &gt; 131072 ? 131072 : $left))){
+      while($read =
+            sysread(STDIN,$buf,
+                    ($left &gt; 131072 ? 131072 : $left))){
         $left -= $read;
         syswrite(STDOUT,$buf);
       }
-    }&#39; &lt;&lt;startposition&gt;&gt; &lt;&lt;length&gt;&gt;</code></pre>
+    }&#39; $STARTPOS $LENGTH</code></pre>
 
-<p>This will read <i>&lt;&lt;length</i>&gt;&gt; bytes from <i>&lt;&lt;file</i>&gt;&gt; starting at <i>&lt;&lt;startposition</i>&gt;&gt; and send it to STDOUT.</p>
+<p>This will read <b>$LENGTH</b> bytes from <b>$FILE</b> starting at <b>$STARTPOS</b> and send it to STDOUT.</p>
 
 </dd>
-<dt id="sshlogin-sln">--sshlogin <i>sln</i></dt>
+<dt id="sshlogin-SSHLOGIN">--sshlogin $SSHLOGIN</dt>
 <dd>
 
-<p>ssh <i>sln</i> <i>shell quoted command</i></p>
-
-<p>Where <i>sln</i> is the sshlogin and <i>shell quoted command</i> is the command quoted so it will be passed to the server.</p>
+<pre><code>  ssh $SSHLOGIN &quot;$COMMAND&quot;</code></pre>
 
 </dd>
 <dt id="transfer">--transfer</dt>
 <dd>
 
-<p>( ssh <i>sln</i> mkdir -p ./<i>workdir</i>;rsync --protocol 30 -rlDzR -essh ./{} <i>sln</i>:./<i>workdir</i> ); <i>&lt;&lt;command</i>&gt;&gt;</p>
+<pre><code>  ssh $SSHLOGIN mkdir -p ./$WORKDIR;
+  rsync --protocol 30 -rlDzR \
+        -essh ./{} $SSHLOGIN:./$WORKDIR;
+  ssh $SSHLOGIN &quot;$COMMAND&quot;</code></pre>
 
 <p>Read about <b>--protocol 30</b> in the section <b>Rsync protocol version</b>.</p>
 
@@ -283,7 +378,11 @@
 <dt id="return-file">--return <i>file</i></dt>
 <dd>
 
-<p><i>&lt;&lt;command</i>&gt;&gt;; _EXIT_status=$?; mkdir -p <i>&lt;&lt;workdir</i>&gt;&gt;; rsync --protocol 30 --rsync-path=cd\ ./<i>&lt;&lt;workdir</i>&gt;&gt;\;\ rsync -rlDzR -essh <i>&lt;&lt;sln</i>&gt;&gt;:./<i>&lt;&lt;file</i>&gt;&gt; ./<i>&lt;&lt;workdir</i>&gt;&gt;; exit $_EXIT_status;</p>
+<pre><code>  $COMMAND; _EXIT_status=$?; mkdir -p $WORKDIR;
+  rsync --protocol 30 \
+    --rsync-path=cd\ ./$WORKDIR\;\ rsync \
+    -rlDzR -essh $SSHLOGIN:./$FILE ./$WORKDIR;
+  exit $_EXIT_status;</code></pre>
 
 <p>The <b>--rsync-path=cd ...</b> is needed because old versions of <b>rsync</b> do not support <b>--no-implied-dirs</b>.</p>
 
@@ -293,9 +392,12 @@
 <dt id="cleanup">--cleanup</dt>
 <dd>
 
-<p><i>&lt;&lt;command</i>&gt;&gt; _EXIT_status=$?; &lt;&lt;return&gt;&gt;;</p>
+<p>$RETURN is the wrapper from <b>--return</b></p>
 
-<p>ssh <i>sln</i> \(rm\ -f\ ./<i>workdir</i>/{}\;\ rmdir\ ./<i>workdir</i>\ \&gt;\&amp;/dev/null\;\); exit $_EXIT_status;</p>
+<pre><code>  $COMMAND; _EXIT_status=$?; $RETURN; 
+  ssh $SSHLOGIN \(rm\ -f\ ./$WORKDIR/{}\;\
+                  rmdir\ ./$WORKDIR\ \&gt;\&amp;/dev/null\;\);
+  exit $_EXIT_status;</code></pre>
 
 <p><b>$_EXIT_status</b>: see <b>--return</b> above.</p>
 
@@ -315,15 +417,15 @@
         }
         close $fh;
         exit ($?&amp;127 ? 128+($?&amp;127) : 1+$?&gt;&gt;8)
-    }&#39; I&lt;shell&gt; -c I&lt;input&gt;</code></pre>
+    }&#39; $SHELL -c $COMMAND</code></pre>
 
-<p>This small wrapper makes sure that <i>input</i> will never be run if there is no data.</p>
+<p>This small wrapper makes sure that <b>$COMMAND</b> will never be run if there is no data.</p>
 
 </dd>
 <dt id="tmux">--tmux</dt>
 <dd>
 
-<p>&lt;&lt;TODO Fixup&gt;&gt; mkfifo /tmp/tmx3cMEV &amp;&amp; sh -c &#39;tmux -S /tmp/tmsaKpv1 new-session -s p334310 -d &quot;sleep .2&quot; &gt;/dev/null 2&gt;&amp;1&#39;; tmux -S /tmp/tmsaKpv1 new-window -t p334310 -n wc\ 10 \(wc\ 10\)\;\ perl\ -e\ \&#39;while\(\$t++\&lt;3\)\{\ print\ \$ARGV\[0\],\&quot;\\n\&quot;\ \}\&#39;\ \$\?h/\$status\ \&gt;\&gt;\ /tmp/tmx3cMEV\&amp;echo\ wc\\\ 10\;\ echo\ \Job\ finished\ at:\ \`date\`\;sleep\ 10; exec perl -e &#39;$/=&quot;/&quot;;$_=&lt;&gt;;$c=&lt;&gt;;unlink $ARGV; /(\d+)h/ and exit($1);exit$c&#39; /tmp/tmx3cMEV</p>
+<p>&lt;&lt;TODO Fixup with &#39;-quoting&gt;&gt; mkfifo /tmp/tmx3cMEV &amp;&amp; sh -c &#39;tmux -S /tmp/tmsaKpv1 new-session -s p334310 -d &quot;sleep .2&quot; &gt;/dev/null 2&gt;&amp;1&#39;; tmux -S /tmp/tmsaKpv1 new-window -t p334310 -n wc\ 10 \(wc\ 10\)\;\ perl\ -e\ \&#39;while\(\$t++\&lt;3\)\{\ print\ \$ARGV\[0\],\&quot;\\n\&quot;\ \}\&#39;\ \$\?h/\$status\ \&gt;\&gt;\ /tmp/tmx3cMEV\&amp;echo\ wc\\\ 10\;\ echo\ \Job\ finished\ at:\ \`date\`\;sleep\ 10; exec perl -e &#39;$/=&quot;/&quot;;$_=&lt;&gt;;$c=&lt;&gt;;unlink $ARGV; /(\d+)h/ and exit($1);exit$c&#39; /tmp/tmx3cMEV</p>
 
 <p>mkfifo <i>tmpfile.tmx</i>; tmux -S &lt;tmpfile.tms&gt; new-session -s p<i>PID</i> -d &#39;sleep .2&#39; &gt;&amp;/dev/null; tmux -S &lt;tmpfile.tms&gt; new-window -t p<i>PID</i> -n &lt;&lt;shell quoted input&gt;&gt; \(&lt;&lt;shell quoted input&gt;&gt;\)\;\ perl\ -e\ \&#39;while\(\$t++\&lt;3\)\{\ print\ \$ARGV\[0\],\&quot;\\n\&quot;\ \}\&#39;\ \$\?h/\$status\ \&gt;\&gt;\ <i>tmpfile.tmx</i>\&amp;echo\ &lt;&lt;shell double quoted input&gt;&gt;\;echo\ \Job\ finished\ at:\ \`date\`\;sleep\ 10; exec perl -e &#39;$/=&quot;/&quot;;$_=&lt;&gt;;$c=&lt;&gt;;unlink $ARGV; /(\d+)h/ and exit($1);exit$c&#39; <i>tmpfile.tmx</i></p>
 
@@ -362,6 +464,9 @@
 
 <ul>
 
+<li><p>$PARALLEL_ENV which is set in env_parallel.* must be prepended to the command first, as the command may contain exported variables or functions.</p>
+
+</li>
 <li><p><b>--nice</b>/<b>--cat</b>/<b>--fifo</b> should be done on the remote machine</p>
 
 </li>
@@ -370,7 +475,7 @@
 </li>
 </ul>
 
-<h2 id="Convenience-options---nice---basefile---transfer---return---cleanup---tmux---group---compress---cat---fifo---workdir">Convenience options --nice --basefile --transfer --return --cleanup --tmux --group --compress --cat --fifo --workdir</h2>
+<h2 id="Convenience-options---nice---basefile---transfer---return---cleanup---tmux---group---compress---cat---fifo---workdir---tag---tagstring">Convenience options --nice --basefile --transfer --return --cleanup --tmux --group --compress --cat --fifo --workdir --tag --tagstring</h2>
 
 <p>These are all convenience options that make it easier to do a task. But more importantly: They are tested to work on corner cases, too. Take <b>--nice</b> as an example:</p>
 
@@ -382,29 +487,61 @@
 
 <p>And this will again work just fine, as long as you are running a single command. When you are running a composed command you need nice to apply to the whole command, and it gets harder still:</p>
 
-<pre><code>  parallel -S server -q nice bash -c &#39;command1 ...; command2 | command3&#39;</code></pre>
+<pre><code>  parallel -S server -q nice bash -c &#39;command1 ...; cmd2 | cmd3&#39;</code></pre>
 
 <p>It is not impossible, but by using <b>--nice</b> GNU <b>parallel</b> will do the right thing for you. Similarly when transferring files: It starts to get hard when the file names contain space, :, `, *, or other special characters.</p>
 
 <p>To run the commands in a <b>tmux</b> session you basically just need to quote the command. For simple commands that is easy, but when commands contain special characters, it gets much harder to get right.</p>
 
+<p><b>--compress</b> not only compresses standard output (stdout) but also standard error (stderr); and it does so into files, that are open but deleted, so a crash will not leave these files around.</p>
+
 <p><b>--cat</b> and <b>--fifo</b> are easy to do by hand, until you want to clean up the tmpfile and keep the exit code of the command.</p>
 
 <p>The real killer comes when you try to combine several of these: Doing that correctly for all corner cases is next to impossible to do by hand.</p>
 
-<h2 id="block-size-adjustment">--block-size adjustment</h2>
+<h2 id="shard">--shard</h2>
 
-<p>Every time GNU <b>parallel</b> detects a record bigger than <b>--block-size</b> it increases the block size by 30%. A small <b>--block-size</b> gives very poor performance; by exponentially increasing the block size performance will not suffer.</p>
+<p>The simple way to implement sharding would be to:</p>
 
-<p>GNU <b>parallel</b> will waste CPU power if <b>--block-size</b> does not contain a full record, because it tries to find a full record and will fail to do so. The recommendation is therefore to use a <b>--block-size</b> &gt; 2 records, so you always get at least one full record when you read one block.</p>
+<ol>
 
-<p>If you use <b>-N</b> then <b>--block-size</b> should be big enough to contain N+1 records.</p>
+<li><p>start n jobs,</p>
+
+</li>
+<li><p>split each line into columns,</p>
+
+</li>
+<li><p>select the data from the relevant column</p>
+
+</li>
+<li><p>compute a hash value from the data</p>
+
+</li>
+<li><p>take the modulo n of the hash value</p>
+
+</li>
+<li><p>pass the full line to the jobslot that has the computed value</p>
+
+</li>
+</ol>
+
+<p>Unfortunately Perl is rather slow at computing the hash value (and somewhat slow at splitting into columns).</p>
+
+<p>One solution is to use a compiled language for the splitting and hashing, but that would go against the design criteria of not depending on a compiler.</p>
+
+<p>Luckily those tasks can be parallelized. So GNU <b>parallel</b> starts n sharders that do step 2-6, and passes blocks of 100k to each of those in a round robin manner. To make sure these sharders compute the hash the same way, $PERL_HASH_SEED is set to the same value for all sharders.</p>
+
+<p>Running n sharders poses a new problem: Instead of having n outputs (one for each computed value) you now have n outputs for each of the n values, so in total n*n outputs; and you need to merge these n*n outputs together into n outputs.</p>
+
+<p>This can be done by simply running &#39;parallel -j0 --lb cat ::: outputs_for_one_value&#39;, but that is rather inefficient, as it spawns a process for each file. Instead the core code from &#39;parcat&#39; is run, which is also a bit faster.</p>
+
+<p>All the sharders and parcats communicate through named pipes that are unlinked as soon as they are opened.</p>
 
 <h2 id="Shell-shock">Shell shock</h2>
 
 <p>The shell shock bug in <b>bash</b> did not affect GNU <b>parallel</b>, but the solutions did. <b>bash</b> first introduced functions in variables named: <i>BASH_FUNC_myfunc()</i> and later changed that to <i>BASH_FUNC_myfunc%%</i>. When transferring functions GNU <b>parallel</b> reads off the function and changes that into a function definition, which is copied to the remote system and executed before the actual command is executed. Therefore GNU <b>parallel</b> needs to know how to read the function.</p>
 
-<p>From version 20150122 GNU <b>parallel</b> tries both the ()-version and the %%-version, and the function definition works on both pre- and post-shellshock versions of <b>bash</b>.</p>
+<p>From version 20150122 GNU <b>parallel</b> tries both the ()-version and the %%-version, and the function definition works on both pre- and post-shell shock versions of <b>bash</b>.</p>
 
 <h2 id="The-remote-system-wrapper">The remote system wrapper</h2>
 
@@ -531,11 +668,13 @@
 </li>
 <li><p>When run as the last command using <b>-c</b> from another shell (because some shells use <b>exec</b>):</p>
 
-<pre><code>  zsh% bash -c &quot;parallel &#39;echo {} is not run in bash; set | grep BASH_VERSION&#39; ::: This&quot;</code></pre>
+<pre><code>  zsh% bash -c &quot;parallel &#39;echo {} is not run in bash; \
+       set | grep BASH_VERSION&#39; ::: This&quot;</code></pre>
 
 <p>You can work around that by appending &#39;&amp;&amp; true&#39;:</p>
 
-<pre><code>  zsh% bash -c &quot;parallel &#39;echo {} is run in bash; set | grep BASH_VERSION&#39; ::: This &amp;&amp; true&quot;</code></pre>
+<pre><code>  zsh% bash -c &quot;parallel &#39;echo {} is run in bash; \
+       set | grep BASH_VERSION&#39; ::: This &amp;&amp; true&quot;</code></pre>
 
 </li>
 <li><p>When run in a Perl script using <b>system</b> with parallel as the first string:</p>
@@ -551,13 +690,45 @@
 
 <p>If GNU <b>parallel</b> guesses wrong in these situation, set the shell using <b>$PARALLEL_SHELL</b>.</p>
 
+<h2 id="Always-running-commands-in-a-shell">Always running commands in a shell</h2>
+
+<p>If the command is a simple command with no redirection and setting of variables, the command <i>could</i> be run without spawning a shell. E.g. this simple <b>grep</b> matching either &#39;ls &#39; or &#39; wc &gt;&gt; c&#39;:</p>
+
+<pre><code>  parallel &quot;grep -E &#39;ls | wc &gt;&gt; c&#39; {}&quot; ::: foo</code></pre>
+
+<p>could be run as:</p>
+
+<pre><code>  system(&quot;grep&quot;,&quot;-E&quot;,&quot;ls | wc &gt;&gt; c&quot;,&quot;foo&quot;);</code></pre>
+
+<p>However, as soon as the command is a bit more complex a shell <i>must</i> be spawned:</p>
+
+<pre><code>  parallel &quot;grep -E &#39;ls | wc &gt;&gt; c&#39; {} | wc &gt;&gt; c&quot; ::: foo
+  parallel &quot;LANG=C grep -E &#39;ls | wc &gt;&gt; c&#39; {}&quot; ::: foo</code></pre>
+
+<p>It is impossible to tell the difference between these without parsing the string (is the <b>|</b> a pipe in shell or an alternation in a <b>grep</b> regexp? Is <b>LANG=C</b> a command in <b>csh</b> or setting a variable in <b>bash</b>? Is <b></b>&gt;&gt; redirection or part of a regexp?).</p>
+
+<p>On top of this wrapper scripts will often require a shell to be spawned.</p>
+
+<p>The downside is that you need to quote special shell chars twice:</p>
+
+<pre><code>  parallel echo &#39;*&#39; ::: This will expand the asterisk
+  parallel echo &quot;&#39;*&#39;&quot; ::: This will not
+  parallel &quot;echo &#39;*&#39;&quot; ::: This will not
+  parallel echo &#39;\*&#39; ::: This will not
+  parallel echo \&#39;&#39;*&#39;\&#39; ::: This will not
+  parallel -q echo &#39;*&#39; ::: This will not</code></pre>
+
+<p><b>-q</b> will quote all special chars, thus redirection will not work: this prints &#39;* &gt; out.1&#39; and <i>does not</i> save &#39;*&#39; into the file out.1:</p>
+
+<pre><code>  parallel -q echo &quot;*&quot; &quot;&gt;&quot; out.{} ::: 1</code></pre>
+
+<p>GNU <b>parallel</b> tries to live up to Principle Of Least Astonishment (POLA), and the requirement of using <b>-q</b> is hard to understand, when you do not see the whole picture.</p>
+
 <h2 id="Quoting">Quoting</h2>
 
-<p>Quoting depends on the shell. For most shells \ is used for all special chars and &#39; is used for newline. Whether a char is special depends on the shell and the context. Luckily quoting a bit too many chars does not break things.</p>
+<p>Quoting depends on the shell. For most shells &#39;-quoting is used for strings containing special characters.</p>
 
-<p>It is fast, but has the distinct disadvantage that if a string needs to be quoted multiple times, the \&#39;s double every time - increasing the string length exponentially.</p>
-
-<p>For <b>tcsh</b>/<b>csh</b> newline is quoted as \ followed by newline.</p>
+<p>For <b>tcsh</b>/<b>csh</b> newline is quoted as \ followed by newline. Other special characters are also \-quoted.</p>
 
 <p>For <b>rc</b> everything is quoted using &#39;.</p>
 
@@ -574,7 +745,8 @@
 <pre><code>  &lt; file perl -e &#39;while(@ARGV) { 
      sysseek(STDIN,shift,0) || die;
      $left = shift;
-     while($read = sysread(STDIN,$buf, ($left &gt; 32768 ? 32768 : $left))){
+     while($read = sysread(STDIN,$buf,
+                           ($left &gt; 131072 ? 131072 : $left))){
        $left -= $read; syswrite(STDOUT,$buf);
      }
   }&#39; startbyte length_in_bytes</code></pre>
@@ -585,17 +757,57 @@
 
 <pre><code>  yes | dd bs=1024k count=10 | wc</code></pre>
 
+<h2 id="block-size-adjustment">--block-size adjustment</h2>
+
+<p>Every time GNU <b>parallel</b> detects a record bigger than <b>--block-size</b> it increases the block size by 30%. A small <b>--block-size</b> gives very poor performance; by exponentially increasing the block size performance will not suffer.</p>
+
+<p>GNU <b>parallel</b> will waste CPU power if <b>--block-size</b> does not contain a full record, because it tries to find a full record and will fail to do so. The recommendation is therefore to use a <b>--block-size</b> &gt; 2 records, so you always get at least one full record when you read one block.</p>
+
+<p>If you use <b>-N</b> then <b>--block-size</b> should be big enough to contain N+1 records.</p>
+
+<h2 id="Automatic---block-size-computation">Automatic --block-size computation</h2>
+
+<p>With <b>--pipepart</b> GNU <b>parallel</b> can compute the <b>--block-size</b> automatically. A <b>--block-size</b> of <b>-1</b> will use a block size so that each jobslot will receive approximately 1 block. <b>--block -2</b> will pass 2 blocks to each jobslot and <b>-<i>n</i></b> will pass <i>n</i> blocks to each jobslot.</p>
+
+<p>This can be done because <b>--pipepart</b> reads from files, and we can compute the total size of the input.</p>
+
 <h2 id="jobs-and---onall">--jobs and --onall</h2>
 
 <p>When running the same commands on many servers what should <b>--jobs</b> signify? Is it the number of servers to run on in parallel? Is it the number of jobs run in parallel on each server?</p>
 
 <p>GNU <b>parallel</b> lets <b>--jobs</b> represent the number of servers to run on in parallel. This is to make it possible to run a sequence of commands (that cannot be parallelized) on each server, but run the same sequence on multiple servers.</p>
 
+<h2 id="shuf">--shuf</h2>
+
+<p>When using <b>--shuf</b> to shuffle the jobs, all jobs are read, then they are shuffled, and finally executed. When using SQL this makes the <b>--sqlmaster</b> be the part that shuffles the jobs. The <b>--sqlworker</b>s simply executes according to Seq number.</p>
+
+<h2 id="csv">--csv</h2>
+
+<p><b>--pipepart</b> is incompatible with <b>--csv</b> because you can have records like:</p>
+
+<pre><code>  a,b,c
+  a,&quot;
+  a,b,c
+  a,b,c
+  a,b,c
+  &quot;,c 
+  a,b,c</code></pre>
+
+<p>Here the second record contains a multi-line field that looks like records. Since <b>--pipepart</b> does not read then whole file when searching for record endings, it may start reading in this multi-line field, which would be wrong.</p>
+
 <h2 id="Buffering-on-disk">Buffering on disk</h2>
+
+<p>GNU <b>parallel</b> buffers output, because if output is not buffered you have to be ridiculously careful on sizes to avoid mixing of outputs (see excellent example on https://catern.com/posts/pipes.html).</p>
 
 <p>GNU <b>parallel</b> buffers on disk in $TMPDIR using files, that are removed as soon as they are created, but which are kept open. So even if GNU <b>parallel</b> is killed by a power outage, there will be no files to clean up afterwards. Another advantage is that the file system is aware that these files will be lost in case of a crash, so it does not need to sync them to disk.</p>
 
 <p>It gives the odd situation that a disk can be fully used, but there are no visible files on it.</p>
+
+<h3 id="Partly-buffering-in-memory">Partly buffering in memory</h3>
+
+<p>When using output formats SQL and CSV then GNU Parallel has to read the whole output into memory. When run normally it will only read the output from a single job. But when using <b>--linebuffer</b> every line printed will also be buffered in memory - for all jobs currently running.</p>
+
+<p>If memory is tight, then do not use the output format SQL/CSV with <b>--linebuffer</b>.</p>
 
 <h3 id="Comparing-to-buffering-in-memory">Comparing to buffering in memory</h3>
 
@@ -645,6 +857,38 @@
 
 <p>GNU <b>parallel</b> buffers on disk. If the disk is full, data may be lost. To check if the disk is full GNU <b>parallel</b> writes a 8193 byte file every second. If this file is written successfully, it is removed immediately. If it is not written successfully, the disk is full. The size 8193 was chosen because 8192 gave wrong result on some file systems, whereas 8193 did the correct thing on all tested filesystems.</p>
 
+<h2 id="Memory-usage">Memory usage</h2>
+
+<p>Normally GNU <b>parallel</b> will use around 17 MB RAM constantly - no matter how many jobs or how much output there is. There are a few things that cause the memory usage to rise:</p>
+
+<ul>
+
+<li><p>Multiple input sources. GNU <b>parallel</b> reads an input source only once. This is by design, as an input source can be a stream (e.g. FIFO, pipe, standard input (stdin)) which cannot be rewound and read again. When reading a single input source, the memory is freed as soon as the job is done - thus keeping the memory usage constant.</p>
+
+<p>But when reading multiple input sources GNU <b>parallel</b> keeps the already read values for generating all combinations with other input sources.</p>
+
+</li>
+<li><p>Computing the number of jobs. <b>--bar</b>, <b>--eta</b>, and <b>--halt xx%</b> use <b>total_jobs()</b> to compute the total number of jobs. It does this by generating the data structures for all jobs. All these job data structures will be stored in memory and take up around 400 bytes/job.</p>
+
+</li>
+<li><p>Buffering a full line. <b>--linebuffer</b> will read a full line per running job. A very long output line (say 1 GB without \n) will increase RAM usage temporarily: From when the beginning of the line is read till the line is printed.</p>
+
+</li>
+<li><p>Buffering the full output of a single job. This happens when using <b>--results *.csv/*.tsv</b> or <b>--sql*</b>. Here GNU <b>parallel</b> will read the whole output of a single job and save it as csv/tsv or SQL.</p>
+
+</li>
+</ul>
+
+<h2 id="Argument-separators">Argument separators ::: :::: :::+ ::::+</h2>
+
+<p>The argument separator <b>:::</b> was chosen because I have never seen <b>:::</b> used in any command. The natural choice <b>--</b> would be a bad idea since it is not unlikely that the template command will contain <b>--</b>. I have seen <b>::</b> used in programming languanges to separate classes, and I did not want the user to be confused that the separator had anything to do with classes.</p>
+
+<p><b>:::</b> also makes a visual separation, which is good if there are multiple <b>:::</b>.</p>
+
+<p>When <b>:::</b> was chosen, <b>::::</b> came as a fairly natural extension.</p>
+
+<p>Linking input sources meant having to decide for some way to indicate linking of <b>:::</b> and <b>::::</b>. <b>:::+</b> and <b>::::+</b> was chosen, so that they were similar to <b>:::</b> and <b>::::</b>.</p>
+
 <h2 id="Perl-replacement-strings-and---rpl">Perl replacement strings, {= =}, and --rpl</h2>
 
 <p>The shorthands for replacement strings make a command look more cryptic. Different users will need different replacement strings. Instead of inventing more shorthands you get more flexible replacement strings if they can be programmed by the user.</p>
@@ -653,9 +897,9 @@
 
 <p>If a user needs the same programmed replacement string again and again, the user may want to make his own shorthand for it. This is what <b>--rpl</b> is for. It works so well, that even GNU <b>parallel</b>&#39;s own shorthands are implemented using <b>--rpl</b>.</p>
 
-<p>In Perl code the bigrams {= and =} rarely exist. They look like a matching pair and can be entered on all keyboards. This made them good candidates for enclosing the Perl expression in the replacement strings. Another candidate ,, and ,, was rejected because they do not look like a matching pair. <b>--parens</b> was made, so that the users can still use ,, and ,, if they like: <b>--parens ,,,,</b></p>
+<p>In Perl code the bigrams <b>{=</b> and <b>=}</b> rarely exist. They look like a matching pair and can be entered on all keyboards. This made them good candidates for enclosing the Perl expression in the replacement strings. Another candidate ,, and ,, was rejected because they do not look like a matching pair. <b>--parens</b> was made, so that the users can still use ,, and ,, if they like: <b>--parens ,,,,</b></p>
 
-<p>Internally, however, the {= and =} are replaced by \257&lt; and \257&gt;. This is to make it simple to make regular expressions: \257 is disallowed on the command line, so when that is matched in a regular expression, it is known that this is a replacement string.</p>
+<p>Internally, however, the <b>{=</b> and <b>=}</b> are replaced by \257&lt; and \257&gt;. This is to make it simpler to make regular expressions. You only need to look one character ahead, and never have to look behind.</p>
 
 <h2 id="Test-suite">Test suite</h2>
 
@@ -692,6 +936,14 @@
 
 <p>Unfortunately it is not always possible to predict the root cause of the error.</p>
 
+<h2 id="Determine-number-of-CPUs">Determine number of CPUs</h2>
+
+<p>CPUs is an ambiguous term. It can mean the number of socket filled (i.e. the number of physical chips). It can mean the number of cores (i.e. the number of physical compute cores). It can mean the number of hyperthreaded cores (i.e. the number of virtual cores - with some of them possibly being hyperthreaded).</p>
+
+<p>On ark.intel.com Intel uses the terms <i>cores</i> and <i>threads</i> for number of physical cores and the number of hyperthreaded cores respectively.</p>
+
+<p>GNU <b>parallel</b> uses uses <i>CPUs</i> as the number of compute units and the terms <i>sockets</i>, <i>cores</i>, and <i>threads</i> to specify how the number of compute units is calculated.</p>
+
 <h2 id="Computation-of-load">Computation of load</h2>
 
 <p>Contrary to the obvious <b>--load</b> does not use load average. This is due to load average rising too slowly. Instead it uses <b>ps</b> to list the number of threads in running or blocked state (state D, O or R). This gives an instant load.</p>
@@ -706,9 +958,9 @@
 
 <p>GNU <b>parallel</b> uses the DBURL from GNU <b>sql</b> to give database software, username, password, host, port, database, and table in a single string.</p>
 
-<p>The DBURL must point to a table name. The table will be dropped and created. The reason for not reusing an exising table is that the user may have added more input sources which would require more columns in the table.</p>
+<p>The DBURL must point to a table name. The table will be dropped and created. The reason for not reusing an existing table is that the user may have added more input sources which would require more columns in the table. By prepending &#39;+&#39; to the DBURL the table will not be dropped.</p>
 
-<p>The table columns are similar to joblog with the addition of <b>V1</b> .. <b>Vn</b> which are values from the input sources, and stdout and stderr which are the output from standard output and standard error, respectively.</p>
+<p>The table columns are similar to joblog with the addition of <b>V1</b> .. <b>Vn</b> which are values from the input sources, and Stdout and Stderr which are the output from standard output and standard error, respectively.</p>
 
 <p>The Signal column has been renamed to _Signal due to Signal being a reserved word in MySQL.</p>
 
@@ -716,11 +968,27 @@
 
 <p>The logo is inspired by the Cafe Wall illusion. The font is DejaVu Sans.</p>
 
+<h2 id="Citation-notice">Citation notice</h2>
+
+<p>Funding a free software project is hard. GNU <b>parallel</b> is no exception. On top of that it seems the less visible a project is, the harder it is to get funding. And the nature of GNU <b>parallel</b> is that it will never be seen by &quot;the guy with the checkbook&quot;, but only by the people doing the actual work.</p>
+
+<p>This problem has been covered by others - though no solution has been found: https://www.slideshare.net/NadiaEghbal/consider-the-maintainer https://www.numfocus.org/blog/why-is-numpy-only-now-getting-funded/</p>
+
+<p>Before implementing the citation notice it was discussed with the users: https://lists.gnu.org/archive/html/parallel/2013-11/msg00006.html</p>
+
+<p>Having to spend 10 seconds on running <b>parallel --citation</b> once is no doubt not an ideal solution, but no one has so far come up with an ideal solution - neither for funding GNU <b>parallel</b> nor other free software.</p>
+
+<p>If you believe you have the perfect solution, you should try it out, and if it works, you should post it on the email list. Ideas that will cost work and which have not been tested are, however, unlikely to be prioritized.</p>
+
+<p>Running <b>parallel --citation</b> one single time takes less than 10 seconds, and will silence the citation notice for future runs. This is comparable to graphical tools where you have to click a checkbox saying &quot;Do not show this again&quot;. But if that is too much trouble for you, why not use one of the alternatives instead? See a list in: <b>man parallel_alternatives</b>.</p>
+
+<p>As the request for citation is not a legal requirement this is acceptable under GPLv3 and cleared with Richard M. Stallman himself. Thus it does not fall under this: https://www.gnu.org/licenses/gpl-faq.en.html#RequireCitation</p>
+
 <h1 id="Ideas-for-new-design">Ideas for new design</h1>
 
 <h2 id="Multiple-processes-working-together">Multiple processes working together</h2>
 
-<p>Open3 is slow. Printing is slow. It would be good if they did not tie up ressources, but were run in separate threads.</p>
+<p>Open3 is slow. Printing is slow. It would be good if they did not tie up resources, but were run in separate threads.</p>
 
 <h2 id="rrs-on-remote-using-a-perl-wrapper">--rrs on remote using a perl wrapper</h2>
 
@@ -733,6 +1001,8 @@
 <p>Will that require 2x block size memory?</p>
 
 <h1 id="Historical-decisions">Historical decisions</h1>
+
+<p>These decisions were relevant for earlier versions of GNU <b>parallel</b>, but not the current version. They are kept here as historical record.</p>
 
 <h2 id="tollef">--tollef</h2>
 

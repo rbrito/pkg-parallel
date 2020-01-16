@@ -66,7 +66,10 @@ run 1 second, suspend (3.00-1.00) seconds, run 1 second, suspend
 @item @strong{--battery}
 @anchor{@strong{--battery}}
 
-Suspend if the system is running on battery. Shorthand for: -l -1 --sensor 'cat /sys/class/power_supply/BAT0/status /proc/acpi/battery/BAT0/state 2>/dev/null |grep -i -q discharging; echo $?'
+Suspend if the system is running on battery. Shorthand for:
+-l -1 --sensor 'cat /sys/class/power_supply/BAT0/status
+/proc/acpi/battery/BAT0/state 2>/dev/null | grep -i -q discharging;
+echo $?'
 
 @item @strong{-f} @emph{FACTOR}
 @anchor{@strong{-f} @emph{FACTOR}}
@@ -95,7 +98,7 @@ under the limits. The default is @strong{--soft}.
 Limit for I/O. The amount of disk I/O will be computed as a value 0 -
 10, where 0 is no I/O and 10 is at least one disk is 100% saturated.
 
-@strong{--io} will set both @strong{--start-io} and @strong{run-io}.
+@strong{--io} will set both @strong{--start-io} and @strong{--run-io}.
 
 @item @strong{--load} @emph{loadlimit}
 @anchor{@strong{--load} @emph{loadlimit}}
@@ -105,7 +108,7 @@ Limit for I/O. The amount of disk I/O will be computed as a value 0 -
 
 Limit for load average.
 
-@strong{--load} will set both @strong{--start-load} and @strong{run-load}.
+@strong{--load} will set both @strong{--start-load} and @strong{--run-load}.
 
 @item @strong{--mem} @emph{memlimit}
 @anchor{@strong{--mem} @emph{memlimit}}
@@ -122,7 +125,7 @@ program will stop
 multiply the size with 1024, 1048576, 1073741824, or 1099511627776
 respectively.
 
-@strong{--mem} will set both @strong{--start-mem} and @strong{run-mem}.
+@strong{--mem} will set both @strong{--start-mem} and @strong{--run-mem}.
 
 @item @strong{--noswap}
 @anchor{@strong{--noswap}}
@@ -135,7 +138,7 @@ indication that the system is memory stressed.
 
 @strong{--noswap} is over limit if the system is swapping both in and out.
 
-@strong{--noswap} will set both @strong{--start-noswap} and @strong{run-noswap}.
+@strong{--noswap} will set both @strong{--start-noswap} and @strong{--run-noswap}.
 
 @item @strong{--net}
 @anchor{@strong{--net}}
@@ -168,14 +171,14 @@ useful to keep the connection alive.
 
 Sets niceness. See @strong{nice}(1).
 
-@item @strong{-p} @emph{PID}
-@anchor{@strong{-p} @emph{PID}}
+@item @strong{-p} @emph{PID}[,@emph{PID}]
+@anchor{@strong{-p} @emph{PID}[@comma{}@emph{PID}]}
 
-@item @strong{--pid} @emph{PID}
-@anchor{@strong{--pid} @emph{PID}}
+@item @strong{--pid} @emph{PID}[,@emph{PID}]
+@anchor{@strong{--pid} @emph{PID}[@comma{}@emph{PID}]}
 
-Process ID of process to suspend. You can specify multiple process IDs
-with multiple @strong{-p} @emph{PID}.
+Process IDs of processes to suspend. You can specify multiple process
+IDs with multiple @strong{-p} @emph{PID} or by separating the PIDs with comma.
 
 @item @strong{--prg} @emph{program}
 @anchor{@strong{--prg} @emph{program}}
@@ -310,18 +313,19 @@ CPU. When the load rises to 1.0 the process is suspended.
 @node EXAMPLE: Run updatedb
 @chapter EXAMPLE: Run updatedb
 
-Running updatedb can often starve the system for disk I/O and thus result in a high load.
+Running @strong{updatedb} can often starve the system for disk I/O and thus result in a high load.
 
-Run updatedb but suspend updatedb if the load is above 2.00:
+Run @strong{updatedb} but suspend @strong{updatedb} if the load is above 2.00:
 
 @strong{niceload -L 2 updatedb}
 
 @node EXAMPLE: Run rsync
 @chapter EXAMPLE: Run rsync
 
-rsync can just like updatedb starve the system for disk I/O and thus result in a high load.
+@strong{rsync} can, just like @strong{updatedb}, starve the system for disk I/O
+and thus result in a high load.
 
-Run rsync but keep load below 3.4. If load reaches 7 sleep for
+Run @strong{rsync} but keep load below 3.4. If load reaches 7 sleep for
 (7-3.4)*12 seconds:
 
 @strong{niceload -L 3.4 -f 12 rsync -Ha /home/ /backup/home/}
@@ -361,15 +365,13 @@ Report bugs to <bug-parallel@@gnu.org>.
 
 Copyright (C) 2004-11-19 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2005,2006,2006,2008,2009,2010 Ole Tange, http://ole.tange.dk
+Copyright (C) 2005-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 @node LICENSE
 @chapter LICENSE
-
-Copyright (C) 2010,2011,2012 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

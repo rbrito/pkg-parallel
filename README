@@ -1,7 +1,8 @@
 
-			 GNU Parallel README
+			     GNU Parallel
 
-Please send problems and feedback to bug-parallel@gnu.org.
+		https://www.gnu.org/software/parallel/
+
 
 = Presentation of GNU Parallel =
 
@@ -23,6 +24,9 @@ GNU Parallel makes sure output from the commands is the same output as
 you would get had you run the commands sequentially. This makes it
 possible to use output from GNU Parallel as input for other programs.
 
+See the cheat sheet for examples that cover most of the daily usage:
+www.gnu.org/s/parallel/parallel_cheat.pdf
+
 
 = 10 seconds installation =
 
@@ -30,11 +34,20 @@ For security reasons it is recommended you use your package manager to
 install. But if you cannot do that then you can use this 10 seconds
 installation.
 
-The 10 seconds installation will try do to a full installation; if
+The 10 seconds installation will try to do a full installation; if
 that fails, a personal installation; if that fails, a minimal
 installation.
 
-    (wget -O - pi.dk/3 || curl pi.dk/3/ || fetch -o - http://pi.dk/3) | bash
+    $ (wget -O - pi.dk/3 || lynx -source pi.dk/3 || curl pi.dk/3/ || \
+       fetch -o - http://pi.dk/3 ) > install.sh
+    $ sha1sum install.sh | grep 3374ec53bacb199b245af2dda86df6c9
+    12345678 3374ec53 bacb199b 245af2dd a86df6c9
+    $ md5sum install.sh | grep 029a9ac06e8b5bc6052eac57b2c3c9ca
+    029a9ac0 6e8b5bc6 052eac57 b2c3c9ca
+    $ sha512sum install.sh | grep f517006d9897747bed8a4694b1acba1b
+    40f53af6 9e20dae5 713ba06c f517006d 9897747b ed8a4694 b1acba1b 1464beb4
+    60055629 3f2356f3 3e9c4e3c 76e3f3af a9db4b32 bd33322b 975696fc e6b23cfb
+    $ bash install.sh
 
 This will literally install faster than reading the rest of this
 document.
@@ -44,9 +57,11 @@ document.
 
 Full installation of GNU Parallel is as simple as:
 
-    wget http://ftpmirror.gnu.org/parallel/parallel-20161122.tar.bz2
-    bzip2 -dc parallel-20161122.tar.bz2 | tar xvf -
-    cd parallel-20161122
+    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2
+    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2.sig
+    gpg parallel-20191222.tar.bz2.sig
+    bzip2 -dc parallel-20191222.tar.bz2 | tar xvf -
+    cd parallel-20191222
     ./configure && make && sudo make install
 
 
@@ -55,9 +70,11 @@ Full installation of GNU Parallel is as simple as:
 If you are not root you can add ~/bin to your path and install in
 ~/bin and ~/share:
 
-    wget http://ftpmirror.gnu.org/parallel/parallel-20161122.tar.bz2
-    bzip2 -dc parallel-20161122.tar.bz2 | tar xvf -
-    cd parallel-20161122
+    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2
+    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2.sig
+    gpg parallel-20191222.tar.bz2.sig
+    bzip2 -dc parallel-20191222.tar.bz2 | tar xvf -
+    cd parallel-20191222
     ./configure --prefix=$HOME && make && make install
 
 Or if your system lacks 'make' you can simply copy src/parallel
@@ -69,10 +86,22 @@ src/sem src/niceload src/sql to a dir in your path.
 If you just need parallel and do not have 'make' installed (maybe the
 system is old or Microsoft Windows):
 
-    wget http://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel
+    wget https://git.savannah.gnu.org/cgit/parallel.git/plain/src/parallel
     chmod 755 parallel
     cp parallel sem
     mv parallel sem dir-in-your-$PATH/bin/
+
+
+= Installation on compute servers =
+
+If you are developing your script to run on a remote server, that does
+not have GNU Parallel installed, but you have it installed on you
+development machine, the use can use `parallel --embed`.
+
+    parallel --embed > newscript.sh
+
+Just edit the last lines of newscript.sh and copy it to the compute
+server.
 
 
 = Test the installation =
@@ -93,10 +122,19 @@ will love you for it.
 When using programs that use GNU Parallel to process data for
 publication please cite:
 
-    O. Tange (2011): GNU Parallel - The Command-Line Power Tool,
-    ;login: The USENIX Magazine, February 2011:42-47.
+    O. Tange (2018): GNU Parallel 2018, Mar 2018, ISBN 9781387509881,
+    DOI https://doi.org/10.5281/zenodo.11460
 
 
 = New versions =
 
-New versions will be released at: ftp://ftp.gnu.org/gnu/parallel/
+New versions will be released at: https://ftp.gnu.org/gnu/parallel/
+
+
+= Dependencies =
+
+GNU Parallel should work with a normal full Perl installation. However,
+if you system has split up Perl into multiple packages then these are
+the important ones:
+
+    opkg install perlbase-getopt perlbase-ipc procps-ng-ps perlbase-mime

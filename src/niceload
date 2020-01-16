@@ -1,10 +1,9 @@
 #!/usr/bin/perl -w
 
-# Copyright (C) 2004,2005,2006,2006,2008,2009,2010 Ole Tange,
-# http://ole.tange.dk
+# Copyright (C) 2004-2010 Ole Tange, http://ole.tange.dk
 #
-# Copyright (C) 2010,2011,2012,2013,2014,2015 Ole Tange,
-# http://ole.tange.dk and Free Software Foundation, Inc.
+# Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and
+# Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +23,7 @@
 use strict;
 use Getopt::Long;
 $Global::progname="niceload";
-$Global::version = 20161122;
+$Global::version = 20191222;
 Getopt::Long::Configure("bundling","require_order");
 get_options_from_array(\@ARGV) || die_usage();
 if($opt::version) {
@@ -61,6 +60,7 @@ if(not defined $opt::start_noswap) { $opt::start_noswap = $opt::noswap; }
 if(not defined $opt::run_noswap) { $opt::run_noswap = $opt::noswap; }
 
 if(defined $opt::load) { multiply_binary_prefix($opt::load); }
+if(defined $opt::baseline) { collect_net_baseline(); }
 
 my $limit = Limit->new();
 my $process = Process->new($opt::nice,@ARGV);
@@ -105,6 +105,8 @@ if(@opt::prg) {
     $::resume_process = $process;
     $SIG{TERM} = $SIG{INT} = \&resume;
 } elsif(@opt::pid) {
+    # Support --pid 3567,25678
+    @opt::pid = map { split /,/, $_ } @opt::pid;
     $process->set_pid(@opt::pid);
     $::resume_process = $process;
     $SIG{TERM} = $SIG{INT} = \&resume;
@@ -299,6 +301,7 @@ sub get_options_from_array {
 	 "battery|B" => \$opt::battery,
 	 "net" => \$opt::net,
 	 "nethops=i" => \$opt::nethops,
+	 "baseline" => \$opt::baseline,
 
 	 "nice|n=i" => \$opt::nice,
 	 "program|prg=s" => \@opt::prg,
@@ -492,6 +495,11 @@ sub min {
     return $min;
 }
 
+sub collect_net_baseline {
+    # Collect what a normal (unloaded) net connection looks line
+}
+
+
 sub netsensor_script {
     # Script for --sensor when using --net
     my $hops = shift;
@@ -500,14 +508,17 @@ sub netsensor_script {
 	use Net::Ping;
 
 	my $medtrc = MedianTraceroute->new(shift);
-	$medtrc->ping();
-	$medtrc->ping();
+	$medtrc->set_remedian($medtrc->ping());
+	$medtrc->set_remedian($medtrc->ping());
 	while(1) {
 	    my $ms = $medtrc->ping();
 	    my $m = $medtrc->remedian();
-	    # printf("%.2f %.2f med*1.5 %f\n",$m*1000,$ms*1000,$m*1.5 < $ms);
-	    # 1 = median*1.5 < current latency
-	    # 0 = median*1.5 > current latency
+	    if($m*1.5 < $ms) {
+		# Bad 1 = median*1.5 < current latency
+	    } else {
+		# OK 0 = median*1.5 > current latency
+		$medtrc->set_remedian($ms);
+	    }
 	    printf("%d\n",$m*1.5 < $ms);
 	    sleep(1);
 	}
@@ -532,7 +543,7 @@ sub netsensor_script {
 		    die("Cannot traceroute to 8.8.8.8 and 89.233.43.71");
 		}
 	    }
-	    my $p = Net::Ping->new("external");
+	    my $p = Net::Ping->new();
 	    $p->hires();
 
 	    return bless {
@@ -552,7 +563,6 @@ sub netsensor_script {
 		my ($ret, $duration, $ip) =
 		    $self->{'pinger'}->ping($self->{'host'}, 5.5);
 		if($ret) {
-		    $self->set_remedian($duration);
 		    return $duration;
 		}
 	    }
@@ -1130,13 +1140,13 @@ sub io_status {
 
 
 sub io_status_linux {
-    # Device: rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
+    # Device rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-sz avgqu-sz   await r_await w_await  svctm  %util
     # sda       0.00     0.00    0.00    0.00     0.00     0.00     0.00     0.00    0.00    0.00    0.00   0.00   0.00
     my @iostat_out = `LANG=C iostat -x 1 2`;
-    # throw away all execpt the last Device:-section
+    # throw away all execpt the last Device-section
     my @iostat;
     for(reverse @iostat_out) {
-	/Device:/ and last;
+	/Device/ and last;
 	push @iostat, (split(/\s+/,$_))[13];
     }
     my $io = ::max(@iostat);

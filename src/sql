@@ -339,14 +339,12 @@ When using GNU B<sql> for a publication please cite:
 O. Tange (2011): GNU SQL - A Command Line Tool for Accessing Different
 Databases Using DBURLs, ;login: The USENIX Magazine, April 2011:29-32.
 
-Copyright (C) 2008,2009,2010 Ole Tange http://ole.tange.dk
+Copyright (C) 2008-2010 Ole Tange http://ole.tange.dk
 
-Copyright (C) 2010,2011 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 =head1 LICENSE
-
-Copyright (C) 2007,2008,2009,2010,2011 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -534,28 +532,38 @@ if($dburl{'query'}) {
     ($fh,$queryfile) = tempfile(SUFFIX => ".sql");
     print $fh $dburl{'query'},"\n";
     close $fh;
-    $batch_command = "cat $queryfile - | $batch_command";
+    $batch_command = "(cat $queryfile;rm $queryfile; cat) | $batch_command";
 }
 
 do {
-    if(@ARGV) {
-	$::opt_debug and print "$batch_command\n";
-	$::opt_verbose and print "$batch_command\n";
-	open(M,"| $batch_command") || die("mysql/psql/sqlplus not in path");
-	for(@ARGV) {
-	    s/\\n/\n/g;
-	    s/\\x0a/\n/gi;
-	    print M "$_\n";
+    if (is_stdin_terminal()) {
+	if(@ARGV) {
+	    open(M,"| $batch_command") || die("mysql/psql/sqlplus not in path");
+	    for(@ARGV) {
+		s/\\n/\n/g;
+		s/\\x0a/\n/gi;
+		print M "$_\n";
+	    }
+	    close M;
+	} else {
+	    $::opt_debug and print "$interactive_command\n";
+	    $::opt_verbose and print "$interactive_command\n";
+	    system("$interactive_command");
 	}
-	close M;
-    } elsif (is_stdin_terminal()) {
-	$::opt_debug and print "$interactive_command\n";
-	$::opt_verbose and print "$interactive_command\n";
-	system("$interactive_command");
     } else {
-	$::opt_debug and print "$batch_command\n";
-	$::opt_verbose and print "$batch_command\n";
-	system("$batch_command");
+	if(@ARGV) {
+	    open(M,"| $batch_command") || die("mysql/psql/sqlplus not in path");
+	    for(@ARGV) {
+		s/\\n/\n/g;
+		s/\\x0a/\n/gi;
+		print M "$_\n";
+	    }
+	    close M;
+	} else {
+	    $::opt_debug and print "$batch_command\n";
+	    $::opt_verbose and print "$batch_command\n";
+	    system("$batch_command");
+	}
     }
     $err = $?>>8;
 } while (--$retries and $err);
@@ -566,7 +574,7 @@ $Global::Initfile && unlink $Global::Initfile;
 exit ($err);
 
 sub parse_options {
-    $Global::version = 20161122;
+    $Global::version = 20191222;
     $Global::progname = 'sql';
 
     # This must be done first as this may exec myself
@@ -656,9 +664,19 @@ sub mysql_commands {
     if ($database_driver eq "mysqlssl") {
 	$ssl="--ssl";
     }
+    my($credential_fh,$tmp) = tempfile(SUFFIX => ".sql");
+    chmod (0600,$tmp);
+    print $credential_fh ("[client]\n",
+			  $user && "user=$opt{'user'}\n",
+			  $password && "password=$opt{'password'}\n",
+			  $host && "host=$opt{'host'}\n");
+    close $credential_fh;
+
+    # Prepend with a remover of the credential tempfile
     # -C: Compression if both ends support it
     $batch_command =
-	"mysql -C $pass_through_options $no_headers $html $ssl $host $user $port $password $database";
+	"((sleep 1; rm $tmp) & ".
+	"mysql --defaults-extra-file=$tmp -C $pass_through_options $no_headers $html $ssl $host $user $port  $database)";
     $interactive_command = $batch_command;
     return($batch_command,$interactive_command);
 }
@@ -1076,7 +1094,8 @@ sub version {
     # Returns: N/A
     print join("\n",
 	       "GNU $Global::progname $Global::version",
-	       "Copyright (C) 2009,2010 Ole Tange and Free Software Foundation, Inc.",
+	       "Copyright (C) 2009,2010,2011,2012,2013,2014,2015,2016,2017",
+	       "Ole Tange and Free Software Foundation, Inc.",
 	       "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>",
 	       "This is free software: you are free to change and redistribute it.",
 	       "GNU $Global::progname comes with no warranty.",
