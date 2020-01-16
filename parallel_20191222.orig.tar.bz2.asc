@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# To check the signature run:
+#   echo | gpg
+#   gpg --auto-key-locate keyserver --keyserver-options auto-key-retrieve parallel-20191222.tar.bz2.sig
+
+echo | gpg 2>/dev/null
+gpg --auto-key-locate keyserver --keyserver-options auto-key-retrieve $0
+exit $?
+
+-----BEGIN PGP SIGNATURE-----
+
+iQUHBAABCgAdFiEEzaAaQgjE90UGEH570atFFoiIiIgFAl3/gnQACgkQ0atFFoiI
+iIiwSCagwYCWabRnw1pQplt/AZ9DeJR4F1YNP5q5K9TCs07f129gwI6Syj4UWmFd
+FdJDctuvQlvHmMyt+RL974go9/V1AuwKH/41MlQIf5k8JzJ2sUzcn7nvkAL/e6w4
+82kgw625xgVOoXb4uGlpkA6ja7JUXVxa4thz948VYMGhej/Jb+dvJDwuZAvE0LxL
+80ONyzL3FJiTcorFn8OgT7T/74kLIm/AKrFZeWwWPVoSlj4jHB6r5Q0ykB8TN99I
+fDFd+ni9dOtIiWnSxPFidGf/dMPur8F8JmtZzi9QEBv8eORyRbOtfmzLcnlWPVIO
+rtJXVvfNi3Sf5A1gp5zafGsM/JzqxEtBTZ+43KKUm+DuEQPfOy+QQZ21vwNGE5ec
+RUVXja/gwL70hj5LniSOBfJCys3mxT+RqmPQWN8veHbHaQuRRtffOuCTK1sHi0Vu
+RVAWcAdRRoaY5yC7L9faGi409bqpJpEBtKGso3nhH2+UBMm1jWJAOCO0i4pVcODP
+UP4KooIxQga7hoNDYqkH5BxlxY0slJWMRoFosxcgXwCzJs/DB3HYboRBM4RcP3Nd
+ZZOw99S5QnGzHnc7sQI8UbC4vl9lHqbGnXmBZPnhADecxV8ETJojFHWKviQQBLNW
+r6LgIaPu5BNJ1dUMs7CD9qgxPsmbLpXvS7s2/3GMX1QfvHL3SwUpBwAQtvFdeNv/
+0MKftsxfbB6dKEjNDRu16iJV+5vANSgCgcd4Gtnm2N85LVCmGOzzkhy79cxyH524
+AVY42jd2IxVtppNUpQy0stz6POl8mWeVhLODN1RNrukCHg2vl2DoTGRAPzog/7z7
+ya8hDZcbq3gtaMu1XmawxvuszOx+WKovdtrZuQAozlVl/GwsBfXUYsuUoinOzXOz
+wVvfucPGLwkhEhH+iDs4RzSc+2nOQdJ4fEVZqPGq6QC9qM47PcIzeWJHMa8ziild
+SXS4dz9/RdHTaXJBti1V32u1JGui54VzxvLgIvSqV+T9rR6k8aUEtVmFaOEZ+MsU
+EvvOcH+QTFXIv5e0YFfsiVgkPU1DbU+2Hkpl5iEj/pT7VyLTjpLerp/6554Nb6HP
+8GID1dNZnK0FHlXEP2NbQWANWGk1jWxRlnH4YdUPNFAOVjT6KQEt7qK9q51H9KPR
+kiSLM8XLnfOVWNqeE3WkQE6sHtrFqUkz/isDO/MUSF1fFETvKrJ5jNRUwovgxbBb
+EHHIZkvuogo0dAeHbDkq97dPzBrYxqVM5IuQuneOnrStY0W0LG1Qv6PhRocSaY+r
+Am89Mf8Rn3RCsDBVHTmJKj8X4BF6nAXlZzCpXRUYQheSG+/EtFMl1vsBAdjvJUMc
+PSWcHupj6HBr43bC54h256BlVjImA4PwfP4gUB3bPwNfshZpwzP210toiRBOoF8i
+WKqnlA/Stp3nfveZ+pm66pw6P9gqGlialAlRWCf9NgU3sJGkpEywQUkx44w4T8Mo
+tYK+J4kK1ua+xI1a40RyVS+O7guC3XBgbcxcmXqk4PGKjoaus6tB6OiW7kdY+g+3
+MH7SGwFlSfsz6MUzjgFWz6k/6gPFqyZ+F1gFK8H7ICcVjNw6hLnqkt8b5Owmhgcd
+MOKogcJ9IA7bXpI67zI0c+apw4Ojdp7H5eLufDROZ+HihVU8xTgKl/ov
+=Atpe
+-----END PGP SIGNATURE-----
