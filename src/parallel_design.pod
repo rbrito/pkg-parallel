@@ -2,6 +2,8 @@
 
 =encoding utf8
 
+options as wrapper scripts
+
 =head1 Design of GNU Parallel
 
 This document describes design decisions made in the development of
@@ -16,8 +18,31 @@ GNU B<parallel> is a Perl script in a single file. It is object
 oriented, but contrary to normal Perl scripts each class is not in its
 own file. This is due to user experience: The goal is that in a pinch
 the user will be able to get GNU B<parallel> working simply by copying
-a single file: No need messing around with environment variables like
+a single file: No need to mess around with environment variables like
 PERL5LIB.
+
+
+=head2 Choice of programming language
+
+GNU B<parallel> is designed to be able to run on old systems. That
+means that it cannot depend on a compiler being installed - and
+especially not a compiler for a language that is younger than 20 years
+old.
+
+The goal is that you can use GNU B<parallel> on any system, even if
+you are not allowed to install additional software.
+
+Of all the systems I have experienced, I have yet to see a system that
+had GCC installed that did not have Perl. The same goes for Rust, Go,
+Haskell, and other younger languages. I have, however, seen systems
+with Perl without any of the mentioned compilers.
+
+Most modern systems also have either Python2 or Python3 installed, but
+you still cannot be certain which version, and since Python2 cannot
+run under Python3, Python is not an option.
+
+Perl has the added benefit that implementing the {= perlexpr =}
+replacement string was fairly easy.
 
 
 =head2 Old Perl style 
@@ -25,6 +50,13 @@ PERL5LIB.
 GNU B<parallel> uses some old, deprecated constructs. This is due to a
 goal of being able to run on old installations. Currently the target
 is CentOS 3.9 and Perl 5.8.0.
+
+
+=head2 Scalability up and down
+
+The smallest system GNU B<parallel> is tested on is a 32 MB ASUS
+WL500gP. The largest is a 2 TB 128-core machine. It scales up to
+around 100 machines - depending on the duration of each job.
 
 
 =head2 Exponentially back off
@@ -69,18 +101,32 @@ The only way to have access to the environment is directly from the
 shell, so the program must be written in a shell script that will be
 sourced and there has to deal with the dialect of the relevant shell.
 
-Dumping the environment into a format that can be activated again is
-easy in Bash: B<typeset> and B<alias> basically give you the commands
-you must run to re-create the environment. It is much harder in B<csh>
-where there is no easy way to convert an environment into commands
-that generate the environment.
+
+=head3 env_parallel.*
+
+These are the files that implements the alias or function
+B<env_parallel> for a given shell. It could be argued that these
+should be put in some obscure place under /usr/lib, but by putting
+them in your path it becomes trivial to find the path to them and
+B<source> them:
+
+  source `which env_parallel.foo`
+
+The beauty is that they can be put anywhere in the path without the
+user having to know the location. So if the user's path includes
+/afs/bin/i386_fc5 or /usr/pkg/parallel/bin or
+/usr/local/parallel/20161222/sunos5.6/bin the files can be put in the
+dir that makes most sense for the sysadmin.
 
 
-=head3 env_parallel.bash / env_parallel.zsh / env_parallel.ksh / env_parallel.pdksh
+=head3 env_parallel.bash / env_parallel.sh / env_parallel.ash /
+env_parallel.dash / env_parallel.zsh / env_parallel.ksh /
+env_parallel.mksh
 
-B<env_parallel.(bash|ksh|pdksh|zsh)> sets the function B<env_parallel>. It uses
-B<alias> and B<typeset> to dump the configuration (with a few
-exceptions) into B<$PARALLEL_ENV> before running GNU B<parallel>.
+B<env_parallel.(bash|sh|ash|dash|ksh|mksh|zsh)> defines the function
+B<env_parallel>. It uses B<alias> and B<typeset> to dump the
+configuration (with a few exceptions) into B<$PARALLEL_ENV> before
+running GNU B<parallel>.
 
 After GNU B<parallel> is finished, B<$PARALLEL_ENV> is deleted.
 
@@ -126,6 +172,17 @@ This is then all saved in B<$PARALLEL_ENV>.
 GNU B<parallel> is called, and B<$PARALLEL_ENV> is deleted.
 
 
+=head2 parset (supported in sh, ash, dash, bash, zsh, ksh, mksh)
+
+B<parset> is a shell function. This is the reason why B<parset> can
+set variables: It runs in the shell which is calling it.
+
+It is also the reason why B<parset> does not work, when data is piped
+into it: B<... | parset ...> makes B<parset> start in a subshell, and
+any changes in environment can therefore not make it back to the
+calling shell.
+
+
 =head2 Job slots
 
 The easiest way to explain what GNU B<parallel> does is to assume that
@@ -166,30 +223,30 @@ compresses the buffered data.  This is a bit tricky because there
 should be no files to clean up if GNU B<parallel> is killed by a power
 outage.
 
-GNU B<parallel> first selects a compression program. If the user has not
-selected one, the first of these that is in $PATH is used: B<lz4 pigz
-lzop plzip pbzip2 pxz gzip lzma xz bzip2 lzip>. They are sorted by
-speed on a 16 core machine.
+GNU B<parallel> first selects a compression program. If the user has
+not selected one, the first of these that is in $PATH is used: B<pzstd
+lbzip2 pbzip2 zstd pixz lz4 pigz lzop plzip lzip gzip lrz pxz bzip2
+lzma xz clzip>. They are sorted by speed on a 128 core machine.
 
 Schematically the setup is as follows:
 
   command started by parallel | compress > tmpfile
-  cattail tmpfile | uncompress | parallel
+  cattail tmpfile | uncompress | parallel which reads the output
 
 The setup is duplicated for both standard output (stdout) and standard
 error (stderr).
 
 GNU B<parallel> pipes output from the command run into the compression
 program which saves to a tmpfile. GNU B<parallel> records the pid of
-the compress program.  At the same time a small perl script (called
+the compress program.  At the same time a small Perl script (called
 B<cattail> above) is started: It basically does B<cat> followed by
 B<tail -f>, but it also removes the tmpfile as soon as the first byte
-is read, and it continously checks if the pid of the compression
+is read, and it continuously checks if the pid of the compression
 program is dead. If the compress program is dead, B<cattail> reads the
 rest of tmpfile and exits.
 
 As most compression programs write out a header when they start, the
-tmpfile in practice is unlinked after around 40 ms.
+tmpfile in practice is removed by B<cattail> after around 40 ms.
 
 
 =head2 Wrapping
@@ -197,11 +254,54 @@ tmpfile in practice is unlinked after around 40 ms.
 The command given by the user can be wrapped in multiple
 templates. Templates can be wrapped in other templates.
 
+
+
 =over 15
+
+=item B<$COMMAND>
+
+the command to run.
+
+
+=item B<$INPUT>
+
+the input to run.
+
+
+=item B<$SHELL>
+
+the shell that started GNU Parallel.
+
+
+=item B<$SSHLOGIN>
+
+the sshlogin.
+
+
+=item B<$WORKDIR>
+
+the working dir.
+
+
+=item B<$FILE>
+
+the file to read parts from.
+
+
+=item B<$STARTPOS>
+
+the first byte position to read from B<$FILE>.
+
+
+=item B<$LENGTH>
+
+the number of bytes to read from B<$FILE>.
+
 
 =item --shellquote
 
-echo I<shell double quoted input>
+echo I<Double quoted $INPUT>
+
 
 =item --nice I<pri>
 
@@ -211,7 +311,7 @@ Local: B<setpriority(0,0,$nice)>
 
 =item --cat
 
-  cat > {}; <<command>> {};
+  cat > {}; $COMMAND {};
   perl -e '$bash = shift;
     $csh = shift;
     for(@ARGV) { unlink;rmdir; }
@@ -240,38 +340,41 @@ B<*csh>/B<fish> (using $status).
     waitpid $pid,0;
     # Cleanup
     unlink $f;
-    exit $?/256;' <<shell>> -c <<command>> $PARALLEL_TMP
+    exit $?/256;' $SHELL -c $COMMAND $PARALLEL_TMP
 
-This is an elaborate way of: mkfifo {}; run I<<<command>>> in the
-background using I<<<shell>>>; copying STDIN to {}; waiting for background
-to complete; remove {} and exit with the exit code from I<<<command>>>.
+This is an elaborate way of: mkfifo {}; run B<$COMMAND> in the
+background using B<$SHELL>; copying STDIN to {}; waiting for background
+to complete; remove {} and exit with the exit code from B<$COMMAND>.
 
 It is made this way to be compatible with B<*csh>/B<fish>.
 
 =item --pipepart
 
-  < <<file>> perl -e 'while(@ARGV) {
+
+  < $FILE perl -e 'while(@ARGV) {
       sysseek(STDIN,shift,0) || die;
       $left = shift;
-      while($read = sysread(STDIN,$buf, ($left > 131072 ? 131072 : $left))){
+      while($read =
+            sysread(STDIN,$buf,
+                    ($left > 131072 ? 131072 : $left))){
         $left -= $read;
         syswrite(STDOUT,$buf);
       }
-    }' <<startposition>> <<length>>
+    }' $STARTPOS $LENGTH
 
-This will read I<<<length>>> bytes from I<<<file>>> starting at
-I<<<startposition>>> and send it to STDOUT.
+This will read B<$LENGTH> bytes from B<$FILE> starting at B<$STARTPOS>
+and send it to STDOUT.
 
-=item --sshlogin I<sln>
+=item --sshlogin $SSHLOGIN
 
-ssh I<sln> I<shell quoted command>
-
-Where I<sln> is the sshlogin and I<shell quoted command> is the
-command quoted so it will be passed to the server.
+  ssh $SSHLOGIN "$COMMAND"
 
 =item --transfer
 
-( ssh I<sln> mkdir -p ./I<workdir>;rsync --protocol 30 -rlDzR -essh ./{} I<sln>:./I<workdir> ); I<<<command>>>
+  ssh $SSHLOGIN mkdir -p ./$WORKDIR;
+  rsync --protocol 30 -rlDzR \
+        -essh ./{} $SSHLOGIN:./$WORKDIR;
+  ssh $SSHLOGIN "$COMMAND"
 
 Read about B<--protocol 30> in the section B<Rsync protocol version>.
 
@@ -285,7 +388,11 @@ Read about B<--protocol 30> in the section B<Rsync protocol version>.
 
 =item --return I<file>
 
-I<<<command>>>; _EXIT_status=$?; mkdir -p I<<<workdir>>>; rsync --protocol 30 --rsync-path=cd\ ./I<<<workdir>>>\;\ rsync -rlDzR -essh I<<<sln>>>:./I<<<file>>> ./I<<<workdir>>>; exit $_EXIT_status;
+  $COMMAND; _EXIT_status=$?; mkdir -p $WORKDIR;
+  rsync --protocol 30 \
+    --rsync-path=cd\ ./$WORKDIR\;\ rsync \
+    -rlDzR -essh $SSHLOGIN:./$FILE ./$WORKDIR;
+  exit $_EXIT_status;
 
 The B<--rsync-path=cd ...> is needed because old versions of B<rsync>
 do not support B<--no-implied-dirs>.
@@ -296,9 +403,12 @@ wrapping 'sh -c' is enough?
 
 =item --cleanup
 
-I<<<command>>> _EXIT_status=$?; <<return>>; 
+$RETURN is the wrapper from B<--return>
 
-ssh I<sln> \(rm\ -f\ ./I<workdir>/{}\;\ rmdir\ ./I<workdir>\ \>\&/dev/null\;\); exit $_EXIT_status;
+  $COMMAND; _EXIT_status=$?; $RETURN; 
+  ssh $SSHLOGIN \(rm\ -f\ ./$WORKDIR/{}\;\
+                  rmdir\ ./$WORKDIR\ \>\&/dev/null\;\);
+  exit $_EXIT_status;
 
 B<$_EXIT_status>: see B<--return> above.
 
@@ -317,14 +427,14 @@ B<$_EXIT_status>: see B<--return> above.
 	}
 	close $fh;
 	exit ($?&127 ? 128+($?&127) : 1+$?>>8)
-    }' I<shell> -c I<input>
+    }' $SHELL -c $COMMAND
 
-This small wrapper makes sure that I<input> will never be run if
+This small wrapper makes sure that B<$COMMAND> will never be run if
 there is no data.
 
 =item --tmux
 
-<<TODO Fixup>>
+<<TODO Fixup with '-quoting>>
 mkfifo /tmp/tmx3cMEV &&
   sh -c 'tmux -S /tmp/tmsaKpv1 new-session -s p334310 -d "sleep .2" >/dev/null 2>&1';
 tmux -S /tmp/tmsaKpv1 new-window -t p334310 -n wc\ 10 \(wc\ 10\)\;\ perl\ -e\ \'while\(\$t++\<3\)\{\ print\ \$ARGV\[0\],\"\\n\"\ \}\'\ \$\?h/\$status\ \>\>\ /tmp/tmx3cMEV\&echo\ wc\\\ 10\;\ echo\ \Job\ finished\ at:\ \`date\`\;sleep\ 10;
@@ -386,6 +496,12 @@ The ordering of the wrapping is important:
 
 =item *
 
+$PARALLEL_ENV which is set in env_parallel.* must be prepended to the
+command first, as the command may contain exported variables or
+functions.
+
+=item *
+
 B<--nice>/B<--cat>/B<--fifo> should be done on the remote machine
 
 =item *
@@ -396,7 +512,8 @@ B<--pipepart>/B<--pipe> should be done on the local machine inside B<--tmux>
 
 
 =head2 Convenience options --nice --basefile --transfer --return
---cleanup --tmux --group --compress --cat --fifo --workdir
+--cleanup --tmux --group --compress --cat --fifo --workdir --tag
+--tagstring
 
 These are all convenience options that make it easier to do a
 task. But more importantly: They are tested to work on corner cases,
@@ -413,7 +530,7 @@ And this will again work just fine, as long as you are running a
 single command. When you are running a composed command you need nice
 to apply to the whole command, and it gets harder still:
 
-  parallel -S server -q nice bash -c 'command1 ...; command2 | command3'
+  parallel -S server -q nice bash -c 'command1 ...; cmd2 | cmd3'
 
 It is not impossible, but by using B<--nice> GNU B<parallel> will do
 the right thing for you. Similarly when transferring files: It starts
@@ -424,6 +541,10 @@ To run the commands in a B<tmux> session you basically just need to
 quote the command. For simple commands that is easy, but when commands
 contain special characters, it gets much harder to get right.
 
+B<--compress> not only compresses standard output (stdout) but also
+standard error (stderr); and it does so into files, that are open but
+deleted, so a crash will not leave these files around.
+
 B<--cat> and B<--fifo> are easy to do by hand, until you want to clean
 up the tmpfile and keep the exit code of the command.
 
@@ -431,22 +552,62 @@ The real killer comes when you try to combine several of these: Doing
 that correctly for all corner cases is next to impossible to do by
 hand.
 
+=head2 --shard
 
-=head2 --block-size adjustment
+The simple way to implement sharding would be to:
 
-Every time GNU B<parallel> detects a record bigger than
-B<--block-size> it increases the block size by 30%. A small
-B<--block-size> gives very poor performance; by exponentially
-increasing the block size performance will not suffer.
+=over 5
 
-GNU B<parallel> will waste CPU power if B<--block-size> does not
-contain a full record, because it tries to find a full record and will
-fail to do so. The recommendation is therefore to use a
-B<--block-size> > 2 records, so you always get at least one full
-record when you read one block.
+=item 1
 
-If you use B<-N> then B<--block-size> should be big enough to contain
-N+1 records.
+start n jobs,
+
+=item 2
+
+split each line into columns,
+
+=item 3
+
+select the data from the relevant column
+
+=item 4
+
+compute a hash value from the data
+
+=item 5
+
+take the modulo n of the hash value
+
+=item 6
+
+pass the full line to the jobslot that has the computed value
+
+=back
+
+Unfortunately Perl is rather slow at computing the hash value (and
+somewhat slow at splitting into columns).
+
+One solution is to use a compiled language for the splitting and
+hashing, but that would go against the design criteria of not
+depending on a compiler.
+
+Luckily those tasks can be parallelized. So GNU B<parallel> starts n
+sharders that do step 2-6, and passes blocks of 100k to each of those
+in a round robin manner. To make sure these sharders compute the hash
+the same way, $PERL_HASH_SEED is set to the same value for all sharders.
+
+Running n sharders poses a new problem: Instead of having n outputs
+(one for each computed value) you now have n outputs for each of the n
+values, so in total n*n outputs; and you need to merge these n*n
+outputs together into n outputs.
+
+This can be done by simply running 'parallel -j0 --lb cat :::
+outputs_for_one_value', but that is rather inefficient, as it spawns a
+process for each file. Instead the core code from 'parcat' is run,
+which is also a bit faster.
+
+All the sharders and parcats communicate through named pipes that are
+unlinked as soon as they are opened.
 
 
 =head2 Shell shock
@@ -461,7 +622,7 @@ needs to know how to read the function.
 
 From version 20150122 GNU B<parallel> tries both the ()-version and
 the %%-version, and the function definition works on both pre- and
-post-shellshock versions of B<bash>.
+post-shell shock versions of B<bash>.
 
 
 =head2 The remote system wrapper
@@ -639,11 +800,13 @@ When run using B<exec>.
 When run as the last command using B<-c> from another shell (because
 some shells use B<exec>):
 
-  zsh% bash -c "parallel 'echo {} is not run in bash; set | grep BASH_VERSION' ::: This"
+  zsh% bash -c "parallel 'echo {} is not run in bash; \
+       set | grep BASH_VERSION' ::: This"
 
 You can work around that by appending '&& true':
 
-  zsh% bash -c "parallel 'echo {} is run in bash; set | grep BASH_VERSION' ::: This && true"
+  zsh% bash -c "parallel 'echo {} is run in bash; \
+       set | grep BASH_VERSION' ::: This && true"
 
 =item *
 
@@ -664,18 +827,59 @@ not known to B<bash>.
 If GNU B<parallel> guesses wrong in these situation, set the shell using
 B<$PARALLEL_SHELL>.
 
+
+=head2 Always running commands in a shell
+
+If the command is a simple command with no redirection and setting of
+variables, the command I<could> be run without spawning a
+shell. E.g. this simple B<grep> matching either 'ls ' or ' wc >> c':
+
+  parallel "grep -E 'ls | wc >> c' {}" ::: foo
+
+could be run as:
+
+  system("grep","-E","ls | wc >> c","foo");
+
+However, as soon as the command is a bit more complex a shell I<must>
+be spawned:
+
+  parallel "grep -E 'ls | wc >> c' {} | wc >> c" ::: foo
+  parallel "LANG=C grep -E 'ls | wc >> c' {}" ::: foo
+
+It is impossible to tell the difference between these without parsing
+the string (is the B<|> a pipe in shell or an alternation in a B<grep>
+regexp?  Is B<LANG=C> a command in B<csh> or setting a variable in
+B<bash>? Is B<>>> redirection or part of a regexp?).
+
+On top of this wrapper scripts will often require a shell to be
+spawned.
+
+The downside is that you need to quote special shell chars twice:
+
+  parallel echo '*' ::: This will expand the asterisk
+  parallel echo "'*'" ::: This will not
+  parallel "echo '*'" ::: This will not
+  parallel echo '\*' ::: This will not
+  parallel echo \''*'\' ::: This will not
+  parallel -q echo '*' ::: This will not
+
+B<-q> will quote all special chars, thus redirection will not work:
+this prints '* > out.1' and I<does not> save '*' into the file out.1:
+
+  parallel -q echo "*" ">" out.{} ::: 1
+
+GNU B<parallel> tries to live up to Principle Of Least Astonishment
+(POLA), and the requirement of using B<-q> is hard to understand, when
+you do not see the whole picture.
+
+
 =head2 Quoting
 
-Quoting depends on the shell. For most shells \ is used for all
-special chars and ' is used for newline. Whether a char is special
-depends on the shell and the context. Luckily quoting a bit too many
-chars does not break things.
+Quoting depends on the shell. For most shells '-quoting is used for
+strings containing special characters.
 
-It is fast, but has the distinct disadvantage that if a string needs
-to be quoted multiple times, the \'s double every time - increasing
-the string length exponentially.
-
-For B<tcsh>/B<csh> newline is quoted as \ followed by newline.
+For B<tcsh>/B<csh> newline is quoted as \ followed by newline. Other
+special characters are also \-quoted.
 
 For B<rc> everything is quoted using '.
 
@@ -706,7 +910,8 @@ B<parallel> had been in its normal mode. The script looks like this:
   < file perl -e 'while(@ARGV) { 
      sysseek(STDIN,shift,0) || die;
      $left = shift;
-     while($read = sysread(STDIN,$buf, ($left > 32768 ? 32768 : $left))){
+     while($read = sysread(STDIN,$buf,
+                           ($left > 131072 ? 131072 : $left))){
        $left -= $read; syswrite(STDOUT,$buf);
      }
   }' startbyte length_in_bytes
@@ -718,6 +923,36 @@ not support reading from one byte to another and might cause partial
 data. See this for a surprising example:
 
   yes | dd bs=1024k count=10 | wc
+
+
+=head2 --block-size adjustment
+
+Every time GNU B<parallel> detects a record bigger than
+B<--block-size> it increases the block size by 30%. A small
+B<--block-size> gives very poor performance; by exponentially
+increasing the block size performance will not suffer.
+
+GNU B<parallel> will waste CPU power if B<--block-size> does not
+contain a full record, because it tries to find a full record and will
+fail to do so. The recommendation is therefore to use a
+B<--block-size> > 2 records, so you always get at least one full
+record when you read one block.
+
+If you use B<-N> then B<--block-size> should be big enough to contain
+N+1 records.
+
+
+=head2 Automatic --block-size computation
+
+With B<--pipepart> GNU B<parallel> can compute the B<--block-size>
+automatically. A B<--block-size> of B<-1> will use a block size so
+that each jobslot will receive approximately 1 block. B<--block -2>
+will pass 2 blocks to each jobslot and B<-I<n>> will pass I<n> blocks
+to each jobslot.
+
+This can be done because B<--pipepart> reads from files, and we can
+compute the total size of the input.
+
 
 =head2 --jobs and --onall
 
@@ -731,7 +966,38 @@ commands (that cannot be parallelized) on each server, but run the
 same sequence on multiple servers.
 
 
+=head2 --shuf
+
+When using B<--shuf> to shuffle the jobs, all jobs are read, then they
+are shuffled, and finally executed. When using SQL this makes the
+B<--sqlmaster> be the part that shuffles the jobs. The B<--sqlworker>s
+simply executes according to Seq number.
+
+
+=head2 --csv
+
+B<--pipepart> is incompatible with B<--csv> because you can have
+records like:
+
+  a,b,c
+  a,"
+  a,b,c
+  a,b,c
+  a,b,c
+  ",c 
+  a,b,c
+
+Here the second record contains a multi-line field that looks like
+records. Since B<--pipepart> does not read then whole file when
+searching for record endings, it may start reading in this multi-line
+field, which would be wrong.
+
+
 =head2 Buffering on disk
+
+GNU B<parallel> buffers output, because if output is not buffered you
+have to be ridiculously careful on sizes to avoid mixing of outputs
+(see excellent example on https://catern.com/posts/pipes.html).
 
 GNU B<parallel> buffers on disk in $TMPDIR using files, that are
 removed as soon as they are created, but which are kept open. So even
@@ -742,6 +1008,19 @@ not need to sync them to disk.
 
 It gives the odd situation that a disk can be fully used, but there
 are no visible files on it.
+
+
+=head3 Partly buffering in memory
+
+When using output formats SQL and CSV then GNU Parallel has to read
+the whole output into memory. When run normally it will only read the
+output from a single job. But when using B<--linebuffer> every line
+printed will also be buffered in memory - for all jobs currently
+running.
+
+If memory is tight, then do not use the output format SQL/CSV with
+B<--linebuffer>.
+
 
 =head3 Comparing to buffering in memory
 
@@ -810,6 +1089,69 @@ size 8193 was chosen because 8192 gave wrong result on some file
 systems, whereas 8193 did the correct thing on all tested filesystems.
 
 
+=head2 Memory usage
+
+Normally GNU B<parallel> will use around 17 MB RAM constantly - no
+matter how many jobs or how much output there is. There are a few
+things that cause the memory usage to rise:
+
+=over 3
+
+=item *
+
+Multiple input sources. GNU B<parallel> reads an input source only
+once. This is by design, as an input source can be a stream
+(e.g. FIFO, pipe, standard input (stdin)) which cannot be rewound and
+read again. When reading a single input source, the memory is freed as
+soon as the job is done - thus keeping the memory usage constant.
+
+But when reading multiple input sources GNU B<parallel> keeps the
+already read values for generating all combinations with other input
+sources.
+
+=item *
+
+Computing the number of jobs. B<--bar>, B<--eta>, and B<--halt xx%>
+use B<total_jobs()> to compute the total number of jobs. It does this
+by generating the data structures for all jobs. All these job data
+structures will be stored in memory and take up around 400 bytes/job.
+
+=item *
+
+Buffering a full line. B<--linebuffer> will read a full line per
+running job. A very long output line (say 1 GB without \n) will
+increase RAM usage temporarily: From when the beginning of the line is
+read till the line is printed.
+
+=item *
+
+Buffering the full output of a single job. This happens when using
+B<--results *.csv/*.tsv> or B<--sql*>. Here GNU B<parallel> will read
+the whole output of a single job and save it as csv/tsv or SQL.
+
+=back
+
+
+=head2 Argument separators ::: :::: :::+ ::::+
+
+The argument separator B<:::> was chosen because I have never seen B<:::>
+used in any command. The natural choice B<--> would be a bad idea since
+it is not unlikely that the template command will contain B<-->. I have
+seen B<::> used in programming languanges to separate classes, and I
+did not want the user to be confused that the separator had anything
+to do with classes.
+
+
+B<:::> also makes a visual separation, which is good if there are
+multiple B<:::>.
+
+When B<:::> was chosen, B<::::> came as a fairly natural extension.
+
+Linking input sources meant having to decide for some way to indicate
+linking of B<:::> and B<::::>. B<:::+> and B<::::+> was chosen, so
+that they were similar to B<:::> and B<::::>.
+
+
 =head2 Perl replacement strings, {= =}, and --rpl
 
 The shorthands for replacement strings make a command look more
@@ -826,17 +1168,16 @@ again, the user may want to make his own shorthand for it. This is
 what B<--rpl> is for. It works so well, that even GNU B<parallel>'s
 own shorthands are implemented using B<--rpl>.
 
-In Perl code the bigrams {= and =} rarely exist. They look like a
+In Perl code the bigrams B<{=> and B<=}> rarely exist. They look like a
 matching pair and can be entered on all keyboards. This made them good
 candidates for enclosing the Perl expression in the replacement
 strings. Another candidate ,, and ,, was rejected because they do not
 look like a matching pair. B<--parens> was made, so that the users can
 still use ,, and ,, if they like: B<--parens ,,,,>
 
-Internally, however, the {= and =} are replaced by \257< and
-\257>. This is to make it simple to make regular expressions: \257 is
-disallowed on the command line, so when that is matched in a regular
-expression, it is known that this is a replacement string.
+Internally, however, the B<{=> and B<=}> are replaced by \257< and
+\257>. This is to make it simpler to make regular expressions. You
+only need to look one character ahead, and never have to look behind.
 
 
 =head2 Test suite
@@ -901,6 +1242,23 @@ Unfortunately it is not always possible to predict the root cause of
 the error.
 
 
+=head2 Determine number of CPUs
+
+CPUs is an ambiguous term. It can mean the number of socket filled
+(i.e. the number of physical chips). It can mean the number of cores
+(i.e. the number of physical compute cores). It can mean the number of
+hyperthreaded cores (i.e. the number of virtual cores - with some of
+them possibly being hyperthreaded).
+
+On ark.intel.com Intel uses the terms I<cores> and I<threads> for
+number of physical cores and the number of hyperthreaded cores
+respectively.
+
+GNU B<parallel> uses uses I<CPUs> as the number of compute units and
+the terms I<sockets>, I<cores>, and I<threads> to specify how the
+number of compute units is calculated.
+
+
 =head2 Computation of load
 
 Contrary to the obvious B<--load> does not use load average. This is
@@ -928,22 +1286,62 @@ software, username, password, host, port, database, and table in a
 single string.
 
 The DBURL must point to a table name. The table will be dropped and
-created. The reason for not reusing an exising table is that the user
+created. The reason for not reusing an existing table is that the user
 may have added more input sources which would require more columns in
-the table.
+the table. By prepending '+' to the DBURL the table will not be
+dropped.
 
 The table columns are similar to joblog with the addition of B<V1>
-.. B<Vn> which are values from the input sources, and stdout and
-stderr which are the output from standard output and standard error,
+.. B<Vn> which are values from the input sources, and Stdout and
+Stderr which are the output from standard output and standard error,
 respectively.
 
 The Signal column has been renamed to _Signal due to Signal being a
 reserved word in MySQL.
 
+
 =head2 Logo
 
 The logo is inspired by the Cafe Wall illusion. The font is DejaVu
 Sans.
+
+=head2 Citation notice
+
+Funding a free software project is hard. GNU B<parallel> is no
+exception. On top of that it seems the less visible a project is, the
+harder it is to get funding. And the nature of GNU B<parallel> is that
+it will never be seen by "the guy with the checkbook", but only by the
+people doing the actual work.
+
+This problem has been covered by others - though no solution has been
+found: https://www.slideshare.net/NadiaEghbal/consider-the-maintainer
+https://www.numfocus.org/blog/why-is-numpy-only-now-getting-funded/
+
+Before implementing the citation notice it was discussed with the
+users:
+https://lists.gnu.org/archive/html/parallel/2013-11/msg00006.html
+
+Having to spend 10 seconds on running B<parallel --citation> once is
+no doubt not an ideal solution, but no one has so far come up with an
+ideal solution - neither for funding GNU B<parallel> nor other free
+software.
+
+If you believe you have the perfect solution, you should try it out,
+and if it works, you should post it on the email list. Ideas that will
+cost work and which have not been tested are, however, unlikely to be
+prioritized.
+
+Running B<parallel --citation> one single time takes less than 10
+seconds, and will silence the citation notice for future runs. This is
+comparable to graphical tools where you have to click a checkbox
+saying "Do not show this again". But if that is too much trouble for
+you, why not use one of the alternatives instead?  See a list in:
+B<man parallel_alternatives>.
+
+As the request for citation is not a legal requirement this is
+acceptable under GPLv3 and cleared with Richard M. Stallman
+himself. Thus it does not fall under this:
+https://www.gnu.org/licenses/gpl-faq.en.html#RequireCitation
 
 
 =head1 Ideas for new design
@@ -951,7 +1349,7 @@ Sans.
 =head2 Multiple processes working together
 
 Open3 is slow. Printing is slow. It would be good if they did not tie
-up ressources, but were run in separate threads.
+up resources, but were run in separate threads.
 
 
 =head2 --rrs on remote using a perl wrapper
@@ -967,6 +1365,10 @@ Will that require 2x block size memory?
 
 
 =head1 Historical decisions
+
+These decisions were relevant for earlier versions of GNU B<parallel>,
+but not the current version. They are kept here as historical record.
+
 
 =head2 --tollef
 

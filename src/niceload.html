@@ -63,7 +63,7 @@
 <dt id="battery"><b>--battery</b></dt>
 <dd>
 
-<p>Suspend if the system is running on battery. Shorthand for: -l -1 --sensor &#39;cat /sys/class/power_supply/BAT0/status /proc/acpi/battery/BAT0/state 2&gt;/dev/null |grep -i -q discharging; echo $?&#39;</p>
+<p>Suspend if the system is running on battery. Shorthand for: -l -1 --sensor &#39;cat /sys/class/power_supply/BAT0/status /proc/acpi/battery/BAT0/state 2&gt;/dev/null | grep -i -q discharging; echo $?&#39;</p>
 
 </dd>
 <dt id="f-FACTOR"><b>-f</b> <i>FACTOR</i></dt>
@@ -95,7 +95,7 @@
 
 <p>Limit for I/O. The amount of disk I/O will be computed as a value 0 - 10, where 0 is no I/O and 10 is at least one disk is 100% saturated.</p>
 
-<p><b>--io</b> will set both <b>--start-io</b> and <b>run-io</b>.</p>
+<p><b>--io</b> will set both <b>--start-io</b> and <b>--run-io</b>.</p>
 
 </dd>
 <dt id="load-loadlimit"><b>--load</b> <i>loadlimit</i></dt>
@@ -107,7 +107,7 @@
 
 <p>Limit for load average.</p>
 
-<p><b>--load</b> will set both <b>--start-load</b> and <b>run-load</b>.</p>
+<p><b>--load</b> will set both <b>--start-load</b> and <b>--run-load</b>.</p>
 
 </dd>
 <dt id="mem-memlimit"><b>--mem</b> <i>memlimit</i></dt>
@@ -121,7 +121,7 @@
 
 <p><i>memlimit</i> can be postfixed with K, M, G, T, or P which would multiply the size with 1024, 1048576, 1073741824, or 1099511627776 respectively.</p>
 
-<p><b>--mem</b> will set both <b>--start-mem</b> and <b>run-mem</b>.</p>
+<p><b>--mem</b> will set both <b>--start-mem</b> and <b>--run-mem</b>.</p>
 
 </dd>
 <dt id="noswap"><b>--noswap</b></dt>
@@ -135,7 +135,7 @@
 
 <p><b>--noswap</b> is over limit if the system is swapping both in and out.</p>
 
-<p><b>--noswap</b> will set both <b>--start-noswap</b> and <b>run-noswap</b>.</p>
+<p><b>--noswap</b> will set both <b>--start-noswap</b> and <b>--run-noswap</b>.</p>
 
 </dd>
 <dt id="net"><b>--net</b></dt>
@@ -166,14 +166,14 @@
 <p>Sets niceness. See <b>nice</b>(1).</p>
 
 </dd>
-<dt id="p-PID"><b>-p</b> <i>PID</i></dt>
+<dt id="p-PID-PID"><b>-p</b> <i>PID</i>[,<i>PID</i>]</dt>
 <dd>
 
 </dd>
-<dt id="pid-PID"><b>--pid</b> <i>PID</i></dt>
+<dt id="pid-PID-PID"><b>--pid</b> <i>PID</i>[,<i>PID</i>]</dt>
 <dd>
 
-<p>Process ID of process to suspend. You can specify multiple process IDs with multiple <b>-p</b> <i>PID</i>.</p>
+<p>Process IDs of processes to suspend. You can specify multiple process IDs with multiple <b>-p</b> <i>PID</i> or by separating the PIDs with comma.</p>
 
 </dd>
 <dt id="prg-program"><b>--prg</b> <i>program</i></dt>
@@ -316,17 +316,17 @@
 
 <h1 id="EXAMPLE:-Run-updatedb">EXAMPLE: Run updatedb</h1>
 
-<p>Running updatedb can often starve the system for disk I/O and thus result in a high load.</p>
+<p>Running <b>updatedb</b> can often starve the system for disk I/O and thus result in a high load.</p>
 
-<p>Run updatedb but suspend updatedb if the load is above 2.00:</p>
+<p>Run <b>updatedb</b> but suspend <b>updatedb</b> if the load is above 2.00:</p>
 
 <p><b>niceload -L 2 updatedb</b></p>
 
 <h1 id="EXAMPLE:-Run-rsync">EXAMPLE: Run rsync</h1>
 
-<p>rsync can just like updatedb starve the system for disk I/O and thus result in a high load.</p>
+<p><b>rsync</b> can, just like <b>updatedb</b>, starve the system for disk I/O and thus result in a high load.</p>
 
-<p>Run rsync but keep load below 3.4. If load reaches 7 sleep for (7-3.4)*12 seconds:</p>
+<p>Run <b>rsync</b> but keep load below 3.4. If load reaches 7 sleep for (7-3.4)*12 seconds:</p>
 
 <p><b>niceload -L 3.4 -f 12 rsync -Ha /home/ /backup/home/</b></p>
 
@@ -356,13 +356,11 @@
 
 <p>Copyright (C) 2004-11-19 Ole Tange, http://ole.tange.dk</p>
 
-<p>Copyright (C) 2005,2006,2006,2008,2009,2010 Ole Tange, http://ole.tange.dk</p>
+<p>Copyright (C) 2005-2010 Ole Tange, http://ole.tange.dk</p>
 
-<p>Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free Software Foundation, Inc.</p>
+<p>Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free Software Foundation, Inc.</p>
 
 <h1 id="LICENSE">LICENSE</h1>
-
-<p>Copyright (C) 2010,2011,2012 Free Software Foundation, Inc.</p>
 
 <p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or at your option any later version.</p>
 

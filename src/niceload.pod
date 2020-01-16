@@ -36,7 +36,10 @@ run 1 second, suspend (3.00-1.00) seconds, run 1 second, suspend
 
 =item B<--battery>
 
-Suspend if the system is running on battery. Shorthand for: -l -1 --sensor 'cat /sys/class/power_supply/BAT0/status /proc/acpi/battery/BAT0/state 2>/dev/null |grep -i -q discharging; echo $?'
+Suspend if the system is running on battery. Shorthand for:
+-l -1 --sensor 'cat /sys/class/power_supply/BAT0/status
+/proc/acpi/battery/BAT0/state 2>/dev/null | grep -i -q discharging;
+echo $?'
 
 
 =item B<-f> I<FACTOR>
@@ -62,7 +65,7 @@ under the limits. The default is B<--soft>.
 Limit for I/O. The amount of disk I/O will be computed as a value 0 -
 10, where 0 is no I/O and 10 is at least one disk is 100% saturated.
 
-B<--io> will set both B<--start-io> and B<run-io>.
+B<--io> will set both B<--start-io> and B<--run-io>.
 
 
 =item B<--load> I<loadlimit>
@@ -71,7 +74,7 @@ B<--io> will set both B<--start-io> and B<run-io>.
 
 Limit for load average.
 
-B<--load> will set both B<--start-load> and B<run-load>.
+B<--load> will set both B<--start-load> and B<--run-load>.
 
 
 =item B<--mem> I<memlimit>
@@ -87,7 +90,7 @@ I<memlimit> can be postfixed with K, M, G, T, or P which would
 multiply the size with 1024, 1048576, 1073741824, or 1099511627776
 respectively.
 
-B<--mem> will set both B<--start-mem> and B<run-mem>.
+B<--mem> will set both B<--start-mem> and B<--run-mem>.
 
 
 =item B<--noswap>
@@ -99,7 +102,7 @@ indication that the system is memory stressed.
 
 B<--noswap> is over limit if the system is swapping both in and out.
 
-B<--noswap> will set both B<--start-noswap> and B<run-noswap>.
+B<--noswap> will set both B<--start-noswap> and B<--run-noswap>.
 
 
 =item B<--net>
@@ -132,12 +135,12 @@ useful to keep the connection alive.
 Sets niceness. See B<nice>(1).
 
 
-=item B<-p> I<PID>
+=item B<-p> I<PID>[,I<PID>]
 
-=item B<--pid> I<PID>
+=item B<--pid> I<PID>[,I<PID>]
 
-Process ID of process to suspend. You can specify multiple process IDs
-with multiple B<-p> I<PID>.
+Process IDs of processes to suspend. You can specify multiple process
+IDs with multiple B<-p> I<PID> or by separating the PIDs with comma.
 
 
 =item B<--prg> I<program>
@@ -251,18 +254,19 @@ CPU. When the load rises to 1.0 the process is suspended.
 
 =head1 EXAMPLE: Run updatedb
 
-Running updatedb can often starve the system for disk I/O and thus result in a high load.
+Running B<updatedb> can often starve the system for disk I/O and thus result in a high load.
 
-Run updatedb but suspend updatedb if the load is above 2.00:
+Run B<updatedb> but suspend B<updatedb> if the load is above 2.00:
 
 B<niceload -L 2 updatedb>
 
 
 =head1 EXAMPLE: Run rsync
 
-rsync can just like updatedb starve the system for disk I/O and thus result in a high load.
+B<rsync> can, just like B<updatedb>, starve the system for disk I/O
+and thus result in a high load.
 
-Run rsync but keep load below 3.4. If load reaches 7 sleep for
+Run B<rsync> but keep load below 3.4. If load reaches 7 sleep for
 (7-3.4)*12 seconds:
 
 B<niceload -L 3.4 -f 12 rsync -Ha /home/ /backup/home/>
@@ -299,14 +303,12 @@ Report bugs to <bug-parallel@gnu.org>.
 
 Copyright (C) 2004-11-19 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2005,2006,2006,2008,2009,2010 Ole Tange, http://ole.tange.dk
+Copyright (C) 2005-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010,2011,2012 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 =head1 LICENSE
-
-Copyright (C) 2010,2011,2012 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
