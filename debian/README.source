@@ -5,14 +5,26 @@ A quick summary of how one can update the Debian packaging of parallel is
 to, assuming that one already has the appropriate build-dependencies,
 `devscripts`, `pristine-tar`, and `git-buildpackage` installed:
 
-    gbp-clone --all git+ssh://git.debian.org/git/collab-maint/parallel.git
-    cd parallel
-    git-import-orig --uscan --pristine-tar
+    gbp-clone --all https://github.com/rbrito/pkg-parallel
+    cd pkg-parallel
+    gbp import-orig --pristine-tar --uscan
+    fbp dch -S -a
     [ Make here some adaptations, like updating debian/patches, if needed ]
+    gbp buildpackage -us -uc  # create a test build
     git-buildpackage --git-pristine-tar
+
+    # Final (source only) package creation:
+
+    gbp dch -R -a
+    gbp buildpackage -S -k8F930BD1934C3E2140A258790747BD39BCFCAAAA --git-tag
+
+    # Push the results to the repositories:
+    git push --all; git push --tags
+    git push git@salsa.debian.org:debian/parallel.git --all; git push git@salsa.debian.org:debian/parallel.git --tags
+    dput ftp-master parallel*changes
 
 These are the important steps and may need to be changed according to
 deviations, say, in the release process of upstream releases (e.g., if
 upstream changes the location where the tarballs reside).
 
- -- Rogério Brito <rbrito@ime.usp.br>, Tue, 24 Apr 2012 01:05:41 -0300
+ -- Rogério Brito <rbrito@ime.usp.br>, Thu, 16 Jan 2020 01:04:42 -0300
