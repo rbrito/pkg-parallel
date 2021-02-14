@@ -27,6 +27,7 @@ parallel (20210122-1) UNRELEASED; urgency=medium
     + Set Rules-Requires-Root to no.
     + State compliancy with Policy 4.5.1.
   * New upstream version
+  * Add salsa-ci file (routine-update)
 
  -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 04:00:10 -0300
 
