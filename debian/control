@@ -6,7 +6,7 @@ Uploaders:
  Ondřej Surý <ondrej@debian.org>
 Build-Depends:
  autoconf,
- debhelper-compat (= 12),
+ debhelper-compat (= 13),
  perl,
  pod2pdf,
  texinfo
