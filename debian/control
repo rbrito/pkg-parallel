@@ -18,7 +18,6 @@ Vcs-Browser: https://salsa.debian.org/debian/parallel
 Package: parallel
 Architecture: all
 Depends:
- perl,
  procps,
  sysstat,
  ${misc:Depends},
