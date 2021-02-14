@@ -1,20 +1,39 @@
-parallel (20161122-1~2.gbpcef37c) UNRELEASED; urgency=medium
+parallel (20191222-0~3.gbpa37430) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @cef37cc76c88bfe97c57a79730a0c743bcc944c3 **
+  ** SNAPSHOT build @a37430e9b6ad797a0898ef19e0b482470acd2377 **
 
+  * New upstream version 20191222
+  * debian/copyright: Extend copyright years.
+
+ -- Rogério Brito <rbrito@ime.usp.br>  Thu, 16 Jan 2020 01:05:43 -0300
+
+parallel (20161222-1.1) unstable; urgency=medium
+
+  * Non-maintainer upload
+  * Update Vcs-* to point to salsa
+  * Remove citation requirements completely (Closes: #905674)
+
+ -- Didier Raboud <odyx@debian.org>  Sat, 01 Dec 2018 23:18:34 +0100
+
+parallel (20161222-1) unstable; urgency=medium
+
+  [ Rogério Brito ]
   * New upstream version 20161122.
     + Fixes CVE-2015-4155 and CVE-2015-4156. (Closes: #787954)
   * debian/gbp.conf:
     + Avoid warning by renaming section from git-import-orig to import-orig.
     + Avoid warning by renaming section from git-dch to dch.
   * debian/control:
-    + Depend on procps. (Closes: 815952)
+    + Depend on procps. (Closes: #815952)
     + Remove conflicts with moreutils. Thanks to Ian Jackson for the
-      suggestion and many others for the discussions.  (Closes: 749355)
+      suggestion and many others for the discussions.  (Closes: #749355)
     + Substitute dependency on perl-modules with simple perl.
     + Fix Vcs-* URLs to point to new, cgit HTTPS locations.
 
- -- Rogério Brito <rbrito@ime.usp.br>  Mon, 12 Dec 2016 15:33:18 -0200
+  [ Ondřej Surý ]
+  * Imported Upstream version 20161222 (Closes: #813639)
+
+ -- Ondřej Surý <ondrej@debian.org>  Sat, 31 Dec 2016 14:24:10 +0100
 
 parallel (20141022+ds1-1) unstable; urgency=medium
 
@@ -107,7 +126,7 @@ parallel (20120322-1) unstable; urgency=low
   * debian/doc-base:
     + properly register the documentation with doc-base.
 
-  [ Ondřej Surý ]  
+  [ Ondřej Surý ]
   * Add myself to Uploaders
   * Add a diversion for /usr/bin/parallel to allow concurrent install
     with moreutils
