@@ -1,6 +1,6 @@
 Source: parallel
 Section: utils
-Priority: extra
+Priority: optional
 Maintainer: Rogério Brito <rbrito@gmail.com>
 Uploaders:
  Ondřej Surý <ondrej@debian.org>
