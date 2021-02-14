@@ -136,13 +136,13 @@ $SERVER1 and $SERVER2 must work.
   SERVER1=server.example.com
   SERVER2=server2.example.net
 
-So you must be able to do this:
+So you must be able to do this without entering a password:
 
   ssh $SERVER1 echo works
   ssh $SERVER2 echo works
 
 It can be setup by running 'ssh-keygen -t dsa; ssh-copy-id $SERVER1'
-and using an empty passphrase.
+and using an empty passphrase, or you can use B<ssh-agent>.
 
 =back
 
@@ -1489,7 +1489,8 @@ A progress bar can be shown with B<--bar>:
 And a graphic bar can be shown with B<--bar> and B<zenity>:
 
   seq 1000 | parallel -j10 --bar '(echo -n {};sleep 0.1)' \
-    2> >(zenity --progress --auto-kill --auto-close)
+    2> >(perl -pe 'BEGIN{$/="\r";$|=1};s/\r/\n/g' |
+         zenity --progress --auto-kill --auto-close)
 
 A logfile of the jobs completed so far can be generated with B<--joblog>:
 
@@ -2243,7 +2244,7 @@ the output each in their own column.
 
 The simplest is to use a CSV file as the storage table:
 
-  parallel --sqlandworker csv:////%2Ftmp%2Flog.csv \
+  parallel --sqlandworker csv:///%2Ftmp/log.csv \
     seq ::: 10 ::: 12 13 14
   cat /tmp/log.csv
 
@@ -2274,7 +2275,7 @@ format correctly - even with fields containing newlines as above.
 
 If the output is big you may want to put it into files using B<--results>:
 
-  parallel --results outdir --sqlandworker csv:////%2Ftmp%2Flog2.csv \
+  parallel --results outdir --sqlandworker csv:///%2Ftmp/log2.csv \
     seq ::: 10 ::: 12 13 14
   cat /tmp/log2.csv
 
@@ -2303,7 +2304,7 @@ Example:
   mysql://scott:tiger@my.example.com/mydatabase/mytable
   postgresql://scott:tiger@pg.example.com/mydatabase/mytable
   sqlite3:///%2Ftmp%2Fmydatabase/mytable
-  csv:////%2Ftmp%2Flog.csv
+  csv:///%2Ftmp/log.csv
 
 To refer to B</tmp/mydatabase> with B<sqlite> or B<csv> you need to
 encode the B</> as B<%2F>.
@@ -2998,9 +2999,9 @@ When asking for help, always report the full output of this:
 
 Output:
 
-  GNU parallel 20180122
-  Copyright (C) 2007-2018
-  Ole Tange and Free Software Foundation, Inc.
+  GNU parallel 20210122
+  Copyright (C) 2007-2021 Ole Tange, http://ole.tange.dk and Free Software
+  Foundation, Inc.
   License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
   This is free software: you are free to change and redistribute it.
   GNU parallel comes with no warranty.
@@ -3160,7 +3161,7 @@ https://my.fsf.org/donate/
 
 =back
 
-(C) 2013-2019 Ole Tange, FDLv1.3 (See fdl.txt)
+(C) 2013-2021 Ole Tange, FDLv1.3 (See fdl.txt)
 
 
 =cut

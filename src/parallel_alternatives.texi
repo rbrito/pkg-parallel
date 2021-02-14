@@ -40,7 +40,7 @@ developers with irregular releases and only maintained for a few
 years.
 
 @menu
-* SUMMARY TABLE::
+* SUMMARY LEGEND::
 * DIFFERENCES BETWEEN xargs AND GNU Parallel::
 * DIFFERENCES BETWEEN find -exec AND GNU Parallel::
 * DIFFERENCES BETWEEN make -j AND GNU Parallel::
@@ -84,11 +84,20 @@ years.
 * DIFFERENCES BETWEEN lateral AND GNU Parallel::
 * DIFFERENCES BETWEEN with-this AND GNU Parallel::
 * DIFFERENCES BETWEEN Tollef's parallel (moreutils) AND GNU Parallel::
+* DIFFERENCES BETWEEN rargs AND GNU Parallel::
+* DIFFERENCES BETWEEN threader AND GNU Parallel::
+* DIFFERENCES BETWEEN runp AND GNU Parallel::
+* DIFFERENCES BETWEEN papply AND GNU Parallel::
+* DIFFERENCES BETWEEN async AND GNU Parallel::
+* DIFFERENCES BETWEEN pardi AND GNU Parallel::
+* DIFFERENCES BETWEEN bthread AND GNU Parallel::
+* DIFFERENCES BETWEEN simple_gpu_scheduler AND GNU Parallel::
+* DIFFERENCES BETWEEN parasweep AND GNU Parallel::
 * Todo::
 @end menu
 
-@node SUMMARY TABLE
-@section SUMMARY TABLE
+@node SUMMARY LEGEND
+@section SUMMARY LEGEND
 
 The following features are in some of the comparable tools:
 
@@ -117,8 +126,9 @@ The following features are in some of the comparable tools:
  O5. Stdout only contains stdout (standard output) from the command
  O6. Stderr only contains stderr (standard error) from the command
  O7. Buffering on disk
- O8. Cleanup of file if killed
+ O8. Cleanup of temporary files if killed
  O9. Test if disk runs full during run
+ O10. Output of a line bigger than 4 GB
 
 @strong{Execution}
  E1. Running jobs in parallel
@@ -150,41 +160,21 @@ The following features are in some of the comparable tools:
  ID = yes
 
 As every new version of the programs are not tested the table may be
-outdated. Please file a bug-report if you find errors (See REPORTING
+outdated. Please file a bug report if you find errors (See REPORTING
 BUGS).
 
 parallel:
 I1 I2 I3 I4 I5 I6 I7
 M1 M2 M3 M4 M5 M6
-O1 O2 O3 O4 O5 O6 O7 O8 O9
+O1 O2 O3 O4 O5 O6 O7 O8 O9 O10
 E1 E2 E3 E4 E5 E6 E7
 R1 R2 R3 R4 R5 R6 R7 R8 R9
 S1 S2
 
-find -exec:
--  -  -  x  -  x  -
--  M2 M3 -  -  -  -
--  O2 O3 O4 O5 O6
--  -  -  -  -  -  -
--  -  -  -  -  -  -  -  -
-x  x
-
-make -j:
--  -  -  -  -  -  -
--  -  -  -  -  -
-O1 O2 O3 -  x  O6
-E1 -  -  -  E5 -
--  -  -  -  -  -  -  -  -
--  -
-
-xjobs, prll, dxargs, mdm/middelman, xapply, paexec, ladon, jobflow,
-ClusterSSH: TODO - Please file a bug-report if you know what features
-they support (See REPORTING BUGS).
-
 @node DIFFERENCES BETWEEN xargs AND GNU Parallel
 @section DIFFERENCES BETWEEN xargs AND GNU Parallel
 
-Summary table (see legend above):
+Summary (see legend above):
 I1 I2 - - - - -
 - M2 M3 - - -
 - O2 O3 - O5 O6
@@ -290,6 +280,14 @@ https://www.gnu.org/software/findutils/
 @node DIFFERENCES BETWEEN find -exec AND GNU Parallel
 @section DIFFERENCES BETWEEN find -exec AND GNU Parallel
 
+Summary (see legend above):
+-  -  -  x  -  x  -
+-  M2 M3 -  -  -  -
+-  O2 O3 O4 O5 O6
+-  -  -  -  -  -  -
+-  -  -  -  -  -  -  -  -
+x  x
+
 @strong{find -exec} offers some of the same possibilities as GNU @strong{parallel}.
 
 @strong{find -exec} only works on files. Processing other input (such as
@@ -300,6 +298,14 @@ https://www.gnu.org/software/findutils/ (Last checked: 2019-01)
 
 @node DIFFERENCES BETWEEN make -j AND GNU Parallel
 @section DIFFERENCES BETWEEN make -j AND GNU Parallel
+
+Summary (see legend above):
+-  -  -  -  -  -  -
+-  -  -  -  -  -
+O1 O2 O3 -  x  O6
+E1 -  -  -  E5 -
+-  -  -  -  -  -  -  -  -
+-  -
 
 @strong{make -j} can run jobs in parallel, but requires a crafted Makefile
 to do this. That results in extra quoting to get filenames containing
@@ -316,7 +322,7 @@ https://www.gnu.org/software/make/ (Last checked: 2019-01)
 @node DIFFERENCES BETWEEN ppss AND GNU Parallel
 @section DIFFERENCES BETWEEN ppss AND GNU Parallel
 
-Summary table (see legend above):
+Summary (see legend above):
 I1 I2 - - - - I7
 M1 - M3 - - M6
 O1 - - x - -
@@ -359,53 +365,56 @@ start. GNU @strong{parallel} only requires one step.
 Here are the examples from @strong{ppss}'s manual page with the equivalent
 using GNU @strong{parallel}:
 
-@strong{1} ./ppss.sh standalone -d /path/to/files -c 'gzip '
+@verbatim
+  1$ ./ppss.sh standalone -d /path/to/files -c 'gzip '
 
-@strong{1} find /path/to/files -type f | parallel gzip
+  1$ find /path/to/files -type f | parallel gzip
 
-@strong{2} ./ppss.sh standalone -d /path/to/files -c 'cp "$ITEM" /destination/dir '
+  2$ ./ppss.sh standalone -d /path/to/files -c 'cp "$ITEM" /destination/dir '
 
-@strong{2} find /path/to/files -type f | parallel cp @{@} /destination/dir
+  2$ find /path/to/files -type f | parallel cp {} /destination/dir
 
-@strong{3} ./ppss.sh standalone -f list-of-urls.txt -c 'wget -q '
+  3$ ./ppss.sh standalone -f list-of-urls.txt -c 'wget -q '
 
-@strong{3} parallel -a list-of-urls.txt wget -q
+  3$ parallel -a list-of-urls.txt wget -q
 
-@strong{4} ./ppss.sh standalone -f list-of-urls.txt -c 'wget -q "$ITEM"'
+  4$ ./ppss.sh standalone -f list-of-urls.txt -c 'wget -q "$ITEM"'
 
-@strong{4} parallel -a list-of-urls.txt wget -q @{@}
+  4$ parallel -a list-of-urls.txt wget -q {}
 
-@strong{5} ./ppss config -C config.cfg -c 'encode.sh ' -d /source/dir -m
-192.168.1.100 -u ppss -k ppss-key.key -S ./encode.sh -n nodes.txt -o
-/some/output/dir --upload --download ; ./ppss deploy -C config.cfg ;
-./ppss start -C config
+  5$ ./ppss config -C config.cfg -c 'encode.sh ' -d /source/dir \
+       -m 192.168.1.100 -u ppss -k ppss-key.key -S ./encode.sh \
+       -n nodes.txt -o /some/output/dir --upload --download;
+     ./ppss deploy -C config.cfg
+     ./ppss start -C config
 
-@strong{5} # parallel does not use configs. If you want a different username put it in nodes.txt: user@@hostname
+  5$ # parallel does not use configs. If you want a different username put it in nodes.txt: user@hostname
+     find source/dir -type f |
+       parallel --sshloginfile nodes.txt --trc {.}.mp3 lame -a {} -o {.}.mp3 --preset standard --quiet
 
-@strong{5} find source/dir -type f | parallel --sshloginfile nodes.txt --trc @{.@}.mp3 lame -a @{@} -o @{.@}.mp3 --preset standard --quiet
+  6$ ./ppss stop -C config.cfg
 
-@strong{6} ./ppss stop -C config.cfg
+  6$ killall -TERM parallel
 
-@strong{6} killall -TERM parallel
+  7$ ./ppss pause -C config.cfg
 
-@strong{7} ./ppss pause -C config.cfg
+  7$ Press: CTRL-Z or killall -SIGTSTP parallel
 
-@strong{7} Press: CTRL-Z or killall -SIGTSTP parallel
+  8$ ./ppss continue -C config.cfg
 
-@strong{8} ./ppss continue -C config.cfg
+  8$ Enter: fg or killall -SIGCONT parallel
 
-@strong{8} Enter: fg or killall -SIGCONT parallel
+  9$ ./ppss.sh status -C config.cfg
 
-@strong{9} ./ppss.sh status -C config.cfg
-
-@strong{9} killall -SIGUSR2 parallel
+  9$ killall -SIGUSR2 parallel
+@end verbatim
 
 https://github.com/louwrentius/PPSS
 
 @node DIFFERENCES BETWEEN pexec AND GNU Parallel
 @section DIFFERENCES BETWEEN pexec AND GNU Parallel
 
-Summary table (see legend above):
+Summary (see legend above):
 I1 I2 - I4 I5 - -
 M1 - M3 - - M6
 O1 O2 O3 - O5 O6
@@ -425,55 +434,56 @@ S1 -
 Here are the examples from @strong{pexec}'s info page with the equivalent
 using GNU @strong{parallel}:
 
-@strong{1} pexec -o sqrt-%s.dat -p "$(seq 10)" -e NUM -n 4 -c -- \
-  'echo "scale=10000;sqrt($NUM)" | bc'
+@verbatim
+  1$ pexec -o sqrt-%s.dat -p "$(seq 10)" -e NUM -n 4 -c -- \
+       'echo "scale=10000;sqrt($NUM)" | bc'
 
-@strong{1} seq 10 | parallel -j4 'echo "scale=10000;sqrt(@{@})" | bc > sqrt-@{@}.dat'
+  1$ seq 10 | parallel -j4 'echo "scale=10000;sqrt({})" | \
+       bc > sqrt-{}.dat'
 
-@strong{2} pexec -p "$(ls myfiles*.ext)" -i %s -o %s.sort -- sort
+  2$ pexec -p "$(ls myfiles*.ext)" -i %s -o %s.sort -- sort
 
-@strong{2} ls myfiles*.ext | parallel sort @{@} ">@{@}.sort"
+  2$ ls myfiles*.ext | parallel sort {} ">{}.sort"
 
-@strong{3} pexec -f image.list -n auto -e B -u star.log -c -- \
-  'fistar $B.fits -f 100 -F id,x,y,flux -o $B.star'
+  3$ pexec -f image.list -n auto -e B -u star.log -c -- \
+       'fistar $B.fits -f 100 -F id,x,y,flux -o $B.star'
 
-@strong{3} parallel -a image.list \
-  'fistar @{@}.fits -f 100 -F id,x,y,flux -o @{@}.star' 2>star.log
+  3$ parallel -a image.list \
+       'fistar {}.fits -f 100 -F id,x,y,flux -o {}.star' 2>star.log
 
-@strong{4} pexec -r *.png -e IMG -c -o - -- \
-  'convert $IMG $@{IMG%.png@}.jpeg ; "echo $IMG: done"'
+  4$ pexec -r *.png -e IMG -c -o - -- \
+       'convert $IMG ${IMG%.png}.jpeg ; "echo $IMG: done"'
 
-@strong{4} ls *.png | parallel 'convert @{@} @{.@}.jpeg; echo @{@}: done'
+  4$ ls *.png | parallel 'convert {} {.}.jpeg; echo {}: done'
 
-@strong{5} pexec -r *.png -i %s -o %s.jpg -c 'pngtopnm | pnmtojpeg'
+  5$ pexec -r *.png -i %s -o %s.jpg -c 'pngtopnm | pnmtojpeg'
 
-@strong{5} ls *.png | parallel 'pngtopnm < @{@} | pnmtojpeg > @{@}.jpg'
+  5$ ls *.png | parallel 'pngtopnm < {} | pnmtojpeg > {}.jpg'
 
-@strong{6} for p in *.png ; do echo $@{p%.png@} ; done | \
-  pexec -f - -i %s.png -o %s.jpg -c 'pngtopnm | pnmtojpeg'
+  6$ for p in *.png ; do echo ${p%.png} ; done | \
+       pexec -f - -i %s.png -o %s.jpg -c 'pngtopnm | pnmtojpeg'
 
-@strong{6} ls *.png | parallel 'pngtopnm < @{@} | pnmtojpeg > @{.@}.jpg'
+  6$ ls *.png | parallel 'pngtopnm < {} | pnmtojpeg > {.}.jpg'
 
-@strong{7} LIST=$(for p in *.png ; do echo $@{p%.png@} ; done)
-  pexec -r $LIST -i %s.png -o %s.jpg -c 'pngtopnm | pnmtojpeg'
+  7$ LIST=$(for p in *.png ; do echo ${p%.png} ; done)
+     pexec -r $LIST -i %s.png -o %s.jpg -c 'pngtopnm | pnmtojpeg'
 
-@strong{7} ls *.png | parallel 'pngtopnm < @{@} | pnmtojpeg > @{.@}.jpg'
+  7$ ls *.png | parallel 'pngtopnm < {} | pnmtojpeg > {.}.jpg'
 
-@strong{8} pexec -n 8 -r *.jpg -y unix -e IMG -c \
-  'pexec -j -m blockread -d $IMG | \
-  jpegtopnm | pnmscale 0.5 | pnmtojpeg | \
-  pexec -j -m blockwrite -s th_$IMG'
+  8$ pexec -n 8 -r *.jpg -y unix -e IMG -c \
+       'pexec -j -m blockread -d $IMG | \
+        jpegtopnm | pnmscale 0.5 | pnmtojpeg | \
+        pexec -j -m blockwrite -s th_$IMG'
 
-@strong{8} Combining GNU @strong{parallel} and GNU @strong{sem}.
+  8$ # Combining GNU B<parallel> and GNU B<sem>.
+     ls *jpg | parallel -j8 'sem --id blockread cat {} | jpegtopnm |' \
+       'pnmscale 0.5 | pnmtojpeg | sem --id blockwrite cat > th_{}'
 
-@strong{8} ls *jpg | parallel -j8 'sem --id blockread cat @{@} | jpegtopnm |' \
-  'pnmscale 0.5 | pnmtojpeg | sem --id blockwrite cat > th_@{@}'
-
-@strong{8} If reading and writing is done to the same disk, this may be
-faster as only one process will be either reading or writing:
-
-@strong{8} ls *jpg | parallel -j8 'sem --id diskio cat @{@} | jpegtopnm |' \
-  'pnmscale 0.5 | pnmtojpeg | sem --id diskio cat > th_@{@}'
+     # If reading and writing is done to the same disk, this may be
+     # faster as only one process will be either reading or writing:
+     ls *jpg | parallel -j8 'sem --id diskio cat {} | jpegtopnm |' \
+       'pnmscale 0.5 | pnmtojpeg | sem --id diskio cat > th_{}'
+@end verbatim
 
 https://www.gnu.org/software/pexec/
 
@@ -486,38 +496,47 @@ running jobs on your local computer.
 @strong{xjobs} deals badly with special characters just like @strong{xargs}. See
 the section @strong{DIFFERENCES BETWEEN xargs AND GNU Parallel}.
 
+@menu
+* EXAMPLES FROM xjobs MANUAL::
+@end menu
+
+@node EXAMPLES FROM xjobs MANUAL
+@subsection EXAMPLES FROM xjobs MANUAL
+
 Here are the examples from @strong{xjobs}'s man page with the equivalent
 using GNU @strong{parallel}:
 
-@strong{1} ls -1 *.zip | xjobs unzip
+@verbatim
+  1$ ls -1 *.zip | xjobs unzip
 
-@strong{1} ls *.zip | parallel unzip
+  1$ ls *.zip | parallel unzip
 
-@strong{2} ls -1 *.zip | xjobs -n unzip
+  2$ ls -1 *.zip | xjobs -n unzip
 
-@strong{2} ls *.zip | parallel unzip >/dev/null
+  2$ ls *.zip | parallel unzip >/dev/null
 
-@strong{3} find . -name '*.bak' | xjobs gzip
+  3$ find . -name '*.bak' | xjobs gzip
 
-@strong{3} find . -name '*.bak' | parallel gzip
+  3$ find . -name '*.bak' | parallel gzip
 
-@strong{4} ls -1 *.jar | sed 's/\(.*\)/\1 > \1.idx/' | xjobs jar tf
+  4$ ls -1 *.jar | sed 's/\(.*\)/\1 > \1.idx/' | xjobs jar tf
 
-@strong{4} ls *.jar | parallel jar tf @{@} '>' @{@}.idx
+  4$ ls *.jar | parallel jar tf {} '>' {}.idx
 
-@strong{5} xjobs -s script
+  5$ xjobs -s script
 
-@strong{5} cat script | parallel
+  5$ cat script | parallel
 
-@strong{6} mkfifo /var/run/my_named_pipe;
-xjobs -s /var/run/my_named_pipe &
-echo unzip 1.zip >> /var/run/my_named_pipe;
-echo tar cf /backup/myhome.tar /home/me >> /var/run/my_named_pipe
+  6$ mkfifo /var/run/my_named_pipe;
+     xjobs -s /var/run/my_named_pipe &
+     echo unzip 1.zip >> /var/run/my_named_pipe;
+     echo tar cf /backup/myhome.tar /home/me >> /var/run/my_named_pipe
 
-@strong{6} mkfifo /var/run/my_named_pipe;
-cat /var/run/my_named_pipe | parallel &
-echo unzip 1.zip >> /var/run/my_named_pipe;
-echo tar cf /backup/myhome.tar /home/me >> /var/run/my_named_pipe
+  6$ mkfifo /var/run/my_named_pipe;
+     cat /var/run/my_named_pipe | parallel &
+     echo unzip 1.zip >> /var/run/my_named_pipe;
+     echo tar cf /backup/myhome.tar /home/me >> /var/run/my_named_pipe
+@end verbatim
 
 http://www.maier-komor.de/xjobs.html (Last checked: 2019-01)
 
@@ -535,12 +554,20 @@ are exported using @strong{export -f}, and aliases if using @strong{env_parallel
 error) which makes it harder to use the stderr (standard error) output
 of the job directly as input for another program.
 
+@menu
+* EXAMPLES FROM prll's MANUAL::
+@end menu
+
+@node EXAMPLES FROM prll's MANUAL
+@subsection EXAMPLES FROM prll's MANUAL
+
 Here is the example from @strong{prll}'s man page with the equivalent
 using GNU @strong{parallel}:
 
 @verbatim
-  prll -s 'mogrify -flip $1' *.jpg
-  parallel mogrify -flip ::: *.jpg
+  1$ prll -s 'mogrify -flip $1' *.jpg
+
+  1$ parallel mogrify -flip ::: *.jpg
 @end verbatim
 
 https://github.com/exzombie/prll (Last checked: 2019-01)
@@ -562,14 +589,21 @@ semicomplete.com/blog/geekery/distributed-xargs.html (Last checked: 2019-01)
 
 middleman(mdm) is also a tool for running jobs in parallel.
 
+@menu
+* EXAMPLES FROM middleman's WEBSITE::
+@end menu
+
+@node EXAMPLES FROM middleman's WEBSITE
+@subsection EXAMPLES FROM middleman's WEBSITE
+
 Here are the shellscripts of
 https://web.archive.org/web/20110728064735/http://mdm.
 berlios.de/usage.html ported to GNU @strong{parallel}:
 
 @verbatim
-  seq 19 | parallel buffon -o - | sort -n > result
-  cat files | parallel cmd
-  find dir -execdir sem cmd {} \;
+  1$ seq 19 | parallel buffon -o - | sort -n > result
+     cat files | parallel cmd
+     find dir -execdir sem cmd {} \;
 @end verbatim
 
 https://github.com/cklin/mdm (Last checked: 2019-01)
@@ -579,56 +613,68 @@ https://github.com/cklin/mdm (Last checked: 2019-01)
 
 @strong{xapply} can run jobs in parallel on the local computer.
 
+@menu
+* EXAMPLES FROM xapply's MANUAL::
+@end menu
+
+@node EXAMPLES FROM xapply's MANUAL
+@subsection EXAMPLES FROM xapply's MANUAL
+
 Here are the examples from @strong{xapply}'s man page with the equivalent
 using GNU @strong{parallel}:
 
-@strong{1} xapply '(cd %1 && make all)' */
+@verbatim
+  1$ xapply '(cd %1 && make all)' */
 
-@strong{1} parallel 'cd @{@} && make all' ::: */
+  1$ parallel 'cd {} && make all' ::: */
 
-@strong{2} xapply -f 'diff %1 ../version5/%1' manifest | more
+  2$ xapply -f 'diff %1 ../version5/%1' manifest | more
 
-@strong{2} parallel diff @{@} ../version5/@{@} < manifest | more
+  2$ parallel diff {} ../version5/{} < manifest | more
 
-@strong{3} xapply -p/dev/null -f 'diff %1 %2' manifest1 checklist1
+  3$ xapply -p/dev/null -f 'diff %1 %2' manifest1 checklist1
 
-@strong{3} parallel --link diff @{1@} @{2@} :::: manifest1 checklist1
+  3$ parallel --link diff {1} {2} :::: manifest1 checklist1
 
-@strong{4} xapply 'indent' *.c
+  4$ xapply 'indent' *.c
 
-@strong{4} parallel indent ::: *.c
+  4$ parallel indent ::: *.c
 
-@strong{5} find ~ksb/bin -type f ! -perm -111 -print | xapply -f -v 'chmod a+x' -
+  5$ find ~ksb/bin -type f ! -perm -111 -print | \
+       xapply -f -v 'chmod a+x' -
 
-@strong{5} find ~ksb/bin -type f ! -perm -111 -print | parallel -v chmod a+x
+  5$ find ~ksb/bin -type f ! -perm -111 -print | \
+       parallel -v chmod a+x
 
-@strong{6} find */ -... | fmt 960 1024 | xapply -f -i /dev/tty 'vi' -
+  6$ find */ -... | fmt 960 1024 | xapply -f -i /dev/tty 'vi' -
 
-@strong{6} sh <(find */ -... | parallel -s 1024 echo vi)
+  6$ sh <(find */ -... | parallel -s 1024 echo vi)
 
-@strong{6} find */ -... | parallel -s 1024 -Xuj1 vi
+  6$ find */ -... | parallel -s 1024 -Xuj1 vi
 
-@strong{7} find ... | xapply -f -5 -i /dev/tty 'vi' - - - - -
+  7$ find ... | xapply -f -5 -i /dev/tty 'vi' - - - - -
 
-@strong{7} sh <(find ... |parallel -n5 echo vi)
+  7$ sh <(find ... | parallel -n5 echo vi)
 
-@strong{7} find ... |parallel -n5 -uj1 vi
+  7$ find ... | parallel -n5 -uj1 vi
 
-@strong{8} xapply -fn "" /etc/passwd
+  8$ xapply -fn "" /etc/passwd
 
-@strong{8} parallel -k echo < /etc/passwd
+  8$ parallel -k echo < /etc/passwd
 
-@strong{9} tr ':' '\012' < /etc/passwd | xapply -7 -nf 'chown %1 %6' - - - - - - -
+  9$ tr ':' '\012' < /etc/passwd | \
+       xapply -7 -nf 'chown %1 %6' - - - - - - -
 
-@strong{9} tr ':' '\012' < /etc/passwd | parallel -N7 chown @{1@} @{6@}
+  9$ tr ':' '\012' < /etc/passwd | parallel -N7 chown {1} {6}
 
-@strong{10} xapply '[ -d %1/RCS ] || echo %1' */
+  10$ xapply '[ -d %1/RCS ] || echo %1' */
 
-@strong{10} parallel '[ -d @{@}/RCS ] || echo @{@}' ::: */
+  10$ parallel '[ -d {}/RCS ] || echo {}' ::: */
 
-@strong{11} xapply -f '[ -f %1 ] && echo %1' List | ...
+  11$ xapply -f '[ -f %1 ] && echo %1' List | ...
 
-@strong{11} parallel '[ -f @{@} ] && echo @{@}' < List | ...
+  11$ parallel '[ -f {} ] && echo {}' < List | ...
+@end verbatim
 
 https://web.archive.org/web/20160702211113/
 http://carrera.databits.net/~ksb/msrc/local/bin/xapply/xapply.html
@@ -641,37 +687,53 @@ very much like GNU @strong{parallel}. @strong{apply} does not run jobs in
 parallel. @strong{apply} does not use an argument separator (like @strong{:::});
 instead the template must be the first argument.
 
+@menu
+* EXAMPLES FROM IBM's KNOWLEDGE CENTER::
+@end menu
+
+@node EXAMPLES FROM IBM's KNOWLEDGE CENTER
+@subsection EXAMPLES FROM IBM's KNOWLEDGE CENTER
+
 Here are the examples from IBM's Knowledge Center and the
 corresponding command using GNU @strong{parallel}:
 
-1. To obtain results similar to those of the @strong{ls} command, enter:
+@menu
+* To obtain results similar to those of the @strong{ls} command@comma{} enter@asis{:}::
+* To compare the file named a1 to the file named b1@comma{} and the file named a2 to the file named b2@comma{} enter@asis{:}::
+* To run the @strong{who} command five times@comma{} enter@asis{:}::
+* To link all files in the current directory to the directory /usr/joe@comma{} enter@asis{:}::
+@end menu
+
+@node To obtain results similar to those of the @strong{ls} command@comma{} enter:
+@subsubsection To obtain results similar to those of the @strong{ls} command, enter:
 
 @verbatim
-  apply echo *
-  parallel echo ::: *
+  1$ apply echo *
+  1$ parallel echo ::: *
 @end verbatim
 
-2. To compare the file named @strong{a1} to the file named @strong{b1}, and the
-file named @strong{a2} to the file named @strong{b2}, enter:
+@node To compare the file named a1 to the file named b1@comma{} and the file named a2 to the file named b2@comma{} enter:
+@subsubsection To compare the file named a1 to the file named b1, and the file named a2 to the file named b2, enter:
 
 @verbatim
-  apply -2 cmp a1 b1 a2 b2
-  parallel -N2 cmp ::: a1 b1 a2 b2
+  2$ apply -2 cmp a1 b1 a2 b2
+  2$ parallel -N2 cmp ::: a1 b1 a2 b2
 @end verbatim
 
-3. To run the @strong{who} command five times, enter:
+@node To run the @strong{who} command five times@comma{} enter:
+@subsubsection To run the @strong{who} command five times, enter:
 
 @verbatim
-  apply -0 who 1 2 3 4 5
-  parallel -N0 who ::: 1 2 3 4 5
+  3$ apply -0 who 1 2 3 4 5
+  3$ parallel -N0 who ::: 1 2 3 4 5
 @end verbatim
 
-4. To link all files in the current directory to the directory
-@strong{/usr/joe}, enter:
+@node To link all files in the current directory to the directory /usr/joe@comma{} enter:
+@subsubsection To link all files in the current directory to the directory /usr/joe, enter:
 
 @verbatim
-  apply 'ln %1 /usr/joe' *
-  parallel ln {} /usr/joe ::: *
+  4$ apply 'ln %1 /usr/joe' *
+  4$ parallel ln {} /usr/joe ::: *
 @end verbatim
 
 https://www-01.ibm.com/support/knowledgecenter/
@@ -688,117 +750,124 @@ output. This means you will have to write a wrapper for most programs.
 @strong{paexec} has a job dependency facility so a job can depend on another
 job to be executed successfully. Sort of a poor-man's @strong{make}.
 
+@menu
+* EXAMPLES FROM paexec's EXAMPLE CATALOG::
+@end menu
+
+@node EXAMPLES FROM paexec's EXAMPLE CATALOG
+@subsection EXAMPLES FROM paexec's EXAMPLE CATALOG
+
 Here are the examples from @strong{paexec}'s example catalog with the equivalent
 using GNU @strong{parallel}:
 
-@table @asis
-@item 1_div_X_run:
-@anchor{1_div_X_run:}
+@menu
+* 1_div_X_run::
+* all_substr_run::
+* cc_wrapper_run::
+* toupper_run::
+@end menu
+
+@node 1_div_X_run
+@subsubsection 1_div_X_run
 
 @verbatim
-  ../../paexec -s -l -c "`pwd`/1_div_X_cmd" -n +1 <<EOF [...]
-  parallel echo {} '|' `pwd`/1_div_X_cmd <<EOF [...]
+  1$ ../../paexec -s -l -c "`pwd`/1_div_X_cmd" -n +1 <<EOF [...]
+
+  1$ parallel echo {} '|' `pwd`/1_div_X_cmd <<EOF [...]
 @end verbatim
 
-@item all_substr_run:
-@anchor{all_substr_run:}
+@node all_substr_run
+@subsubsection all_substr_run
 
 @verbatim
-  ../../paexec -lp -c "`pwd`/all_substr_cmd" -n +3 <<EOF [...]
-  parallel echo {} '|' `pwd`/all_substr_cmd <<EOF [...]
+  2$ ../../paexec -lp -c "`pwd`/all_substr_cmd" -n +3 <<EOF [...]
+
+  2$ parallel echo {} '|' `pwd`/all_substr_cmd <<EOF [...]
 @end verbatim
 
-@item cc_wrapper_run:
-@anchor{cc_wrapper_run:}
+@node cc_wrapper_run
+@subsubsection cc_wrapper_run
 
 @verbatim
-  ../../paexec -c "env CC=gcc CFLAGS=-O2 `pwd`/cc_wrapper_cmd" \
+  3$ ../../paexec -c "env CC=gcc CFLAGS=-O2 `pwd`/cc_wrapper_cmd" \
              -n 'host1 host2' \
              -t '/usr/bin/ssh -x' <<EOF [...]
-  parallel echo {} '|' "env CC=gcc CFLAGS=-O2 `pwd`/cc_wrapper_cmd" \
+
+  3$ parallel echo {} '|' "env CC=gcc CFLAGS=-O2 `pwd`/cc_wrapper_cmd" \
              -S host1,host2 <<EOF [...]
-  # This is not exactly the same, but avoids the wrapper
-  parallel gcc -O2 -c -o {.}.o {} \
+
+     # This is not exactly the same, but avoids the wrapper
+     parallel gcc -O2 -c -o {.}.o {} \
              -S host1,host2 <<EOF [...]
 @end verbatim
 
-@item toupper_run:
-@anchor{toupper_run:}
+@node toupper_run
+@subsubsection toupper_run
 
 @verbatim
-  ../../paexec -lp -c "`pwd`/toupper_cmd" -n +10 <<EOF [...]
-  parallel echo {} '|' ./toupper_cmd <<EOF [...]
-  # Without the wrapper:
-  parallel echo {} '| awk {print\ toupper\(\$0\)}' <<EOF [...]
-@end verbatim
+  4$ ../../paexec -lp -c "`pwd`/toupper_cmd" -n +10 <<EOF [...]
 
-@end table
+  4$ parallel echo {} '|' ./toupper_cmd <<EOF [...]
+
+     # Without the wrapper:
+     parallel echo {} '| awk {print\ toupper\(\$0\)}' <<EOF [...]
+@end verbatim
 
 https://github.com/cheusov/paexec
 
 @node DIFFERENCES BETWEEN map(sitaramc) AND GNU Parallel
 @section DIFFERENCES BETWEEN map(sitaramc) AND GNU Parallel
 
-@strong{map} sees it as a feature to have less features and in doing so it
-also handles corner cases incorrectly. A lot of GNU @strong{parallel}'s code
-is to handle corner cases correctly on every platform, so you will not
-get a nasty surprise if a user, for example, saves a file called: @emph{My
-brother's 12" records.txt}
+Summary (see legend above):
+I1 - - I4 - - (I7)
+M1 (M2) M3 (M4) M5 M6
+- O2 O3 - O5 - - N/A N/A O10
+E1 - - - - - -
+- - - - - - - - -
+- -
 
-@strong{map}'s example showing how to deal with special characters fails on
-special characters:
+(I7): Only under special circumstances. See below.
+
+(M2+M4): Only if there is a single replacement string.
+
+@strong{map} rejects input with special characters:
 
 @verbatim
   echo "The Cure" > My\ brother\'s\ 12\"\ records
 
-  ls | \
-    map 'echo -n `gzip < "%" | wc -c`; echo -n '*100/'; wc -c < "%"' |
-    bc
+  ls | map 'echo %; wc %'
 @end verbatim
 
 It works with GNU @strong{parallel}:
 
 @verbatim
-  ls | \
-    parallel \
-      'echo -n `gzip < {} | wc -c`; echo -n '*100/'; wc -c < {}' | bc
+  ls | parallel 'echo {}; wc {}'
 @end verbatim
 
-And you can even get the file name prepended:
+Under some circumstances it also works with @strong{map}:
 
 @verbatim
-  ls | \
-    parallel --tag \
-      '(echo -n `gzip < {} | wc -c`'*100/'; wc -c < {}) | bc'
+  ls | map 'echo % works %'
 @end verbatim
 
-@strong{map} has no support for grouping. So this gives the wrong results
-without any warnings:
+But tiny changes make it reject the input with special characters:
 
 @verbatim
-  parallel perl -e '\$a=\"1{}\"x10000000\;print\ \$a,\"\\n\"' '>' {} \
-    ::: a b c d e f
-  ls -l a b c d e f
-  parallel -kP4 -n1 grep 1 > out.par ::: a b c d e f
-  map -p 4 'grep 1' a b c d e f > out.map-unbuf
-  map -p 4 'grep --line-buffered 1' a b c d e f > out.map-linebuf
-  map -p 1 'grep --line-buffered 1' a b c d e f > out.map-serial
-  ls -l out*
-  md5sum out*
+  ls | map 'echo % does not work "%"'
 @end verbatim
 
-The documentation shows a workaround, but not only does that mix
-stdout (standard output) with stderr (standard error) it also fails
-completely for certain jobs (and may even be considered less readable):
+This means that many UTF-8 characters will be rejected. This is by
+design. From the web page: "As such, programs that @emph{quietly handle
+them, with no warnings at all,} are doing their users a disservice."
 
-@verbatim
-  parallel echo -n {} ::: 1 2 3
+@strong{map} delays each job by 0.01 s. This can be emulated by using
+@strong{parallel --delay 0.01}.
 
-  map -p 4 'echo -n % 2>&1 | sed -e "s/^/$$:/"' 1 2 3 | \
-    sort | cut -f2- -d:
-@end verbatim
+@strong{map} prints '+' on stderr when a job starts, and '-' when a job
+finishes. This cannot be disabled. @strong{parallel} has @strong{--bar} if you
+need to see progress.
 
-@strong{map}s replacement strings (% %D %B %E) can be simulated in GNU
+@strong{map}'s replacement strings (% %D %B %E) can be simulated in GNU
 @strong{parallel} by putting this in @strong{~/.parallel/config}:
 
 @verbatim
@@ -827,19 +896,67 @@ context replace:
   map "echo 'BEGIN{'%'}END'" 1 2 3
 @end verbatim
 
-@strong{map} requires Perl v5.10.0 making it harder to use on old systems.
+@strong{map} has no support for grouping. So this gives the wrong results:
 
-@strong{map} has no way of using % in the command (GNU @strong{parallel} has -I to
-specify another replacement string than @strong{@{@}}).
+@verbatim
+  parallel perl -e '\$a=\"1{}\"x10000000\;print\ \$a,\"\\n\"' '>' {} \
+    ::: a b c d e f
+  ls -l a b c d e f
+  parallel -kP4 -n1 grep 1 ::: a b c d e f > out.par
+  map -n1 -p 4 'grep 1' a b c d e f > out.map-unbuf
+  map -n1 -p 4 'grep --line-buffered 1' a b c d e f > out.map-linebuf
+  map -n1 -p 1 'grep --line-buffered 1' a b c d e f > out.map-serial
+  ls -l out*
+  md5sum out*
+@end verbatim
 
-By design @strong{map} is option incompatible with @strong{xargs}, it does not
-have remote job execution, a structured way of saving results,
-multiple input sources, progress indicator, configurable record
-delimiter (only field delimiter), logging of jobs run with possibility
-to resume, keeping the output in the same order as input, --pipe
-processing, and dynamically timeouts.
+@menu
+* EXAMPLES FROM map's WEBSITE::
+@end menu
 
-https://github.com/sitaramc/map
+@node EXAMPLES FROM map's WEBSITE
+@subsection EXAMPLES FROM map's WEBSITE
+
+Here are the examples from @strong{map}'s web page with the equivalent using
+GNU @strong{parallel}:
+
+@verbatim
+  1$ ls *.gif | map convert % %B.png         # default max-args: 1
+
+  1$ ls *.gif | parallel convert {} {.}.png
+
+  2$ map "mkdir %B; tar -C %B -xf %" *.tgz   # default max-args: 1
+
+  2$ parallel 'mkdir {.}; tar -C {.} -xf {}' :::  *.tgz
+
+  3$ ls *.gif | map cp % /tmp                # default max-args: 100
+
+  3$ ls *.gif | parallel -X cp {} /tmp
+
+  4$ ls *.tar | map -n 1 tar -xf %
+
+  4$ ls *.tar | parallel tar -xf
+
+  5$ map "cp % /tmp" *.tgz
+
+  5$ parallel cp {} /tmp ::: *.tgz
+
+  6$ map "du -sm /home/%/mail" alice bob carol
+
+  6$ parallel "du -sm /home/{}/mail" ::: alice bob carol
+  or if you prefer running a single job with multiple args:
+  6$ parallel -Xj1 "du -sm /home/{}/mail" ::: alice bob carol
+
+  7$ cat /etc/passwd | map -d: 'echo user %1 has shell %7'
+
+  7$ cat /etc/passwd | parallel --colsep : 'echo user {1} has shell {7}'
+
+  8$ export MAP_MAX_PROCS=$(( `nproc` / 2 ))
+
+  8$ export PARALLEL=-j50%
+@end verbatim
+
+https://github.com/sitaramc/map (Last checked: 2020-05)
 
 @node DIFFERENCES BETWEEN ladon AND GNU Parallel
 @section DIFFERENCES BETWEEN ladon AND GNU Parallel
@@ -884,21 +1001,27 @@ fails for output larger than 200k:
 It is assumed that the '--rpl's above are put in @strong{~/.parallel/config}
 and that it is run under a shell that supports '**' globbing (such as @strong{zsh}):
 
-@strong{1} ladon "**/*.txt" -- echo RELPATH
+@verbatim
+  1$ ladon "**/*.txt" -- echo RELPATH
 
-@strong{1} parallel echo RELPATH ::: **/*.txt
+  1$ parallel echo RELPATH ::: **/*.txt
 
-@strong{2} ladon "~/Documents/**/*.pdf" -- shasum FULLPATH >hashes.txt
+  2$ ladon "~/Documents/**/*.pdf" -- shasum FULLPATH >hashes.txt
 
-@strong{2} parallel shasum FULLPATH ::: ~/Documents/**/*.pdf >hashes.txt
+  2$ parallel shasum FULLPATH ::: ~/Documents/**/*.pdf >hashes.txt
 
-@strong{3} ladon -m thumbs/RELDIR "**/*.jpg" -- convert FULLPATH -thumbnail 100x100^ -gravity center -extent 100x100 thumbs/RELPATH
+  3$ ladon -m thumbs/RELDIR "**/*.jpg" -- convert FULLPATH \
+       -thumbnail 100x100^ -gravity center -extent 100x100 \
+       thumbs/RELPATH
 
-@strong{3} parallel mkdir -p thumbs/RELDIR\; convert FULLPATH -thumbnail 100x100^ -gravity center -extent 100x100 thumbs/RELPATH ::: **/*.jpg
+  3$ parallel mkdir -p thumbs/RELDIR\; convert FULLPATH
+       -thumbnail 100x100^ -gravity center -extent 100x100 \
+       thumbs/RELPATH ::: **/*.jpg
 
-@strong{4} ladon "~/Music/*.wav" -- lame -V 2 FULLPATH DIRNAME/BASENAME.mp3
+  4$ ladon "~/Music/*.wav" -- lame -V 2 FULLPATH DIRNAME/BASENAME.mp3
 
-@strong{4} parallel lame -V 2 FULLPATH DIRNAME/BASENAME.mp3 ::: ~/Music/*.wav
+  4$ parallel lame -V 2 FULLPATH DIRNAME/BASENAME.mp3 ::: ~/Music/*.wav
+@end verbatim
 
 https://github.com/danielgtaylor/ladon (Last checked: 2019-01)
 
@@ -939,21 +1062,25 @@ jobs. This can be emulated by GNU @strong{parallel} using @strong{bash}'s @stron
 @node EXAMPLES FROM jobflow README
 @subsection EXAMPLES FROM jobflow README
 
-@strong{1} cat things.list | jobflow -threads=8 -exec ./mytask @{@}
+@verbatim
+  1$ cat things.list | jobflow -threads=8 -exec ./mytask {}
 
-@strong{1} cat things.list | parallel -j8 ./mytask @{@}
+  1$ cat things.list | parallel -j8 ./mytask {}
 
-@strong{2} seq 100 | jobflow -threads=100 -exec echo @{@}
+  2$ seq 100 | jobflow -threads=100 -exec echo {}
 
-@strong{2} seq 100 | parallel -j100 echo @{@}
+  2$ seq 100 | parallel -j100 echo {}
 
-@strong{3} cat urls.txt | jobflow -threads=32 -exec wget @{@}
+  3$ cat urls.txt | jobflow -threads=32 -exec wget {}
 
-@strong{3} cat urls.txt | parallel -j32 wget @{@}
+  3$ cat urls.txt | parallel -j32 wget {}
 
-@strong{4} find . -name '*.bmp' | jobflow -threads=8 -exec bmp2jpeg @{.@}.bmp @{.@}.jpg
+  4$ find . -name '*.bmp' | \
+       jobflow -threads=8 -exec bmp2jpeg {.}.bmp {.}.jpg
 
-@strong{4} find . -name '*.bmp' | parallel -j8 bmp2jpeg @{.@}.bmp @{.@}.jpg
+  4$ find . -name '*.bmp' | \
+       parallel -j8 bmp2jpeg {.}.bmp {.}.jpg
+@end verbatim
 
 https://github.com/rofl0r/jobflow
 
@@ -973,15 +1100,24 @@ is killed.
 
 Output to stderr (standard error) is changed if the command fails.
 
-Here are the two examples from @strong{gargs} website.
+@menu
+* EXAMPLES FROM gargs WEBSITE::
+@end menu
 
-@strong{1} seq 12 -1 1 | gargs -p 4 -n 3 "sleep @{0@}; echo @{1@} @{2@}"
+@node EXAMPLES FROM gargs WEBSITE
+@subsection EXAMPLES FROM gargs WEBSITE
 
-@strong{1} seq 12 -1 1 | parallel -P 4 -n 3 "sleep @{1@}; echo @{2@} @{3@}"
+@verbatim
+  1$ seq 12 -1 1 | gargs -p 4 -n 3 "sleep {0}; echo {1} {2}"
 
-@strong{2} cat t.txt | gargs --sep "\s+" -p 2 "echo '@{0@}:@{1@}-@{2@}' full-line: \'@{@}\'"
+  1$ seq 12 -1 1 | parallel -P 4 -n 3 "sleep {1}; echo {2} {3}"
 
-@strong{2} cat t.txt | parallel --colsep "\\s+" -P 2 "echo '@{1@}:@{2@}-@{3@}' full-line: \'@{@}\'"
+  2$ cat t.txt | gargs --sep "\s+" \
+       -p 2 "echo '{0}:{1}-{2}' full-line: \'{}\'"
+
+  2$ cat t.txt | parallel --colsep "\\s+" \
+       -P 2 "echo '{1}:{2}-{3}' full-line: \'{}\'"
+@end verbatim
 
 https://github.com/brentp/gargs
 
@@ -1119,133 +1255,133 @@ instead of ^ as that is closer to bash's $@{var%postfix@}):
   --rpl '{@(.*?)} /$$1/ and $_=$1;'
 @end verbatim
 
-Here are the examples from @strong{rush}'s website with the equivalent
-command in GNU @strong{parallel}.
-
 @menu
-* EXAMPLES::
+* EXAMPLES FROM rush's WEBSITE::
 * Other @strong{rush} features::
 @end menu
 
-@node EXAMPLES
-@subsection EXAMPLES
+@node EXAMPLES FROM rush's WEBSITE
+@subsection EXAMPLES FROM rush's WEBSITE
+
+Here are the examples from @strong{rush}'s website with the equivalent
+command in GNU @strong{parallel}.
 
 @strong{1. Simple run, quoting is not necessary}
 
 @verbatim
-  $ seq 1 3 | rush echo {}
+  1$ seq 1 3 | rush echo {}
 
-  $ seq 1 3 | parallel echo {}
+  1$ seq 1 3 | parallel echo {}
 @end verbatim
 
 @strong{2. Read data from file (`-i`)}
 
 @verbatim
-  $ rush echo {} -i data1.txt -i data2.txt
+  2$ rush echo {} -i data1.txt -i data2.txt
 
-  $ cat data1.txt data2.txt | parallel echo {}
+  2$ cat data1.txt data2.txt | parallel echo {}
 @end verbatim
 
 @strong{3. Keep output order (`-k`)}
 
 @verbatim
-  $ seq 1 3 | rush 'echo {}' -k
+  3$ seq 1 3 | rush 'echo {}' -k
 
-  $ seq 1 3 | parallel -k echo {}
+  3$ seq 1 3 | parallel -k echo {}
 @end verbatim
 
 @strong{4. Timeout (`-t`)}
 
 @verbatim
-  $ time seq 1 | rush 'sleep 2; echo {}' -t 1
+  4$ time seq 1 | rush 'sleep 2; echo {}' -t 1
 
-  $ time seq 1 | parallel --timeout 1 'sleep 2; echo {}'
+  4$ time seq 1 | parallel --timeout 1 'sleep 2; echo {}'
 @end verbatim
 
 @strong{5. Retry (`-r`)}
 
 @verbatim
-  $ seq 1 | rush 'python unexisted_script.py' -r 1
+  5$ seq 1 | rush 'python unexisted_script.py' -r 1
 
-  $ seq 1 | parallel --retries 2 'python unexisted_script.py'
+  5$ seq 1 | parallel --retries 2 'python unexisted_script.py'
 @end verbatim
 
 Use @strong{-u} to see it is really run twice:
 
 @verbatim
-  $ seq 1 | parallel -u --retries 2 'python unexisted_script.py'
+  5$ seq 1 | parallel -u --retries 2 'python unexisted_script.py'
 @end verbatim
 
 @strong{6. Dirname (`@{/@}`) and basename (`@{%@}`) and remove custom
 suffix (`@{^suffix@}`)}
 
 @verbatim
-  $ echo dir/file_1.txt.gz | rush 'echo {/} {%} {^_1.txt.gz}'
+  6$ echo dir/file_1.txt.gz | rush 'echo {/} {%} {^_1.txt.gz}'
 
-  $ echo dir/file_1.txt.gz |
-      parallel --plus echo {//} {/} {%_1.txt.gz}
+  6$ echo dir/file_1.txt.gz |
+       parallel --plus echo {//} {/} {%_1.txt.gz}
 @end verbatim
 
 @strong{7. Get basename, and remove last (`@{.@}`) or any (`@{:@}`) extension}
 
 @verbatim
-  $ echo dir.d/file.txt.gz | rush 'echo {.} {:} {%.} {%:}'
+  7$ echo dir.d/file.txt.gz | rush 'echo {.} {:} {%.} {%:}'
 
-  $ echo dir.d/file.txt.gz | parallel 'echo {.} {:} {/.} {/:}'
+  7$ echo dir.d/file.txt.gz | parallel 'echo {.} {:} {/.} {/:}'
 @end verbatim
 
 @strong{8. Job ID, combine fields index and other replacement strings}
 
 @verbatim
-  $ echo 12 file.txt dir/s_1.fq.gz |
-      rush 'echo job {#}: {2} {2.} {3%:^_1}'
+  8$ echo 12 file.txt dir/s_1.fq.gz |
+       rush 'echo job {#}: {2} {2.} {3%:^_1}'
 
-  $ echo 12 file.txt dir/s_1.fq.gz |
-      parallel --colsep ' ' 'echo job {#}: {2} {2.} {3/:%_1}'
+  8$ echo 12 file.txt dir/s_1.fq.gz |
+       parallel --colsep ' ' 'echo job {#}: {2} {2.} {3/:%_1}'
 @end verbatim
 
 @strong{9. Capture submatch using regular expression (`@{@@regexp@}`)}
 
 @verbatim
-  $ echo read_1.fq.gz | rush 'echo {@(.+)_\d}'
+  9$ echo read_1.fq.gz | rush 'echo {@(.+)_\d}'
 
-  $ echo read_1.fq.gz | parallel 'echo {@(.+)_\d}'
+  9$ echo read_1.fq.gz | parallel 'echo {@(.+)_\d}'
 @end verbatim
 
 @strong{10. Custom field delimiter (`-d`)}
 
 @verbatim
-  $ echo a=b=c | rush 'echo {1} {2} {3}' -d =
+  10$ echo a=b=c | rush 'echo {1} {2} {3}' -d =
 
-  $ echo a=b=c | parallel -d = echo {1} {2} {3}
+  10$ echo a=b=c | parallel -d = echo {1} {2} {3}
 @end verbatim
 
 @strong{11. Send multi-lines to every command (`-n`)}
 
 @verbatim
-  $ seq 5 | rush -n 2 -k 'echo "{}"; echo'
+  11$ seq 5 | rush -n 2 -k 'echo "{}"; echo'
 
-  $ seq 5 |
-      parallel -n 2 -k \
-        'echo {=-1 $_=join"\n",@arg[1..$#arg] =}; echo'
+  11$ seq 5 |
+        parallel -n 2 -k \
+          'echo {=-1 $_=join"\n",@arg[1..$#arg] =}; echo'
 
-  $ seq 5 | rush -n 2 -k 'echo "{}"; echo' -J ' '
+  11$ seq 5 | rush -n 2 -k 'echo "{}"; echo' -J ' '
 
-  $ seq 5 | parallel -n 2 -k 'echo {}; echo'
+  11$ seq 5 | parallel -n 2 -k 'echo {}; echo'
 @end verbatim
 
 @strong{12. Custom record delimiter (`-D`), note that empty records are not used.}
 
 @verbatim
-  $ echo a b c d | rush -D " " -k 'echo {}'
+  12$ echo a b c d | rush -D " " -k 'echo {}'
 
-  $ echo a b c d | parallel -d " " -k 'echo {}'
+  12$ echo a b c d | parallel -d " " -k 'echo {}'
 
-  $ echo abcd | rush -D "" -k 'echo {}'
+  12$ echo abcd | rush -D "" -k 'echo {}'
 
   Cannot be done by GNU Parallel
 
-  $ cat fasta.fa
+  12$ cat fasta.fa
   >seq1
   tag
   >seq2
@@ -1256,51 +1392,51 @@ suffix (`@{^suffix@}`)}
   a
   cat
 
-  $ cat fasta.fa | rush -D ">" \
-      'echo FASTA record {#}: name: {1} sequence: {2}' -k -d "\n"
-  # rush fails to join the multiline sequences
+  12$ cat fasta.fa | rush -D ">" \
+        'echo FASTA record {#}: name: {1} sequence: {2}' -k -d "\n"
+      # rush fails to join the multiline sequences
 
-  $ cat fasta.fa | (read -n1 ignore_first_char;
-      parallel -d '>' --colsep '\n' echo FASTA record {#}: \
-        name: {1} sequence: '{=2 $_=join"",@arg[2..$#arg]=}'
-    )
+  12$ cat fasta.fa | (read -n1 ignore_first_char;
+        parallel -d '>' --colsep '\n' echo FASTA record {#}: \
+          name: {1} sequence: '{=2 $_=join"",@arg[2..$#arg]=}'
+      )
 @end verbatim
 
 @strong{13. Assign value to variable, like `awk -v` (`-v`)}
 
 @verbatim
-  $ seq 1 |
-      rush 'echo Hello, {fname} {lname}!' -v fname=Wei -v lname=Shen
+  13$ seq 1 |
+        rush 'echo Hello, {fname} {lname}!' -v fname=Wei -v lname=Shen
 
-  $ seq 1 |
-      parallel -N0 \
-        'fname=Wei; lname=Shen; echo Hello, ${fname} ${lname}!'
+  13$ seq 1 |
+        parallel -N0 \
+          'fname=Wei; lname=Shen; echo Hello, ${fname} ${lname}!'
 
-  $ for var in a b; do \
-  $   seq 1 3 | rush -k -v var=$var 'echo var: {var}, data: {}'; \
-  $ done
+  13$ for var in a b; do \
+  13$   seq 1 3 | rush -k -v var=$var 'echo var: {var}, data: {}'; \
+  13$ done
 @end verbatim
 
 In GNU @strong{parallel} you would typically do:
 
 @verbatim
-  $ seq 1 3 | parallel -k echo var: {1}, data: {2} ::: a b :::: -
+  13$ seq 1 3 | parallel -k echo var: {1}, data: {2} ::: a b :::: -
 @end verbatim
 
 If you @emph{really} want the var:
 
 @verbatim
-  $ seq 1 3 |
-      parallel -k var={1} ';echo var: $var, data: {}' ::: a b :::: -
+  13$ seq 1 3 |
+        parallel -k var={1} ';echo var: $var, data: {}' ::: a b :::: -
 @end verbatim
 
 If you @emph{really} want the @strong{for}-loop:
 
 @verbatim
-  $ for var in a b; do
-  >   export var;
-  >   seq 1 3 | parallel -k 'echo var: $var, data: {}';
-  > done
+  13$ for var in a b; do
+        export var;
+        seq 1 3 | parallel -k 'echo var: $var, data: {}';
+      done
 @end verbatim
 
 Contrary to @strong{rush} this also works if the value is complex like:
@@ -1312,39 +1448,39 @@ Contrary to @strong{rush} this also works if the value is complex like:
 @strong{14. @strong{Preset variable} (`-v`), avoid repeatedly writing verbose replacement strings}
 
 @verbatim
-  # naive way
-  $ echo read_1.fq.gz | rush 'echo {:^_1} {:^_1}_2.fq.gz'
+  14$ # naive way
+      echo read_1.fq.gz | rush 'echo {:^_1} {:^_1}_2.fq.gz'
 
-  $ echo read_1.fq.gz | parallel 'echo {:%_1} {:%_1}_2.fq.gz'
+  14$ echo read_1.fq.gz | parallel 'echo {:%_1} {:%_1}_2.fq.gz'
 
-  # macro + removing suffix
-  $ echo read_1.fq.gz |
-      rush -v p='{:^_1}' 'echo {p} {p}_2.fq.gz'
+  14$ # macro + removing suffix
+      echo read_1.fq.gz |
+        rush -v p='{:^_1}' 'echo {p} {p}_2.fq.gz'
 
-  $ echo read_1.fq.gz |
-      parallel 'p={:%_1}; echo $p ${p}_2.fq.gz'
+  14$ echo read_1.fq.gz |
+        parallel 'p={:%_1}; echo $p ${p}_2.fq.gz'
 
-  # macro + regular expression
-  $ echo read_1.fq.gz | rush -v p='{@(.+?)_\d}' 'echo {p} {p}_2.fq.gz'
+  14$ # macro + regular expression
+      echo read_1.fq.gz | rush -v p='{@(.+?)_\d}' 'echo {p} {p}_2.fq.gz'
 
-  $ echo read_1.fq.gz | parallel 'p={@(.+?)_\d}; echo $p ${p}_2.fq.gz'
+  14$ echo read_1.fq.gz | parallel 'p={@(.+?)_\d}; echo $p ${p}_2.fq.gz'
 @end verbatim
 
 Contrary to @strong{rush} GNU @strong{parallel} works with complex values:
 
 @verbatim
-  echo "My brother's 12\"read_1.fq.gz" |
-    parallel 'p={@(.+?)_\d}; echo $p ${p}_2.fq.gz'
+  14$ echo "My brother's 12\"read_1.fq.gz" |
+        parallel 'p={@(.+?)_\d}; echo $p ${p}_2.fq.gz'
 @end verbatim
 
 @strong{15. Interrupt jobs by `Ctrl-C`, rush will stop unfinished commands and exit.}
 
 @verbatim
-  $ seq 1 20 | rush 'sleep 1; echo {}'
-  ^C
+  15$ seq 1 20 | rush 'sleep 1; echo {}'
+      ^C
 
-  $ seq 1 20 | parallel 'sleep 1; echo {}'
-  ^C
+  15$ seq 1 20 | parallel 'sleep 1; echo {}'
+      ^C
 @end verbatim
 
 @strong{16. Continue/resume jobs (`-c`). When some jobs failed (by
@@ -1353,33 +1489,33 @@ please switch flag `-c/--continue` on and run again, so that `rush`
 can save successful commands and ignore them in @emph{NEXT} run.}
 
 @verbatim
-  $ seq 1 3 | rush 'sleep {}; echo {}' -t 3 -c
-  $ cat successful_cmds.rush
-  $ seq 1 3 | rush 'sleep {}; echo {}' -t 3 -c
+  16$ seq 1 3 | rush 'sleep {}; echo {}' -t 3 -c
+      cat successful_cmds.rush
+      seq 1 3 | rush 'sleep {}; echo {}' -t 3 -c
 
-  $ seq 1 3 | parallel --joblog mylog --timeout 2 \
-      'sleep {}; echo {}'
-  $ cat mylog
-  $ seq 1 3 | parallel --joblog mylog --retry-failed \
-      'sleep {}; echo {}'
+  16$ seq 1 3 | parallel --joblog mylog --timeout 2 \
+        'sleep {}; echo {}'
+      cat mylog
+      seq 1 3 | parallel --joblog mylog --retry-failed \
+        'sleep {}; echo {}'
 @end verbatim
 
 Multi-line jobs:
 
 @verbatim
-  $ seq 1 3 | rush 'sleep {}; echo {}; \
-    echo finish {}' -t 3 -c -C finished.rush
-  $ cat finished.rush
-  $ seq 1 3 | rush 'sleep {}; echo {}; \
-    echo finish {}' -t 3 -c -C finished.rush
+  16$ seq 1 3 | rush 'sleep {}; echo {}; \
+        echo finish {}' -t 3 -c -C finished.rush
+      cat finished.rush
+      seq 1 3 | rush 'sleep {}; echo {}; \
+        echo finish {}' -t 3 -c -C finished.rush
 
-  $ seq 1 3 |
-      parallel --joblog mylog --timeout 2 'sleep {}; echo {}; \
-    echo finish {}'
-  $ cat mylog
-  $ seq 1 3 |
-      parallel --joblog mylog --retry-failed 'sleep {}; echo {}; \
-        echo finish {}'
+  16$ seq 1 3 |
+        parallel --joblog mylog --timeout 2 'sleep {}; echo {}; \
+          echo finish {}'
+      cat mylog
+      seq 1 3 |
+        parallel --joblog mylog --retry-failed 'sleep {}; echo {}; \
+          echo finish {}'
 @end verbatim
 
 @strong{17. A comprehensive example: downloading 1K+ pages given by
@@ -1391,35 +1527,35 @@ running time (`-t`) of `60` seconds and `3` retry changes
 unfinished jobs. Luckily, it's accomplished in one run :)}
 
 @verbatim
-  $ for f in $(seq 2014 2016); do \
-  $    /bin/rm -rf $f; mkdir -p $f; \
-  $    cat $f.html.txt | rush -v d=$f -d = \
-         'phantomjs save_page.js "{}" > {d}/{3}.html' \
-         -j 20 -t 60 -r 3 -c; \
-  $ done
+  17$ for f in $(seq 2014 2016); do \
+        /bin/rm -rf $f; mkdir -p $f; \
+        cat $f.html.txt | rush -v d=$f -d = \
+          'phantomjs save_page.js "{}" > {d}/{3}.html' \
+          -j 20 -t 60 -r 3 -c; \
+      done
 @end verbatim
 
 GNU @strong{parallel} can append to an existing joblog with '+':
 
 @verbatim
-  $ rm mylog
-  $ for f in $(seq 2014 2016); do
-      /bin/rm -rf $f; mkdir -p $f;
-      cat $f.html.txt |
-        parallel -j20 --timeout 60 --retries 4 --joblog +mylog \
-          --colsep = \
-          phantomjs save_page.js {1}={2}={3} '>' $f/{3}.html
-    done
+  17$ rm mylog
+      for f in $(seq 2014 2016); do
+        /bin/rm -rf $f; mkdir -p $f;
+        cat $f.html.txt |
+          parallel -j20 --timeout 60 --retries 4 --joblog +mylog \
+            --colsep = \
+            phantomjs save_page.js {1}={2}={3} '>' $f/{3}.html
+      done
 @end verbatim
 
 @strong{18. A bioinformatics example: mapping with `bwa`, and
 processing result with `samtools`:}
 
 @verbatim
-  $ ref=ref/xxx.fa
-  $ threads=25
-  $ ls -d raw.cluster.clean.mapping/* \
-    | rush -v ref=$ref -v j=$threads -v p='{}/{%}' \
+  18$ ref=ref/xxx.fa
+      threads=25
+      ls -d raw.cluster.clean.mapping/* \
+        | rush -v ref=$ref -v j=$threads -v p='{}/{%}' \
         'bwa mem -t {j} -M -a {ref} {p}_1.fq.gz {p}_2.fq.gz >{p}.sam;\
         samtools view -bS {p}.sam > {p}.bam; \
         samtools sort -T {p}.tmp -@ {j} {p}.bam -o {p}.sorted.bam; \
@@ -1432,25 +1568,25 @@ processing result with `samtools`:}
 GNU @strong{parallel} would use a function:
 
 @verbatim
-  $ ref=ref/xxx.fa
-  $ export ref
-  $ thr=25
-  $ export thr
-  $ bwa_sam() {
-      p="$1"
-      bam="$p".bam
-      sam="$p".sam
-      sortbam="$p".sorted.bam
-      bwa mem -t $thr -M -a $ref ${p}_1.fq.gz ${p}_2.fq.gz > "$sam"
-      samtools view -bS "$sam" > "$bam"
-      samtools sort -T ${p}.tmp -@ $thr "$bam" -o "$sortbam"
-      samtools index "$sortbam"
-      samtools flagstat "$sortbam" > "$sortbam".flagstat
-      /bin/rm "$bam" "$sam"
-    }
-  $ export -f bwa_sam
-  $ ls -d raw.cluster.clean.mapping/* |
-      parallel -j 2 --verbose --joblog mylog bwa_sam
+  18$ ref=ref/xxx.fa
+      export ref
+      thr=25
+      export thr
+      bwa_sam() {
+        p="$1"
+        bam="$p".bam
+        sam="$p".sam
+        sortbam="$p".sorted.bam
+        bwa mem -t $thr -M -a $ref ${p}_1.fq.gz ${p}_2.fq.gz > "$sam"
+        samtools view -bS "$sam" > "$bam"
+        samtools sort -T ${p}.tmp -@ $thr "$bam" -o "$sortbam"
+        samtools index "$sortbam"
+        samtools flagstat "$sortbam" > "$sortbam".flagstat
+        /bin/rm "$bam" "$sam"
+      }
+      export -f bwa_sam
+      ls -d raw.cluster.clean.mapping/* |
+        parallel -j 2 --verbose --joblog mylog bwa_sam
 @end verbatim
 
 @node Other @strong{rush} features
@@ -1768,6 +1904,13 @@ issues that parallelization raises:
 
 @end itemize
 
+@menu
+* EXAMPLES FROM maps WEBSITE::
+@end menu
+
+@node EXAMPLES FROM maps WEBSITE
+@subsection EXAMPLES FROM maps WEBSITE
+
 Here are the 5 examples converted to GNU Parallel:
 
 @verbatim
@@ -1813,6 +1956,13 @@ https://github.com/soveran/map (Last checked: 2019-01)
     export -f myfunc
     loop 'myfunc this fails'
 @end verbatim
+
+@menu
+* EXAMPLES FROM loop's WEBSITE::
+@end menu
+
+@node EXAMPLES FROM loop's WEBSITE
+@subsection EXAMPLES FROM loop's WEBSITE
 
 Some of the examples from https://github.com/Miserlou/Loop/ can be
 emulated with GNU @strong{parallel}:
@@ -2022,49 +2172,56 @@ to fit on a single command line.
 
 @strong{paral} has no support for running jobs remotely.
 
+@menu
+* EXAMPLES FROM README.markdown::
+@end menu
+
+@node EXAMPLES FROM README.markdown
+@subsection EXAMPLES FROM README.markdown
+
 The examples from @strong{README.markdown} and the corresponding command run
 with GNU @strong{parallel} (@strong{--results
 'out_@{#@}_@{=s/[^\sa-z_0-9]//g;s/\s+/_/g=@}.log' --eta} is omitted from
 the GNU @strong{parallel} command):
 
 @verbatim
-  paral "command 1" "command 2 --flag" "command arg1 arg2"
-  parallel ::: "command 1" "command 2 --flag" "command arg1 arg2"
+  1$ paral "command 1" "command 2 --flag" "command arg1 arg2"
+  1$ parallel ::: "command 1" "command 2 --flag" "command arg1 arg2"
 
-  paral "sleep 1 && echo c1" "sleep 2 && echo c2" \
-    "sleep 3 && echo c3" "sleep 4 && echo c4"  "sleep 5 && echo c5"
-  parallel ::: "sleep 1 && echo c1" "sleep 2 && echo c2" \
-    "sleep 3 && echo c3" "sleep 4 && echo c4"  "sleep 5 && echo c5"
-  # Or shorter:
-  parallel "sleep {} && echo c{}" ::: {1..5}
+  2$ paral "sleep 1 && echo c1" "sleep 2 && echo c2" \
+       "sleep 3 && echo c3" "sleep 4 && echo c4"  "sleep 5 && echo c5"
+  2$ parallel ::: "sleep 1 && echo c1" "sleep 2 && echo c2" \
+       "sleep 3 && echo c3" "sleep 4 && echo c4"  "sleep 5 && echo c5"
+     # Or shorter:
+     parallel "sleep {} && echo c{}" ::: {1..5}
 
-  paral -n=0 "sleep 5 && echo c5" "sleep 4 && echo c4" \
-    "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
-  parallel ::: "sleep 5 && echo c5" "sleep 4 && echo c4" \
-    "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
-  # Or shorter:
-  parallel -j0 "sleep {} && echo c{}" ::: 5 4 3 2 1
+  3$ paral -n=0 "sleep 5 && echo c5" "sleep 4 && echo c4" \
+       "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
+  3$ parallel ::: "sleep 5 && echo c5" "sleep 4 && echo c4" \
+       "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
+     # Or shorter:
+     parallel -j0 "sleep {} && echo c{}" ::: 5 4 3 2 1
 
-  paral -n=1 "sleep 5 && echo c5" "sleep 4 && echo c4" \
-    "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
-  parallel -j1 "sleep {} && echo c{}" ::: 5 4 3 2 1
+  4$ paral -n=1 "sleep 5 && echo c5" "sleep 4 && echo c4" \
+       "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
+  4$ parallel -j1 "sleep {} && echo c{}" ::: 5 4 3 2 1
 
-  paral -n=2 "sleep 5 && echo c5" "sleep 4 && echo c4" \
-    "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
-  parallel -j2 "sleep {} && echo c{}" ::: 5 4 3 2 1
+  5$ paral -n=2 "sleep 5 && echo c5" "sleep 4 && echo c4" \
+       "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
+  5$ parallel -j2 "sleep {} && echo c{}" ::: 5 4 3 2 1
 
-  paral -n=5 "sleep 5 && echo c5" "sleep 4 && echo c4" \
-    "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
-  parallel -j5 "sleep {} && echo c{}" ::: 5 4 3 2 1
+  6$ paral -n=5 "sleep 5 && echo c5" "sleep 4 && echo c4" \
+       "sleep 3 && echo c3" "sleep 2 && echo c2" "sleep 1 && echo c1"
+  6$ parallel -j5 "sleep {} && echo c{}" ::: 5 4 3 2 1
 
-  paral -n=1 "echo a && sleep 0.5 && echo b && sleep 0.5 && \
-    echo c && sleep 0.5 && echo d && sleep 0.5 && \
-    echo e && sleep 0.5 && echo f && sleep 0.5 && \
-    echo g && sleep 0.5 && echo h"
-  parallel ::: "echo a && sleep 0.5 && echo b && sleep 0.5 && \
-    echo c && sleep 0.5 && echo d && sleep 0.5 && \
-    echo e && sleep 0.5 && echo f && sleep 0.5 && \
-    echo g && sleep 0.5 && echo h"
+  7$ paral -n=1 "echo a && sleep 0.5 && echo b && sleep 0.5 && \
+       echo c && sleep 0.5 && echo d && sleep 0.5 && \
+       echo e && sleep 0.5 && echo f && sleep 0.5 && \
+       echo g && sleep 0.5 && echo h"
+  7$ parallel ::: "echo a && sleep 0.5 && echo b && sleep 0.5 && \
+       echo c && sleep 0.5 && echo d && sleep 0.5 && \
+       echo e && sleep 0.5 && echo f && sleep 0.5 && \
+       echo g && sleep 0.5 && echo h"
 @end verbatim
 
 https://github.com/amattn/paral (Last checked: 2019-01)
@@ -2075,20 +2232,27 @@ https://github.com/amattn/paral (Last checked: 2019-01)
 @strong{concurr} is built to run jobs in parallel using a client/server
 model.
 
+@menu
+* EXAMPLES FROM README.md::
+@end menu
+
+@node EXAMPLES FROM README.md
+@subsection EXAMPLES FROM README.md
+
 The examples from @strong{README.md}:
 
 @verbatim
-  concurr 'echo job {#} on slot {%}: {}' : arg1 arg2 arg3 arg4
-  parallel 'echo job {#} on slot {%}: {}' ::: arg1 arg2 arg3 arg4
+  1$ concurr 'echo job {#} on slot {%}: {}' : arg1 arg2 arg3 arg4
+  1$ parallel 'echo job {#} on slot {%}: {}' ::: arg1 arg2 arg3 arg4
 
-  concurr 'echo job {#} on slot {%}: {}' :: file1 file2 file3
-  parallel 'echo job {#} on slot {%}: {}' :::: file1 file2 file3
+  2$ concurr 'echo job {#} on slot {%}: {}' :: file1 file2 file3
+  2$ parallel 'echo job {#} on slot {%}: {}' :::: file1 file2 file3
 
-  concurr 'echo {}' < input_file
-  parallel 'echo {}' < input_file
+  3$ concurr 'echo {}' < input_file
+  3$ parallel 'echo {}' < input_file
 
-  cat file | concurr 'echo {}'
-  cat file | parallel 'echo {}'
+  4$ cat file | concurr 'echo {}'
+  4$ cat file | parallel 'echo {}'
 @end verbatim
 
 @strong{concurr} deals badly empty input files and with output larger than
@@ -2123,38 +2287,51 @@ https://github.com/spion/npm-parallel (Last checked: 2019-01)
 @section DIFFERENCES BETWEEN machma AND GNU Parallel
 
 @strong{machma} runs tasks in parallel. It gives time stamped
-output. It buffers in RAM. The examples from README.md:
+output. It buffers in RAM.
+
+@menu
+* EXAMPLES FROM README.md 1::
+@end menu
+
+@node EXAMPLES FROM README.md 1
+@subsection EXAMPLES FROM README.md
+
+The examples from README.md:
 
 @verbatim
-  # Put shorthand for timestamp in config for the examples
-  echo '--rpl '\
-    \''{time} $_=::strftime("%Y-%m-%d %H:%M:%S",localtime())'\' \
-    > ~/.parallel/machma
-  echo '--line-buffer --tagstring "{#} {time} {}"' >> ~/.parallel/machma
+  1$ # Put shorthand for timestamp in config for the examples
+     echo '--rpl '\
+       \''{time} $_=::strftime("%Y-%m-%d %H:%M:%S",localtime())'\' \
+       > ~/.parallel/machma
+     echo '--line-buffer --tagstring "{#} {time} {}"' \
+       >> ~/.parallel/machma
 
-  find . -iname '*.jpg' |
-    machma --  mogrify -resize 1200x1200 -filter Lanczos {}
-  find . -iname '*.jpg' |
-    parallel --bar -Jmachma mogrify -resize 1200x1200 -filter Lanczos {}
+  2$ find . -iname '*.jpg' |
+       machma --  mogrify -resize 1200x1200 -filter Lanczos {}
+     find . -iname '*.jpg' |
+       parallel --bar -Jmachma mogrify -resize 1200x1200 \
+         -filter Lanczos {}
 
-  cat /tmp/ips | machma -p 2 -- ping -c 2 -q {}
-  cat /tmp/ips | parallel -j2 -Jmachma ping -c 2 -q {}
+  3$ cat /tmp/ips | machma -p 2 -- ping -c 2 -q {}
+  3$ cat /tmp/ips | parallel -j2 -Jmachma ping -c 2 -q {}
 
-  cat /tmp/ips |
-    machma -- sh -c 'ping -c 2 -q $0 > /dev/null && echo alive' {}
-  cat /tmp/ips |
-    parallel -Jmachma 'ping -c 2 -q {} > /dev/null && echo alive'
+  4$ cat /tmp/ips |
+       machma -- sh -c 'ping -c 2 -q $0 > /dev/null && echo alive' {}
+  4$ cat /tmp/ips |
+       parallel -Jmachma 'ping -c 2 -q {} > /dev/null && echo alive'
 
-  find . -iname '*.jpg' |
-    machma --timeout 5s -- mogrify -resize 1200x1200 -filter Lanczos {}
-  find . -iname '*.jpg' |
-    parallel --timeout 5s --bar mogrify -resize 1200x1200 \
-      -filter Lanczos {}
+  5$ find . -iname '*.jpg' |
+       machma --timeout 5s -- mogrify -resize 1200x1200 \
+         -filter Lanczos {}
+  5$ find . -iname '*.jpg' |
+       parallel --timeout 5s --bar mogrify -resize 1200x1200 \
+         -filter Lanczos {}
 
-  find . -iname '*.jpg' -print0 |
-    machma --null --  mogrify -resize 1200x1200 -filter Lanczos {}
-  find . -iname '*.jpg' -print0 |
-    parallel --null --bar mogrify -resize 1200x1200 -filter Lanczos {}
+  6$ find . -iname '*.jpg' -print0 |
+       machma --null --  mogrify -resize 1200x1200 -filter Lanczos {}
+  6$ find . -iname '*.jpg' -print0 |
+       parallel --null --bar mogrify -resize 1200x1200 \
+         -filter Lanczos {}
 @end verbatim
 
 https://github.com/fd0/machma (Last checked: 2019-06)
@@ -2162,7 +2339,7 @@ https://github.com/fd0/machma (Last checked: 2019-06)
 @node DIFFERENCES BETWEEN interlace AND GNU Parallel
 @section DIFFERENCES BETWEEN interlace AND GNU Parallel
 
-Summary table (see legend above):
+Summary (see legend above):
 - I2 I3 I4 - - -
 M1 - M3 - - M6
 - O2 O3 - - - - x x
@@ -2176,6 +2353,13 @@ E1 E2 - - - - -
 
 The overhead for each target is O(n*n), so with 1000 targets it
 becomes very slow with an overhead in the order of 500ms/target.
+
+@menu
+* EXAMPLES FROM interlace's WEBSITE::
+@end menu
+
+@node EXAMPLES FROM interlace's WEBSITE
+@subsection EXAMPLES FROM interlace's WEBSITE
 
 Using @strong{prips} most of the examples from
 https://github.com/codingo/Interlace can be run with GNU @strong{parallel}:
@@ -2434,7 +2618,9 @@ is sendt to stdout (standard output) and prepended with e:.
 For short jobs with little output @strong{par} is 20% faster than GNU
 @strong{parallel} and 60% slower than @strong{xargs}.
 
-http://savannah.nongnu.org/projects/par (Last checked: 2019-02)
+https://github.com/UnixJunkie/PAR
+
+https://savannah.nongnu.org/projects/par (Last checked: 2019-02)
 
 @node DIFFERENCES BETWEEN fd AND GNU Parallel
 @section DIFFERENCES BETWEEN fd AND GNU Parallel
@@ -2499,49 +2685,49 @@ corresponding GNU @strong{sem} and GNU @strong{parallel} commands:
 
 @verbatim
   1$ lateral start
+     for i in $(cat /tmp/names); do
+       lateral run -- some_command $i
+     done
+     lateral wait
+  
   1$ for i in $(cat /tmp/names); do
-  1$   lateral run -- some_command $i
-  1$ done
-  1$ lateral wait
-  1$
-  1$ for i in $(cat /tmp/names); do
-  1$   sem some_command $i
-  1$ done
-  1$ sem --wait
-  1$
+       sem some_command $i
+     done
+     sem --wait
+  
   1$ parallel some_command :::: /tmp/names
 
   2$ lateral start
+     for i in $(seq 1 100); do
+       lateral run -- my_slow_command < workfile$i > /tmp/logfile$i
+     done
+     lateral wait
+    
   2$ for i in $(seq 1 100); do
-  2$   lateral run -- my_slow_command < workfile$i > /tmp/logfile$i
-  2$ done
-  2$ lateral wait
-  2$
-  2$ for i in $(seq 1 100); do
-  2$   sem my_slow_command < workfile$i > /tmp/logfile$i
-  2$ done
-  2$ sem --wait
-  2$
+       sem my_slow_command < workfile$i > /tmp/logfile$i
+     done
+     sem --wait
+    
   2$ parallel 'my_slow_command < workfile{} > /tmp/logfile{}' \
        ::: {1..100}
 
   3$ lateral start -p 0 # yup, it will just queue tasks
+     for i in $(seq 1 100); do
+       lateral run -- command_still_outputs_but_wont_spam inputfile$i
+     done
+     # command output spam can commence
+     lateral config -p 10; lateral wait
+    
   3$ for i in $(seq 1 100); do
-  3$   lateral run -- command_still_outputs_but_wont_spam inputfile$i
-  3$ done
-  3$ # command output spam can commence
-  3$ lateral config -p 10; lateral wait
-  3$
-  3$ for i in $(seq 1 100); do
-  3$   echo "command inputfile$i" >> joblist
-  3$ done
-  3$ parallel -j 10 :::: joblist
-  3$
+       echo "command inputfile$i" >> joblist
+     done
+     parallel -j 10 :::: joblist
+  
   3$ echo 1 > /tmp/njobs
-  3$ parallel -j /tmp/njobs command inputfile{} \
+     parallel -j /tmp/njobs command inputfile{} \
        ::: {1..100} &
-  3$ echo 10 >/tmp/njobs
-  3$ wait
+     echo 10 >/tmp/njobs
+     wait
 @end verbatim
 
 https://github.com/akramer/lateral (Last checked: 2019-03)
@@ -2584,7 +2770,7 @@ https://github.com/amritb/with-this.git (Last checked: 2019-03)
 @node DIFFERENCES BETWEEN Tollef's parallel (moreutils) AND GNU Parallel
 @section DIFFERENCES BETWEEN Tollef's parallel (moreutils) AND GNU Parallel
 
-Summary table (see legend above):
+Summary (see legend above):
 - - - I4 - - I7
 - - M3 - - M6
 - O2 O3 - O5 O6 - x x
@@ -2613,10 +2799,642 @@ E1 - - - - - E7
 
 (Last checked: 2019-08)
 
+@node DIFFERENCES BETWEEN rargs AND GNU Parallel
+@section DIFFERENCES BETWEEN rargs AND GNU Parallel
+
+Summary (see legend above):
+I1 - - - - - I7
+- - M3 M4 - -
+- O2 O3 - O5 O6 - O8 -
+E1 - - E4 - - -
+- - - - - - - - -
+- -
+
+@strong{rargs} has elegant ways of doing named regexp capture and field ranges.
+
+With GNU @strong{parallel} you can use @strong{--rpl} to get a similar
+functionality as regexp capture gives, and use @strong{join} and @strong{@@arg} to
+get the field ranges. But the syntax is longer. This:
+
+@verbatim
+  --rpl '{r(\d+)\.\.(\d+)} $_=join"$opt::colsep",@arg[$$1..$$2]'
+@end verbatim
+
+would make it possible to use:
+
+@verbatim
+  {1r3..6}
+@end verbatim
+
+for field 3..6.
+
+For full support of @{n..m:s@} including negative numbers use a dynamic
+replacement string like this:
+
+@verbatim
+  PARALLEL=--rpl\ \''{r((-?\d+)?)\.\.((-?\d+)?)((:([^}]*))?)}
+          $a = defined $$2 ? $$2 < 0 ? 1+$#arg+$$2 : $$2 : 1;
+          $b = defined $$4 ? $$4 < 0 ? 1+$#arg+$$4 : $$4 : $#arg+1;
+          $s = defined $$6 ? $$7 : " ";
+          $_ = join $s,@arg[$a..$b]'\'
+  export PARALLEL
+@end verbatim
+
+You can then do:
+
+@verbatim
+  head /etc/passwd | parallel --colsep : echo ..={1r..} ..3={1r..3} \
+    4..={1r4..} 2..4={1r2..4} 3..3={1r3..3} ..3:-={1r..3:-} \
+    ..3:/={1r..3:/} -1={-1} -5={-5} -6={-6} -3..={1r-3..}
+@end verbatim
+
+@menu
+* EXAMPLES FROM rargs MANUAL::
+@end menu
+
+@node EXAMPLES FROM rargs MANUAL
+@subsection EXAMPLES FROM rargs MANUAL
+
+@verbatim
+  ls *.bak | rargs -p '(.*)\.bak' mv {0} {1}
+  ls *.bak | parallel mv {} {.}
+
+  cat download-list.csv | rargs -p '(?P<url>.*),(?P<filename>.*)' wget {url} -O {filename}
+  cat download-list.csv | parallel --csv wget {1} -O {2}
+  # or use regexps:
+  cat download-list.csv |
+    parallel --rpl '{url} s/,.*//' --rpl '{filename} s/.*?,//' wget {url} -O {filename}
+
+  cat /etc/passwd | rargs -d: echo -e 'id: "{1}"\t name: "{5}"\t rest: "{6..::}"'
+  cat /etc/passwd |
+    parallel -q --colsep : echo -e 'id: "{1}"\t name: "{5}"\t rest: "{=6 $_=join":",@arg[6..$#arg]=}"'
+@end verbatim
+
+https://github.com/lotabout/rargs (Last checked: 2020-01)
+
+@node DIFFERENCES BETWEEN threader AND GNU Parallel
+@section DIFFERENCES BETWEEN threader AND GNU Parallel
+
+Summary (see legend above):
+I1 - - - - - -
+M1 - M3 - - M6
+O1 - O3 - O5 - - N/A N/A
+E1 - - E4 - - -
+- - - - - - - - -
+- -
+
+Newline separates arguments, but newline at the end of file is treated
+as an empty argument. So this runs 2 jobs:
+
+@verbatim
+  echo two_jobs | threader -run 'echo "$THREADID"'
+@end verbatim
+
+@strong{threader} ignores stderr, so any output to stderr is
+lost. @strong{threader} buffers in RAM, so output bigger than the machine's
+virtual memory will cause the machine to crash.
+
+https://github.com/voodooEntity/threader (Last checked: 2020-04)
+
+@node DIFFERENCES BETWEEN runp AND GNU Parallel
+@section DIFFERENCES BETWEEN runp AND GNU Parallel
+
+Summary (see legend above):
+I1 I2 - - - - -
+M1 - (M3) - - M6
+O1 O2 O3 - O5 O6 - N/A N/A -
+E1 - - - - - -
+- - - - - - - - -
+- -
+
+(M3): You can add a prefix and a postfix to the input, so it means you can
+only insert the argument on the command line once.
+
+@strong{runp} runs 10 jobs in parallel by default.  @strong{runp} blocks if output
+of a command is > 64 Kbytes.  Quoting of input is needed.  It adds
+output to stderr (this can be prevented with -q)
+
+@menu
+* Examples as GNU Parallel::
+@end menu
+
+@node Examples as GNU Parallel
+@subsection Examples as GNU Parallel
+
+@verbatim
+  base='https://images-api.nasa.gov/search'
+  query='jupiter'
+  desc='planet'
+  type='image'
+  url="$base?q=$query&description=$desc&media_type=$type"
+  
+  # Download the images in parallel using runp
+  curl -s $url | jq -r .collection.items[].href | \
+    runp -p 'curl -s' | jq -r .[] | grep large | \
+    runp -p 'curl -s -L -O'
+
+  time curl -s $url | jq -r .collection.items[].href | \
+    runp -g 1 -q -p 'curl -s' | jq -r .[] | grep large | \
+    runp -g 1 -q -p 'curl -s -L -O'
+
+  # Download the images in parallel
+  curl -s $url | jq -r .collection.items[].href | \
+    parallel curl -s | jq -r .[] | grep large | \
+    parallel curl -s -L -O
+  
+  time curl -s $url | jq -r .collection.items[].href | \
+    parallel -j 1 curl -s | jq -r .[] | grep large | \
+    parallel -j 1 curl -s -L -O
+@end verbatim
+
+@menu
+* Run some test commands (read from file)::
+* Ping several hosts and see packet loss (read from stdin)::
+* Get directories' sizes (read from stdin)::
+* Compress files::
+* Measure HTTP request + response time::
+* Find open TCP ports::
+@end menu
+
+@node Run some test commands (read from file)
+@subsubsection Run some test commands (read from file)
+
+@verbatim
+  # Create a file containing commands to run in parallel.
+  cat << EOF > /tmp/test-commands.txt
+  sleep 5
+  sleep 3
+  blah     # this will fail
+  ls $PWD  # PWD shell variable is used here
+  EOF
+  
+  # Run commands from the file.
+  runp /tmp/test-commands.txt > /dev/null
+  
+  parallel -a /tmp/test-commands.txt > /dev/null
+@end verbatim
+
+@node Ping several hosts and see packet loss (read from stdin)
+@subsubsection Ping several hosts and see packet loss (read from stdin)
+
+@verbatim
+  # First copy this line and press Enter
+  runp -p 'ping -c 5 -W 2' -s '| grep loss'
+  localhost
+  1.1.1.1
+  8.8.8.8
+  # Press Enter and Ctrl-D when done entering the hosts
+
+  # First copy this line and press Enter
+  parallel ping -c 5 -W 2 {} '| grep loss'
+  localhost
+  1.1.1.1
+  8.8.8.8
+  # Press Enter and Ctrl-D when done entering the hosts
+@end verbatim
+
+@node Get directories' sizes (read from stdin)
+@subsubsection Get directories' sizes (read from stdin)
+
+@verbatim
+  echo -e "$HOME\n/etc\n/tmp" | runp -q -p 'sudo du -sh'
+
+  echo -e "$HOME\n/etc\n/tmp" | parallel sudo du -sh
+  # or:
+  parallel sudo du -sh ::: "$HOME" /etc /tmp
+@end verbatim
+
+@node Compress files
+@subsubsection Compress files
+
+@verbatim
+  find . -iname '*.txt' | runp -p 'gzip --best'
+
+  find . -iname '*.txt' | parallel gzip --best
+@end verbatim
+
+@node Measure HTTP request + response time
+@subsubsection Measure HTTP request + response time
+
+@verbatim
+  export CURL="curl -w 'time_total:  %{time_total}\n'"
+  CURL="$CURL -o /dev/null -s https://golang.org/"
+  perl -wE 'for (1..10) { say $ENV{CURL} }' |
+     runp -q  # Make 10 requests
+
+  perl -wE 'for (1..10) { say $ENV{CURL} }' | parallel
+  # or:
+  parallel -N0 "$CURL" ::: {1..10}
+@end verbatim
+
+@node Find open TCP ports
+@subsubsection Find open TCP ports
+
+@verbatim
+  cat << EOF > /tmp/host-port.txt
+  localhost 22
+  localhost 80
+  localhost 81
+  127.0.0.1 443
+  127.0.0.1 444
+  scanme.nmap.org 22
+  scanme.nmap.org 23
+  scanme.nmap.org 443
+  EOF
+  
+  1$ cat /tmp/host-port.txt |
+       runp -q -p 'netcat -v -w2 -z' 2>&1 | egrep '(succeeded!|open)$'
+  
+  # --colsep is needed to split the line
+  1$ cat /tmp/host-port.txt |
+       parallel --colsep ' ' netcat -v -w2 -z 2>&1 |
+       egrep '(succeeded!|open)$'
+  # or use uq for unquoted:
+  1$ cat /tmp/host-port.txt |
+       parallel netcat -v -w2 -z {=uq=} 2>&1 |
+       egrep '(succeeded!|open)$'
+@end verbatim
+
+https://github.com/jreisinger/runp (Last checked: 2020-04)
+
+@node DIFFERENCES BETWEEN papply AND GNU Parallel
+@section DIFFERENCES BETWEEN papply AND GNU Parallel
+
+Summary (see legend above):
+- - - I4 - - -
+M1 - M3 - - M6
+- - O3 - O5 - - N/A N/A O10
+E1 - - E4 - - -
+- - - - - - - - -
+- -
+
+@strong{papply} does not print the output if the command fails:
+
+@verbatim
+  $ papply 'echo %F; false' foo
+  "echo foo; false" did not succeed
+@end verbatim
+
+@strong{papply}'s replacement strings (%F %d %f %n %e %z) can be simulated in GNU
+@strong{parallel} by putting this in @strong{~/.parallel/config}:
+
+@verbatim
+  --rpl '%F'
+  --rpl '%d $_=Q(::dirname($_));'
+  --rpl '%f s:.*/::;'
+  --rpl '%n s:.*/::;s:\.[^/.]+$::;'
+  --rpl '%e s:.*\.:.:'
+  --rpl '%z $_=""'
+@end verbatim
+
+@strong{papply} buffers in RAM, and uses twice the amount of output. So
+output of 5 GB takes 10 GB RAM.
+
+The buffering is very CPU intensive: Buffering a line of 5 GB takes 40
+seconds (compared to 10 seconds with GNU @strong{parallel}).
+
+@menu
+* Examples as GNU Parallel 1::
+@end menu
+
+@node Examples as GNU Parallel 1
+@subsection Examples as GNU Parallel
+
+@verbatim
+  1$ papply gzip *.txt
+  
+  1$ parallel gzip ::: *.txt
+  
+  2$ papply "convert %F %n.jpg" *.png
+  
+  2$ parallel convert {} {.}.jpg ::: *.png
+@end verbatim
+
+https://pypi.org/project/papply/ (Last checked: 2020-04)
+
+@node DIFFERENCES BETWEEN async AND GNU Parallel
+@section DIFFERENCES BETWEEN async AND GNU Parallel
+
+Summary (see legend above):
+- - - I4 - - I7
+- - - - - M6
+- O2 O3 - O5 O6 - N/A N/A O10
+E1 - - E4 - E6 -
+- - - - - - - - -
+S1 S2
+
+@strong{async} is very similary to GNU @strong{parallel}'s @strong{--semaphore} mode
+(aka @strong{sem}). @strong{async} requires the user to start a server process.
+
+The input is quoted like @strong{-q} so you need @strong{bash -c "...;..."} to run
+composed commands.
+
+@menu
+* Examples as GNU Parallel 2::
+@end menu
+
+@node Examples as GNU Parallel 2
+@subsection Examples as GNU Parallel
+
+@verbatim
+  1$ S="/tmp/example_socket"
+  
+  1$ ID=myid
+  
+  2$ async -s="$S" server --start
+  
+  2$ # GNU Parallel does not need a server to run
+  
+  3$ for i in {1..20}; do
+         # prints command output to stdout
+         async -s="$S" cmd -- bash -c "sleep 1 && echo test $i"
+     done
+  
+  3$ for i in {1..20}; do
+         # prints command output to stdout
+         sem --id "$ID" -j100% "sleep 1 && echo test $i"
+         # GNU Parallel will only print job when it is done
+         # If you need output from different jobs to mix
+         # use -u or --line-buffer
+         sem --id "$ID" -j100% --line-buffer "sleep 1 && echo test $i"
+     done
+  
+  4$ # wait until all commands are finished
+     async -s="$S" wait
+  
+  4$ sem --id "$ID" --wait
+  
+  5$ # configure the server to run four commands in parallel
+     async -s="$S" server -j4
+  
+  5$ export PARALLEL=-j4
+  
+  6$ mkdir "/tmp/ex_dir"
+     for i in {21..40}; do
+       # redirects command output to /tmp/ex_dir/file*
+       async -s="$S" cmd -o "/tmp/ex_dir/file$i" -- \
+         bash -c "sleep 1 && echo test $i"
+     done
+  
+  6$ mkdir "/tmp/ex_dir"
+     for i in {21..40}; do
+       # redirects command output to /tmp/ex_dir/file*
+       sem --id "$ID" --result '/tmp/my-ex/file-{=$_=""=}'"$i" \
+         "sleep 1 && echo test $i"
+     done
+  
+  7$ sem --id "$ID" --wait
+  
+  7$ async -s="$S" wait
+  
+  8$ # stops server
+     async -s="$S" server --stop
+  
+  8$ # GNU Parallel does not need to stop a server
+@end verbatim
+
+https://github.com/ctbur/async/ (Last checked: 2020-11)
+
+@node DIFFERENCES BETWEEN pardi AND GNU Parallel
+@section DIFFERENCES BETWEEN pardi AND GNU Parallel
+
+Summary (see legend above):
+I1 I2 - - - - I7
+M1 - - - - M6
+O1 O2 O3 O4 O5 - O7 - - O10
+E1 - - E4 - - -
+- - - - - - - - -
+- -
+
+@strong{pardi} is very similar to @strong{parallel --pipe --cat}: It reads blocks
+of data and not arguments. So it cannot insert an argument in the
+command line. It puts the block into a temporary file, and this file
+name (%IN) can be put in the command line. You can only use %IN once.
+
+It can also run full command lines in parallel (like: @strong{cat file |
+parallel}).
+
+@menu
+* EXAMPLES FROM pardi test.sh::
+@end menu
+
+@node EXAMPLES FROM pardi test.sh
+@subsection EXAMPLES FROM pardi test.sh
+
+@verbatim
+  1$ time pardi -v -c 100 -i data/decoys.smi -ie .smi -oe .smi \
+       -o data/decoys_std_pardi.smi \
+          -w '(standardiser -i %IN -o %OUT 2>&1) > /dev/null'
+  
+  1$ cat data/decoys.smi |
+       time parallel -N 100 --pipe --cat \
+         '(standardiser -i {} -o {#} 2>&1) > /dev/null; cat {#}; rm {#}' \
+         > data/decoys_std_pardi.smi
+  
+  2$ pardi -n 1 -i data/test_in.types -o data/test_out.types \
+             -d 'r:^#atoms:' -w 'cat %IN > %OUT'
+  
+  2$ cat data/test_in.types | parallel -n 1 -k --pipe --cat \
+             --regexp --recstart '^#atoms' 'cat {}' > data/test_out.types
+  
+  3$ pardi -c 6 -i data/test_in.types -o data/test_out.types \
+             -d 'r:^#atoms:' -w 'cat %IN > %OUT'
+  
+  3$ cat data/test_in.types | parallel -n 6 -k --pipe --cat \
+             --regexp --recstart '^#atoms' 'cat {}' > data/test_out.types
+  
+  4$ pardi -i data/decoys.mol2 -o data/still_decoys.mol2 \
+             -d 's:@<TRIPOS>MOLECULE' -w 'cp %IN %OUT'
+  
+  4$ cat data/decoys.mol2 |
+       parallel -n 1 --pipe --cat --recstart '@<TRIPOS>MOLECULE' \
+         'cp {} {#}; cat {#}; rm {#}' > data/still_decoys.mol2
+  
+  5$ pardi -i data/decoys.mol2 -o data/decoys2.mol2 \
+             -d b:10000 -w 'cp %IN %OUT' --preserve
+  
+  5$ cat data/decoys.mol2 |
+       parallel -k --pipe --block 10k --recend '' --cat \
+         'cat {} > {#}; cat {#}; rm {#}' > data/decoys2.mol2
+@end verbatim
+
+https://github.com/UnixJunkie/pardi (Last checked: 2021-01)
+
+@node DIFFERENCES BETWEEN bthread AND GNU Parallel
+@section DIFFERENCES BETWEEN bthread AND GNU Parallel
+
+Summary (see legend above):
+- - - I4 -  - -
+- - - - - M6
+O1 - O3 - - - O7 O8 - -
+E1 - - - - - -
+- - - - - - - - -
+- -
+
+@strong{bthread} takes around 1 sec per MB of output. The maximal output
+line length is 1073741759.
+
+You cannot quote space in the command, so you cannot run composed
+commands like @strong{sh -c "echo a; echo b"}.
+
+https://gitlab.com/netikras/bthread (Last checked: 2021-01)
+
+@node DIFFERENCES BETWEEN simple_gpu_scheduler AND GNU Parallel
+@section DIFFERENCES BETWEEN simple_gpu_scheduler AND GNU Parallel
+
+Summary (see legend above):
+I1 - - - - - I7
+M1 - - - - M6
+- O2 O3 - - O6 - N/A N/A O10
+E1 - - - - - -
+- - - - - - - - -
+- -
+
+@menu
+* EXAMPLES FROM simple_gpu_scheduler MANUAL::
+@end menu
+
+@node EXAMPLES FROM simple_gpu_scheduler MANUAL
+@subsection EXAMPLES FROM simple_gpu_scheduler MANUAL
+
+@verbatim
+  1$ simple_gpu_scheduler --gpus 0 1 2 < gpu_commands.txt
+
+  1$ parallel -j3 --shuf \
+     CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =} {=uq;=}' < gpu_commands.txt
+
+  2$ simple_hypersearch "python3 train_dnn.py --lr {lr} --batch_size {bs}" \
+       -p lr 0.001 0.0005 0.0001 -p bs 32 64 128 |
+       simple_gpu_scheduler --gpus 0,1,2
+
+  2$ parallel --header : --shuf -j3 -v \
+       CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =}' \
+       python3 train_dnn.py --lr {lr} --batch_size {bs} \
+       ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
+
+  3$ simple_hypersearch \
+       "python3 train_dnn.py --lr {lr} --batch_size {bs}" \
+       --n-samples 5 -p lr 0.001 0.0005 0.0001 -p bs 32 64 128 |
+       simple_gpu_scheduler --gpus 0,1,2
+
+  3$ parallel --header : --shuf \
+       CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1; seq() > 5 and skip() =}' \
+       python3 train_dnn.py --lr {lr} --batch_size {bs} \
+       ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
+
+  4$ touch gpu.queue
+     tail -f -n 0 gpu.queue | simple_gpu_scheduler --gpus 0,1,2 &
+     echo "my_command_with | and stuff > logfile" >> gpu.queue
+
+  4$ touch gpu.queue
+     tail -f -n 0 gpu.queue |
+       parallel -j3 CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =} {=uq;=}' &
+     # Needed to fill job slots once
+     seq 3 | parallel echo true >> gpu.queue
+     # Add jobs
+     echo "my_command_with | and stuff > logfile" >> gpu.queue
+     # Needed to flush output from completed jobs
+     seq 3 | parallel echo true >> gpu.queue
+@end verbatim
+
+https://github.com/ExpectationMax/simple_gpu_scheduler (Last checked:
+2021-01)
+
+@node DIFFERENCES BETWEEN parasweep AND GNU Parallel
+@section DIFFERENCES BETWEEN parasweep AND GNU Parallel
+
+@strong{parasweep} is a Python module for facilitating parallel parameter
+sweeps.
+
+A @strong{parasweep} job will normally take a text file as input. The text
+file contains arguments for the job. Some of these arguments will be
+fixed and some of them will be changed by @strong{parasweep}.
+
+It does this by having a template file such as template.txt:
+
+@verbatim
+  Xval: {x}
+  Yval: {y}
+  FixedValue: 9
+  # x with 2 decimals
+  DecimalX: {x:.2f}
+  TenX: ${x*10}
+  RandomVal: {r}
+@end verbatim
+
+and from this template it generates the file to be used by the job by
+replacing the replacement strings.
+
+Being a Python module @strong{parasweep} integrates tighter with Python than
+GNU @strong{parallel}. You get the parameters directly in a Python data
+structure. With GNU @strong{parallel} you can use the JSON or CSV output
+format to get something similar, but you would have to read the
+output.
+
+@strong{parasweep} has a filtering method to ignore parameter combinations
+you do not need.
+
+Instead of calling the jobs directly, @strong{parasweep} can use Python's
+Distributed Resource Management Application API to make jobs run with
+different cluster software.
+
+@menu
+* Future support in GNU Parallel::
+@end menu
+
+@node Future support in GNU Parallel
+@subsection Future support in GNU Parallel
+
+@strong{Future} versions of GNU @strong{parallel} may support templates
+with replacement strings. Such as:
+
+@verbatim
+  Xval: {x}
+  Yval: {y}
+  FixedValue: 9
+  # x with 2 decimals
+  DecimalX: {=x $_=sprintf("%.2f",$_) =}
+  TenX: {=x $_=$_*10 =}
+  RandomVal: {= $_=rand() =}
+@end verbatim
+
+that can be used like:
+
+@verbatim
+  parallel --header : --tmpl my.tmpl {#}.t myprog {#}.t \
+    ::: x 1 2 3 ::: y 1 2 3
+@end verbatim
+
+Filtering may also be supported as:
+
+@verbatim
+  parallel --filter '{1} > {2}' echo ::: 1 2 3 ::: 1 2 3
+@end verbatim
+
+which will basically do:
+
+@verbatim
+  parallel echo '{= $arg[1] > $arg[2] and skip() =}' ::: 1 2 3 ::: 1 2 3
+@end verbatim
+
+https://github.com/eviatarbach/parasweep (Last checked: 2021-01)
+
 @node Todo
 @section Todo
 
-Url for spread
+https://reposhub.com/python/command-line-tools/Akianonymus-parallel-bash.html
+
+https://github.com/Nukesor/pueue
+
+PASH: Light-touch Data-Parallel Shell Processing
+
+https://arxiv.org/pdf/2012.15443.pdf KumQuat
+
+https://arxiv.org/pdf/2007.09436.pdf
+
+https://github.com/JeiKeiLim/simple_distribute_job
+
+https://github.com/Akianonymus/parallel-bash
 
 https://github.com/reggi/pkgrun
 
@@ -2629,31 +3447,6 @@ https://github.com/xuchenCN/go-pssh
 https://github.com/flesler/parallel
 
 https://github.com/Julian/Verge
-
-https://github.com/ExpectationMax/simple_gpu_scheduler
-    simple_gpu_scheduler --gpus 0 1 2 < gpu_commands.txt
-    parallel -j3 --shuf CUDA_VISIBLE_DEVICES='@{=1 $_=slot()-1 =@} @{=uq;=@}' < gpu_commands.txt
-
-@verbatim
-    simple_hypersearch "python3 train_dnn.py --lr {lr} --batch_size {bs}" -p lr 0.001 0.0005 0.0001 -p bs 32 64 128 | simple_gpu_scheduler --gpus 0,1,2
-    parallel --header : --shuf -j3 -v CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =}' python3 train_dnn.py --lr {lr} --batch_size {bs} ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
-
-    simple_hypersearch "python3 train_dnn.py --lr {lr} --batch_size {bs}" --n-samples 5 -p lr 0.001 0.0005 0.0001 -p bs 32 64 128 | simple_gpu_scheduler --gpus 0,1,2
-    parallel --header : --shuf CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1; seq() > 5 and skip() =}' python3 train_dnn.py --lr {lr} --batch_size {bs} ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
-
-    touch gpu.queue
-    tail -f -n 0 gpu.queue | simple_gpu_scheduler --gpus 0,1,2 &
-    echo "my_command_with | and stuff > logfile" >> gpu.queue
-
-    touch gpu.queue
-    tail -f -n 0 gpu.queue | parallel -j3 CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =} {=uq;=}' &
-    # Needed to fill job slots once
-    seq 3 | parallel echo true >> gpu.queue
-    # Add jobs
-    echo "my_command_with | and stuff > logfile" >> gpu.queue
-    # Needed to flush output from completed jobs 
-    seq 3 | parallel echo true >> gpu.queue
-@end verbatim
 
 @node TESTING OTHER TOOLS
 @chapter TESTING OTHER TOOLS
@@ -2673,6 +3466,7 @@ coded it may overload your machine.
 * ONEREP@asis{:} Only one replacement string allowed::
 * INPUTSIZE@asis{:} Length of input should not be limited::
 * NUMWORDS@asis{:} Speed depends on number of words::
+* 4GB@asis{:} Output with a line > 4GB should be OK::
 @end menu
 
 @node MIX: Output mixes
@@ -2904,6 +3698,25 @@ Some tools become very slow if output lines have many words.
   seq 30 | time $paralleltool -j0 ./mycommand > /dev/null
 @end verbatim
 
+@node 4GB: Output with a line > 4GB should be OK
+@section 4GB: Output with a line > 4GB should be OK
+
+@verbatim
+  #!/bin/bash
+  
+  paralleltool="parallel -j0"
+  
+  cat <<-EOF > mycommand
+  #!/bin/bash
+  
+  perl -e '\$a="a"x1000_000; for(1..5000) { print \$a }'
+  EOF
+  chmod +x mycommand
+  
+  # Run 1 job
+  seq 1 | $paralleltool ./mycommand | LC_ALL=C wc
+@end verbatim
+
 @node AUTHOR
 @chapter AUTHOR
 
@@ -2919,7 +3732,7 @@ Copyright (C) 2007-10-18 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2008-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 Parts of the manual concerning @strong{xargs} compatibility is inspired by

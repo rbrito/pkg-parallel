@@ -305,7 +305,7 @@ Copyright (C) 2004-11-19 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2005-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 =head1 LICENSE

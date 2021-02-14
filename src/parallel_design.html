@@ -122,7 +122,7 @@
 
 <h2 id="Exponentially-back-off">Exponentially back off</h2>
 
-<p>GNU <b>parallel</b> busy waits. This is because the reason why a job is not started may be due to load average (when using <b>--load</b>), and thus it will not make sense to wait for a job to finish. Instead the load average must be checked again. Load average is not the only reason: <b>--timeout</b> has a similar problem.</p>
+<p>GNU <b>parallel</b> busy waits. This is because the reason why a job is not started may be due to load average (when using <b>--load</b>), and thus it will not make sense to just wait for a job to finish. Instead the load average must be rechecked regularly. Load average is not the only reason: <b>--timeout</b> has a similar problem.</p>
 
 <p>To not burn up too much CPU GNU <b>parallel</b> sleeps exponentially longer and longer if nothing happens, maxing out at 1 second.</p>
 
@@ -557,6 +557,8 @@
 
 <p>So what is needed is a way to have both. It seems the reason why Ctrl-C does not kill the remote jobs is because the shell does not propagate the hang-up signal from <b>sshd</b>. But when <b>sshd</b> dies, the parent of the login shell becomes <b>init</b> (process id 1). So by exec&#39;ing a Perl wrapper to monitor the parent pid and kill the child if the parent pid becomes 1, then Ctrl-C works and stderr is kept on stderr.</p>
 
+<p>Ctrl-C does, however, kill the ssh connection, so any output from a remote dying process is lost.</p>
+
 <p>To be able to kill all (grand)*children a new process group is started.</p>
 
 <h3 id="nice">--nice</h3>
@@ -705,9 +707,9 @@
 <pre><code>  parallel &quot;grep -E &#39;ls | wc &gt;&gt; c&#39; {} | wc &gt;&gt; c&quot; ::: foo
   parallel &quot;LANG=C grep -E &#39;ls | wc &gt;&gt; c&#39; {}&quot; ::: foo</code></pre>
 
-<p>It is impossible to tell the difference between these without parsing the string (is the <b>|</b> a pipe in shell or an alternation in a <b>grep</b> regexp? Is <b>LANG=C</b> a command in <b>csh</b> or setting a variable in <b>bash</b>? Is <b></b>&gt;&gt; redirection or part of a regexp?).</p>
+<p>It is impossible to tell how <b>| wc </b>&gt;&gt;<b> c</b> should be interpreted without parsing the string (is the <b>|</b> a pipe in shell or an alternation in a <b>grep</b> regexp? Is <b>LANG=C</b> a command in <b>csh</b> or setting a variable in <b>bash</b>? Is <b></b>&gt;&gt; redirection or part of a regexp?).</p>
 
-<p>On top of this wrapper scripts will often require a shell to be spawned.</p>
+<p>On top of this, wrapper scripts will often require a shell to be spawned.</p>
 
 <p>The downside is that you need to quote special shell chars twice:</p>
 

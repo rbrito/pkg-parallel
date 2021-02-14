@@ -123,4 +123,25 @@ testurls:
 	mkdir -p urls
 	cd urls && grep -v '(dead)' ../src/* | grep -h -Po 'https?://[^ $$<>")}]+' | perl -pe 's/(&gt|\{).*//;s/\\-/-/g;s/\\n//g;s/&amp;/&/g;s/&#.*//;'"s/'.*//" | grep -Ev 'parallel-(20)?$$|coolwebsite.biz' | sort -u | egrep -v 'example.com|##|\*\(' | parallel -j0 --timeout 33 --bar --tag --joblog joblog --retries 3 neno wget -m -l1 -Q1 '{=$$_=Q($$_)=}'
 
+reconf:
+	rm -fr autom4te.cache aclocal.m4 config.h config.h.in config.log Makefile.in missing install-sh
+	rm -rf src/Makefile.in
+	autoreconf --install -W gnu
+	./configure
+	make -j
+	sudo make install
+
+pack_unpack_and_test_build:
+	echo '### Building tar.bz2'
+	./configure
+	make dist
+	make dist-bzip2
+	echo "### Unpack parallel-$(YYYYMMDD).tar.bz2"
+	cp parallel-$(YYYYMMDD).tar.bz2 /tmp
+	cd /tmp && \
+	tar xjf parallel-$(YYYYMMDD).tar.bz2 && \
+	cd parallel-$(YYYYMMDD) && \
+	./configure && make -j && sudo make -j install
+
+
 EXTRA_DIST = CITATION CREDITS cc-by-sa.txt fdl.txt

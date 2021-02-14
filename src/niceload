@@ -2,7 +2,7 @@
 
 # Copyright (C) 2004-2010 Ole Tange, http://ole.tange.dk
 #
-# Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and
+# Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and
 # Free Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 use strict;
 use Getopt::Long;
 $Global::progname="niceload";
-$Global::version = 20191222;
+$Global::version = 20210122;
 Getopt::Long::Configure("bundling","require_order");
 get_options_from_array(\@ARGV) || die_usage();
 if($opt::version) {
@@ -1147,7 +1147,9 @@ sub io_status_linux {
     my @iostat;
     for(reverse @iostat_out) {
 	/Device/ and last;
-	push @iostat, (split(/\s+/,$_))[13];
+	my @col = (split(/\s+/,$_));
+	# Util% is last column
+	push @iostat, pop @col;
     }
     my $io = ::max(@iostat);
     return undef_as_zero($io)/10;

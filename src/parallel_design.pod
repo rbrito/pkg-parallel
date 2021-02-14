@@ -63,9 +63,9 @@ around 100 machines - depending on the duration of each job.
 
 GNU B<parallel> busy waits. This is because the reason why a job is
 not started may be due to load average (when using B<--load>), and
-thus it will not make sense to wait for a job to finish. Instead the
-load average must be checked again. Load average is not the only
-reason: B<--timeout> has a similar problem.
+thus it will not make sense to just wait for a job to finish. Instead
+the load average must be rechecked regularly. Load average is not the
+only reason: B<--timeout> has a similar problem.
 
 To not burn up too much CPU GNU B<parallel> sleeps exponentially
 longer and longer if nothing happens, maxing out at 1 second.
@@ -652,8 +652,12 @@ exec'ing a Perl wrapper to monitor the parent pid and kill the child
 if the parent pid becomes 1, then Ctrl-C works and stderr is kept on
 stderr.
 
+Ctrl-C does, however, kill the ssh connection, so any output from
+a remote dying process is lost.
+
 To be able to kill all (grand)*children a new process group is
 started.
+
 
 =head3 --nice
 
@@ -846,12 +850,13 @@ be spawned:
   parallel "grep -E 'ls | wc >> c' {} | wc >> c" ::: foo
   parallel "LANG=C grep -E 'ls | wc >> c' {}" ::: foo
 
-It is impossible to tell the difference between these without parsing
-the string (is the B<|> a pipe in shell or an alternation in a B<grep>
-regexp?  Is B<LANG=C> a command in B<csh> or setting a variable in
-B<bash>? Is B<>>> redirection or part of a regexp?).
+It is impossible to tell how B<| wc >>>B< c> should be interpreted
+without parsing the string (is the B<|> a pipe in shell or an
+alternation in a B<grep> regexp?  Is B<LANG=C> a command in B<csh> or
+setting a variable in B<bash>? Is B<>>> redirection or part of a
+regexp?).
 
-On top of this wrapper scripts will often require a shell to be
+On top of this, wrapper scripts will often require a shell to be
 spawned.
 
 The downside is that you need to quote special shell chars twice:

@@ -40,13 +40,13 @@ installation.
 
     $ (wget -O - pi.dk/3 || lynx -source pi.dk/3 || curl pi.dk/3/ || \
        fetch -o - http://pi.dk/3 ) > install.sh
-    $ sha1sum install.sh | grep 3374ec53bacb199b245af2dda86df6c9
-    12345678 3374ec53 bacb199b 245af2dd a86df6c9
-    $ md5sum install.sh | grep 029a9ac06e8b5bc6052eac57b2c3c9ca
-    029a9ac0 6e8b5bc6 052eac57 b2c3c9ca
-    $ sha512sum install.sh | grep f517006d9897747bed8a4694b1acba1b
-    40f53af6 9e20dae5 713ba06c f517006d 9897747b ed8a4694 b1acba1b 1464beb4
-    60055629 3f2356f3 3e9c4e3c 76e3f3af a9db4b32 bd33322b 975696fc e6b23cfb
+    $ sha1sum install.sh | grep 67bd7bc7dc20aff99eb8f1266574dadb
+    12345678 67bd7bc7 dc20aff9 9eb8f126 6574dadb
+    $ md5sum install.sh | grep b7a15cdbb07fb6e11b0338577bc1780f
+    b7a15cdb b07fb6e1 1b033857 7bc1780f
+    $ sha512sum install.sh | grep 186000b62b66969d7506ca4f885e0c80e02a22444
+    6f25960b d4b90cf6 ba5b76de c1acdf39 f3d24249 72930394 a4164351 93a7668d
+    21ff9839 6f920be5 186000b6 2b66969d 7506ca4f 885e0c80 e02a2244 40e8a43f
     $ bash install.sh
 
 This will literally install faster than reading the rest of this
@@ -57,11 +57,11 @@ document.
 
 Full installation of GNU Parallel is as simple as:
 
-    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2
-    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2.sig
-    gpg parallel-20191222.tar.bz2.sig
-    bzip2 -dc parallel-20191222.tar.bz2 | tar xvf -
-    cd parallel-20191222
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2.sig
+    gpg parallel-20210122.tar.bz2.sig
+    bzip2 -dc parallel-20210122.tar.bz2 | tar xvf -
+    cd parallel-20210122
     ./configure && make && sudo make install
 
 
@@ -70,11 +70,11 @@ Full installation of GNU Parallel is as simple as:
 If you are not root you can add ~/bin to your path and install in
 ~/bin and ~/share:
 
-    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2
-    wget https://ftpmirror.gnu.org/parallel/parallel-20191222.tar.bz2.sig
-    gpg parallel-20191222.tar.bz2.sig
-    bzip2 -dc parallel-20191222.tar.bz2 | tar xvf -
-    cd parallel-20191222
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2.sig
+    gpg parallel-20210122.tar.bz2.sig
+    bzip2 -dc parallel-20210122.tar.bz2 | tar xvf -
+    cd parallel-20210122
     ./configure --prefix=$HOME && make && make install
 
 Or if your system lacks 'make' you can simply copy src/parallel
@@ -122,8 +122,12 @@ will love you for it.
 When using programs that use GNU Parallel to process data for
 publication please cite:
 
-    O. Tange (2018): GNU Parallel 2018, Mar 2018, ISBN 9781387509881,
-    DOI https://doi.org/10.5281/zenodo.11460
+    Tange, O. (2021, January 22). GNU Parallel 20210122 ('Capitol Riots').
+    Zenodo. https://doi.org/10.5281/zenodo.4454976
+
+Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
+2016, 2017, 2018, 2019, 2020 Ole Tange, http://ole.tange.dk and Free
+Software Foundation, Inc.
 
 
 = New versions =

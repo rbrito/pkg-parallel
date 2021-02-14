@@ -47,6 +47,10 @@
 
 <pre><code>   (cat file1 &amp; cat file2 &amp;) | ...</code></pre>
 
+<p>It is faster than doing:</p>
+
+<pre><code>   parallel -j0 --lb cat ::: file*</code></pre>
+
 <p>Arguments can be given on the command line or passed in on stdin (standard input).</p>
 
 <h1 id="OPTIONS">OPTIONS</h1>
@@ -75,11 +79,12 @@
 
 <h2 id="Simple-line-buffered-output">Simple line buffered output</h2>
 
-<p>GNU <b>parallel</b> saves output to tempfiles. If the amount of data is bigger than the free disk space, then you can use this technique to do line buffering without saving to disk:</p>
+<p><b>traceroute</b> will often print half a line. If run in parallel, two instances may half-lines of their output. This can be avoided by saving the output to a fifo and then using <b>parcat</b> to read the two fifos in parallel:</p>
 
-<pre><code>  mkfifo slot-{1..5}
-  seq 10000000 | parallel -j5 --round --pipe &#39;cat &gt; slot-{%}&#39; &amp;
-  parcat slot-{1..5} | wc</code></pre>
+<pre><code>  mkfifo freenetproject.org.fifo tange.dk.fifo
+  traceroute freenetproject.org &gt; freenetproject.org.fifo &amp;
+  traceroute tange.dk &gt; tange.dk.fifo &amp;
+  parcat --rm *fifo</code></pre>
 
 <h1 id="REPORTING-BUGS">REPORTING BUGS</h1>
 
@@ -87,7 +92,7 @@
 
 <h1 id="AUTHOR">AUTHOR</h1>
 
-<p>Copyright (C) 2016-2019 Ole Tange, http://ole.tange.dk and Free Software Foundation, Inc.</p>
+<p>Copyright (C) 2016-2021 Ole Tange, http://ole.tange.dk and Free Software Foundation, Inc.</p>
 
 <h1 id="LICENSE">LICENSE</h1>
 
