@@ -1,11 +1,14 @@
-parallel (20191222-0~3.gbpa37430) UNRELEASED; urgency=medium
+parallel (20191222-0~3.gbp62bcc2) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @a37430e9b6ad797a0898ef19e0b482470acd2377 **
+  ** SNAPSHOT build @62bcc25940f9a7f764447ccdc0d9718c3ab1f572 **
 
   * New upstream version 20191222
-  * debian/copyright: Extend copyright years.
+  * debian/copyright: Extend my copyright years.
+  * debian/README.source: Update instructions to build the package.
+  * debian/{compat,control}: Update to new notation and level 12.
+  * Update my email address.
 
- -- Rogério Brito <rbrito@gmail.com>  Thu, 16 Jan 2020 01:05:43 -0300
+ -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 02:52:50 -0300
 
 parallel (20161222-1.1) unstable; urgency=medium
 
