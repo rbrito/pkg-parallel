@@ -5,7 +5,7 @@ parallel (20191222-0~3.gbpa37430) UNRELEASED; urgency=medium
   * New upstream version 20191222
   * debian/copyright: Extend copyright years.
 
- -- Rogério Brito <rbrito@ime.usp.br>  Thu, 16 Jan 2020 01:05:43 -0300
+ -- Rogério Brito <rbrito@gmail.com>  Thu, 16 Jan 2020 01:05:43 -0300
 
 parallel (20161222-1.1) unstable; urgency=medium
 

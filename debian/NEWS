@@ -12,4 +12,4 @@ parallel (20130622-1) unstable; urgency=low
   that keeping the `--tollef` option is not a recommended mode of
   execution of GNU parallel.
 
- -- Rogério Brito <rbrito@ime.usp.br>  Sun, 07 Jul 2013 18:57:53 -0300
+ -- Rogério Brito <rbrito@gmail.com>  Sun, 07 Jul 2013 18:57:53 -0300
