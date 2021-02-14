@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: GNU Parallel
 Upstream-Contact: Ole Tange <ole@tange.dk>
-Source: ftp://ftp.gnu.org/gnu/parallel/
+Source: https://ftpmirror.gnu.org/parallel/
 
 Files: *
 Copyright: 2007-2019, Ole Tange and Free Software Foundation, Inc.
