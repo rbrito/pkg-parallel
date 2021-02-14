@@ -1,14 +1,33 @@
-parallel (20191222-0~3.gbp62bcc2) UNRELEASED; urgency=medium
+parallel (20191222-0~4.gbp93ae51) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @62bcc25940f9a7f764447ccdc0d9718c3ab1f572 **
+  ** SNAPSHOT build @93ae51898ae2550c82e172506632b4088597e5d0 **
 
   * New upstream version 20191222
   * debian/copyright: Extend my copyright years.
   * debian/README.source: Update instructions to build the package.
   * debian/{compat,control}: Update to new notation and level 12.
   * Update my email address.
+  * debian/copyright:
+    + Use secure copyright file specification URI.
+    + use spaces rather than tabs to start continuation lines.
+  * debian/upstream:
+    + signing-key.asc: Re-export upstream signing key without extra signatures.
+    + metadata: Set upstream metadata fields: Bug-Submit (from ./configure),
+      Repository, Repository-Browse.
+  * debian/rules:
+    + Remove get-orig-source target.
+    + Remove redundant targets or calls: override_dh_installchangelogs,
+      dh_install --list-missing, override_dh_auto_install and leftover
+      targets.
+  * debian/control:
+    + Update Vcs-* headers to use salsa repository.
+    + Change priority extra to priority optional.
+    + Bump debhelper from old 12 to 13.
+    + Follow cme's advice remove depends on perl.
+    + Set Rules-Requires-Root to no.
+    + State compliancy with Policy 4.5.1.
 
- -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 02:52:50 -0300
+ -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 03:53:41 -0300
 
 parallel (20161222-1.1) unstable; urgency=medium
 
