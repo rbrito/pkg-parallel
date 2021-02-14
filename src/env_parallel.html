@@ -125,12 +125,12 @@
   env_parallel --session
 
   # Define whatever you want to use
-  alias myalias=echo
-  myvar=it
-  myfunc() { myalias $1 $myvar works.; }
+  myfunc() { myalias and functions $myvar work. $1.; }
+  alias myalias=&#39;echo Aliases&#39;
+  myvar=&#39;and variables&#39;
 
   # env_parallel will not export names in $PARALLEL_IGNORED_NAMES
-  env_parallel -S localhost myfunc ::: Yay,</code></pre>
+  env_parallel -S localhost myfunc ::: Hooray</code></pre>
 
 <p>Or:</p>
 
@@ -140,26 +140,26 @@
   # Optionally edit ~/.parallel/ignored_vars (only needed once)
 
   # Define whatever you want to use
-  alias myalias=echo
-  myvar=it
-  myfunc() { myalias $1 $myvar works.; }
+  myfunc() { myalias and functions $myvar work. $1.; }
+  alias myalias=&#39;echo Aliases&#39;
+  myvar=&#39;and variables&#39;
 
   # Use --env _ to only transfer the names not in the &quot;empty&quot; environment
-  env_parallel --env _ -S localhost myfunc ::: Yay,</code></pre>
+  env_parallel --env _ -S localhost myfunc ::: Hooray</code></pre>
 
 <p>In <b>csh</b> <b>--session</b> is not supported:</p>
 
-<pre><code>  # Record the &quot;clean&quot; environment (this only needs to be run once)
+<pre><code>  # Record the &quot;clean&quot; environment - this only needs to be run once
   env_parallel --record-env
 
-  # Optionally edit ~/.parallel/ignored_vars (only needed once)
+  # Optionally edit ~/.parallel/ignored_vars - only needed once
 
   # Define whatever you want to use
-  alias myalias &#39;echo \!* $myvar works.&#39;
-  set myvar=it
+  alias myalias &#39;echo Aliases $myvar \!*.&#39;
+  set myvar=&#39;and variables&#39;
 
   # Use --env _ to only transfer the names not in the &quot;empty&quot; environment
-  env_parallel --env _ -S localhost myalias ::: Yay,</code></pre>
+  env_parallel --env _ -S localhost myalias ::: work</code></pre>
 
 <h2 id="Environment-space">Environment space</h2>
 
@@ -353,7 +353,7 @@
 
 <h3 id="BUGS">BUGS</h3>
 
-<p>Due to a bug in Bash, aliases containing newlines must be followed by a newline in the command.</p>
+<p>Due to a bug in Bash, aliases containing newlines must be followed by a newline in the command. Some systems are not affected by this bug, but will print a warning anyway.</p>
 
 <h2 id="csh">csh</h2>
 
@@ -935,7 +935,7 @@
 
 <p>When using GNU <b>env_parallel</b> for a publication please cite:</p>
 
-<p>O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login: The USENIX Magazine, February 2011:42-47.</p>
+<p>O. Tange (2018): GNU Parallel 2018, March 2018, ISBN 9781387509881, DOI: 10.5281/zenodo.1146014.</p>
 
 <p>This helps funding further development; and it won&#39;t cost you a cent. If you pay 10000 EUR you should feel free to use GNU Parallel without citing.</p>
 
@@ -943,11 +943,9 @@
 
 <p>Copyright (C) 2008-2010 Ole Tange, http://ole.tange.dk</p>
 
-<p>Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free Software Foundation, Inc.</p>
+<p>Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free Software Foundation, Inc.</p>
 
 <h1 id="LICENSE">LICENSE</h1>
-
-<p>Copyright (C) 2016,2017 Free Software Foundation, Inc.</p>
 
 <p>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 3 of the License, or at your option any later version.</p>
 

@@ -7,7 +7,8 @@
 # after which 'env_parallel' works
 #
 #
-# Copyright (C) 2016-2019 Ole Tange and Free Software Foundation, Inc.
+# Copyright (C) 2016-2021 Ole Tange, http://ole.tange.dk and Free
+# Software Foundation, Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -82,7 +83,7 @@ else
   # Make a tmpfile for the variable definitions + alias
   set _tMpaLLfILe=`_tempfile`
   foreach _vARnAmE ($_vARnAmES);
-    # These 3 lines break in csh version 20110502-3
+    # These 3 lines break in csh ver. 20110502-3
     # if not defined: next
     eval if'(! $?'$_vARnAmE') continue'
     # if $#myvar <= 1 echo scalar_myvar=$var

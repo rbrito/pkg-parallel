@@ -271,7 +271,7 @@ Copyright (C) 2007-10-18 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2008-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 @node LICENSE

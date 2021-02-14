@@ -299,7 +299,7 @@ Report bugs to <bug-parallel@@gnu.org>.
 @node AUTHOR
 @chapter AUTHOR
 
-Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 @node LICENSE

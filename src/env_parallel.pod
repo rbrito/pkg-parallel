@@ -31,12 +31,12 @@ usage is either:
   env_parallel --session
 
   # Define whatever you want to use
-  alias myalias=echo
-  myvar=it
-  myfunc() { myalias $1 $myvar works.; }
+  myfunc() { myalias and functions $myvar work. $1.; }
+  alias myalias='echo Aliases'
+  myvar='and variables'
 
   # env_parallel will not export names in $PARALLEL_IGNORED_NAMES
-  env_parallel -S localhost myfunc ::: Yay,
+  env_parallel -S localhost myfunc ::: Hooray
 
 Or:
 
@@ -46,26 +46,26 @@ Or:
   # Optionally edit ~/.parallel/ignored_vars (only needed once)
 
   # Define whatever you want to use
-  alias myalias=echo
-  myvar=it
-  myfunc() { myalias $1 $myvar works.; }
+  myfunc() { myalias and functions $myvar work. $1.; }
+  alias myalias='echo Aliases'
+  myvar='and variables'
 
   # Use --env _ to only transfer the names not in the "empty" environment
-  env_parallel --env _ -S localhost myfunc ::: Yay,
+  env_parallel --env _ -S localhost myfunc ::: Hooray
 
 In B<csh> B<--session> is not supported:
 
-  # Record the "clean" environment (this only needs to be run once)
+  # Record the "clean" environment - this only needs to be run once
   env_parallel --record-env
 
-  # Optionally edit ~/.parallel/ignored_vars (only needed once)
+  # Optionally edit ~/.parallel/ignored_vars - only needed once
 
   # Define whatever you want to use
-  alias myalias 'echo \!* $myvar works.'
-  set myvar=it
+  alias myalias 'echo Aliases $myvar \!*.'
+  set myvar='and variables'
 
   # Use --env _ to only transfer the names not in the "empty" environment
-  env_parallel --env _ -S localhost myalias ::: Yay,
+  env_parallel --env _ -S localhost myalias ::: work
 
 =head2 Environment space
 
@@ -261,7 +261,8 @@ B<--session> is supported.
 =head3 BUGS
 
 Due to a bug in Bash, aliases containing newlines must be followed by
-a newline in the command.
+a newline in the command. Some systems are not affected by this bug,
+but will print a warning anyway.
 
 =head2 csh
 
@@ -792,8 +793,8 @@ Same as GNU B<parallel>.
 
 When using GNU B<env_parallel> for a publication please cite:
 
-O. Tange (2011): GNU Parallel - The Command-Line Power Tool, ;login:
-The USENIX Magazine, February 2011:42-47.
+O. Tange (2018): GNU Parallel 2018, March 2018, ISBN 9781387509881,
+DOI: 10.5281/zenodo.1146014.
 
 This helps funding further development; and it won't cost you a cent.
 If you pay 10000 EUR you should feel free to use GNU Parallel without citing.
@@ -802,13 +803,11 @@ Copyright (C) 2007-10-18 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2008-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 
 =head1 LICENSE
-
-Copyright (C) 2016,2017 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

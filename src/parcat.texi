@@ -42,6 +42,12 @@ you use:
    (cat file1 & cat file2 &) | ...
 @end verbatim
 
+It is faster than doing:
+
+@verbatim
+   parallel -j0 --lb cat ::: file*
+@end verbatim
+
 Arguments can be given on the command line or passed in on stdin
 (standard input).
 
@@ -80,14 +86,16 @@ the files.
 @node Simple line buffered output
 @section Simple line buffered output
 
-GNU @strong{parallel} saves output to tempfiles. If the amount of data is
-bigger than the free disk space, then you can use this technique to do
-line buffering without saving to disk:
+@strong{traceroute} will often print half a line. If run in parallel, two
+instances may half-lines of their output. This can be avoided by
+saving the output to a fifo and then using @strong{parcat} to read the two
+fifos in parallel:
 
 @verbatim
-  mkfifo slot-{1..5}
-  seq 10000000 | parallel -j5 --round --pipe 'cat > slot-{%}' &
-  parcat slot-{1..5} | wc
+  mkfifo freenetproject.org.fifo tange.dk.fifo
+  traceroute freenetproject.org > freenetproject.org.fifo &
+  traceroute tange.dk > tange.dk.fifo &
+  parcat --rm *fifo
 @end verbatim
 
 @node REPORTING BUGS
@@ -99,7 +107,7 @@ GNU @strong{parcat} is part of GNU @strong{parallel}. Report bugs to
 @node AUTHOR
 @chapter AUTHOR
 
-Copyright (C) 2016-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2016-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 @node LICENSE

@@ -244,7 +244,7 @@ Report bugs to <bug-parallel@gnu.org>.
 
 =head1 AUTHOR
 
-Copyright (C) 2010-2019 Ole Tange, http://ole.tange.dk and Free
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
 Software Foundation, Inc.
 
 

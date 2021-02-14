@@ -1,3 +1,298 @@
+20210122
+
+* --memsuspend suspends jobs when there is little memory free. This
+  way you can run jobs in parallel that added up potentially will take
+  up more RAM than is available.
+
+* $PARALLEL_ARGHOSTGROUPS and the replacement string {agrp} will give
+  the hostgroup given on the argument when using --hostgroup.
+
+* Handy time functions for {= =}: yyyy_mm_dd_hh_mm_ss()
+  yyyy_mm_dd_hh_mm() yyyy_mm_dd() yyyymmddhhmmss() yyyymmddhhmm()
+  yyyymmdd() hash($str)
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Software Engineering For Scientists
+  https://canvas.stanford.edu/courses/133091
+
+* Optional Individual Submission 4 Job Handling - GNU Parallel
+  https://www.youtube.com/watch?v=-tX0bFAYAxM
+
+* 关于gnu parallel：GnuParallel：在集群上并行化脚本，脚本将文件写入主
+  节点https://www.codenong.com/25172209/
+
+* すぐ忘れてしまう、仕事で使う技
+  https://qiita.com/hana_shin/items/53c3c78525c9c758ae7c
+
+
+20201222
+
+* --pipe engine changed making --pipe alpha quality.
+
+* --results -.json outputs results as JSON objects on stdout (standard
+  output).
+
+* --delay 123auto will auto-adjust --delay. If jobs fail due to being
+  spawned too quickly, --delay will exponentially increase.
+
+* --plus sets {hgrp} that gives the intersection of the hostgroups of
+  the job and the sshlogin that the job is run on.
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Best practices for accelerating data migrations using AWS Snowball
+  Edge
+  https://aws.amazon.com/blogs/storage/best-practices-for-accelerating-data-migrations-using-aws-snowball-edge/
+
+* Pass the Output of a Command as an Argument for Another
+  https://www.baeldung.com/linux/pass-cmd-output-as-an-argument
+
+* Warwick RSE Drop-in - Workflow Management Part 2 - GNU Parallel
+  https://www.youtube.com/watch?v=t_v2Otgt87g
+
+
+20201122
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* https://bash-prompt.net/guides/gnu-parallel-multi-server/
+
+
+20201022
+
+* --termseq now works for jobs running remotely.
+
+* parsort: Performance optimized for 64-core machines.
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Juan Sierra Pons has made a testimonial:
+  http://www.elsotanillo.net/wp-content/uploads/GnuParallel_JuanSierraPons.mp4
+
+* 「翻译」在生物信息学中使用 GNU-Parallel
+  https://cloud.tencent.com/developer/article/1705499
+
+
+20200922
+
+* New CPU detection for GNU/Linux.
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Aug 21, 2020 - More Unix tools
+  https://floki.blog/2020/08/more_unix_tools
+
+
+20200822
+
+New in this release:
+
+* Max command line length is changed for MacOS - making this version
+  beta quality for MacOS.
+
+* Bug fixes and man page updates.
+
+
+20200722
+
+New in this release:
+
+* No new functionality
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Tips for Running Jobs on your VM
+  https://support.ehelp.edu.au/support/solutions/articles/6000089713-tips-for-running-jobs-on-your-vm#parallel
+
+* Introduction to GNU Parallel: Parallelizing Massive Individual Tasks
+  https://www.youtube.com/watch?v=QSFLTEyCKvo
+
+* Slides for same
+  http://www.hpc.lsu.edu/training/weekly-materials/2020-Spring/GNUParallel_Spring_2020.pdf
+
+* Linux-Fu: Parallel Universe
+  https://hackaday.com/2020/06/29/linux-fu-parallel-universe/
+
+* Resumable batch jobs with gnu parallel https://igor.io/parallel/
+
+* Introducing Parallel into Shell
+  https://www.petelawson.com/post/parallel-in-shell/
+
+* AV1 encoding parallelization with GNU Parallel
+  https://www.reddit.com/r/AV1/comments/fjvqp9/av1_encoding_parallelization_with_gnu_parallel/
+
+* Beschleunigte Befehlsbearbeitung mit GNU Parallel
+  https://www.linux-community.de/ausgaben/linuxuser/2013/06/beschleunigte-befehlsbearbeitung-mit-gnu-parallel/
+
+
+20200622
+
+New in this release:
+
+* No new functionality
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* GNU Parallel is used at NERSC:
+  https://www.nersc.gov/assets/Uploads/08-Workflows-20200616.pdf
+
+* Resumable batch jobs with GNU Parallel https://igor.io/parallel/
+
+* Lab Meeting technical talk
+  https://www.slideshare.net/hoffmanlab/gnu-parallel-194030490
+
+* Open Sky Software Website Credits
+  https://www.openskysoftware.com/site-credits.htm
+
+* Speed up your Python Scripts using Ubuntu and GNU Parallel
+  https://ecce.esri.ca/wpecce/2019/12/24/speed-up-your-python-scripts-using-ubuntu-and-gnu-parallel/
+
+* Indispensable command-line tools
+  https://negfeedback.blogspot.com/2020/05/indispensable-command-line-tools.html
+
+* GNU Parallel for simulations
+  http://pdebuyl.be/blog/2020/gnu-parallel-for-simulations.html
+
+* Introduction to GNU parallel
+  https://bioinformaticsworkbook.org/Appendix/GNUparallel/GNU_parallel_examples.html
+
+
+20200522
+
+New in this release:
+
+* While running a job $PARALLEL_JOBSLOT is the jobslot of the job. It
+  is equal to {%} unless the job is being retried. See {%} for
+  details.
+
+* While running a job $PARALLEL_SSHLOGIN is the sshlogin line with
+  number of cores removed. E.g. '4//usr/bin/specialssh user@host'
+  becomes: '/usr/bin/specialssh user@host'
+
+* While running a job $PARALLEL_SSHHOST is the host part of an
+  sshlogin line. E.g. '4//usr/bin/specialssh user@host' becomes:
+  'host'
+
+* --plus activates the replacement strings {slot} = $PARALLEL_JOBSLOT,
+  {sshlogin} = $PARALLEL_SSHLOGIN, {host} = $PARALLEL_SSHHOST
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Portable Batch System (PBS) & GNU Parallel - Running a Program
+  Multiple Times in Parallel
+  https://www.youtube.com/watch?v=6ccbWu6Befo
+
+* GNU Parallel przykład https://www.youtube.com/watch?v=gs_wG4Kt2G4
+
+* Demo of LINUX APP - GNU PARALLEL - running multiple Gstreamer webcam
+  .sh scripts with only 1 command
+  https://www.youtube.com/watch?v=trQuA_wmWjg
+
+
+20200422
+
+This release celebrates GNU Parallel's 10 years as a GNU tool:
+
+> commit ed2dfb1043768154d4e7678e01e10287155fa834
+> Author: Ole Tange <ole@tange.dk>
+> Date:   Thu Apr 22 01:23:00 2010 +0200
+>
+>    Name change: Parallel is now GNU Parallel.
+>    Basic structure for sshlogin and sshloginfile.
+
+New in this release:
+
+* parsort makes GNU sort run faster for files with more than 1M lines.
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* Several clusters have updated their documentation of GNU Parallel:
+  https://www.grid5000.fr/w/GNU_Parallel
+  https://research-it.berkeley.edu/virtual-training-running-jobs-parallel-savio
+  http://www.hpc.lsu.edu/training/archive/tutorials.php
+
+* add_pho uses GNU Parallel: https://github.com/SeedlingsBabylab/add_pho
+
+* GNU parallel使用笔记https://zhuanlan.zhihu.com/p/37340011
+
+* Virtual Workshop: Running Jobs in Parallel on Savio
+  https://ais.berkeley.edu/events/virtual-workshop-running-jobs-parallel-savio/2020-04-20
+
+* Free Concurrency with GNU Parallel
+  https://phili.pe/posts/free-concurrency-with-gnu-parallel/
+
+
+20200322
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* The GNU Parallel course in Copenhagen is cancelled
+  https://www.prosa.dk/nc/arrangementer/arrangement/gnu-parallel-med-ole-tange/
+
+* The GNU Parallel course in Århus is cancelled
+  https://www.prosa.dk/nc/arrangementer/arrangement/gnu-parallel-og-parallelisering-i-unix-shellen/
+
+* The 10 year anniversary may be cancelled, see
+  https://www.gnu.org/software/parallel/10-years-anniversary.html
+
+* Running shell commands in parallel, via GNU Parallel
+  https://dev.to/saveriomiroddi/running-shell-commands-in-parallel-via-gnu-parallel-3a72
+
+* Faster nmap scanning with the help of GNU parallel
+  https://badshah.io/experiment/faster-nmap-scanning-with-the-help-of-gnu-parallel/
+
+
+20200222
+
+* Bug fixes and man page updates.
+
+
+20200122
+
+* --blocktimeout dur - Time out for reading block when using
+  --pipe. If it takes longer than dur to read a full block, use the
+  partial block read so far.
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* GNU Parallel course in Copenhagen
+  https://www.prosa.dk/nc/arrangementer/arrangement/gnu-parallel-med-ole-tange/
+
+* GNU Parallel course in Århus
+  https://www.prosa.dk/nc/arrangementer/arrangement/gnu-parallel-og-parallelisering-i-unix-shellen/
+
+* GNU Parallel pour accélérer vos process sous Linux
+  https://www.yvonh.com/gnu-parallel-pour-accelerer-vos-process-sous-linux/
+
+* How to copy a file to multiple directories in Linux
+  https://net2.com/how-to-copy-a-file-to-multiple-directories-in-linux/
+
+* Running linux commands in parallel https://dev.to/voyeg3r/runing-linux-commands-in-parallel-4ff8
+
+
 20191222
 
 * GNU Parallel course in Copenhagen

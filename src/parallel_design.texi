@@ -120,9 +120,9 @@ around 100 machines - depending on the duration of each job.
 
 GNU @strong{parallel} busy waits. This is because the reason why a job is
 not started may be due to load average (when using @strong{--load}), and
-thus it will not make sense to wait for a job to finish. Instead the
-load average must be checked again. Load average is not the only
-reason: @strong{--timeout} has a similar problem.
+thus it will not make sense to just wait for a job to finish. Instead
+the load average must be rechecked regularly. Load average is not the
+only reason: @strong{--timeout} has a similar problem.
 
 To not burn up too much CPU GNU @strong{parallel} sleeps exponentially
 longer and longer if nothing happens, maxing out at 1 second.
@@ -735,6 +735,9 @@ exec'ing a Perl wrapper to monitor the parent pid and kill the child
 if the parent pid becomes 1, then Ctrl-C works and stderr is kept on
 stderr.
 
+Ctrl-C does, however, kill the ssh connection, so any output from
+a remote dying process is lost.
+
 To be able to kill all (grand)*children a new process group is
 started.
 
@@ -935,12 +938,13 @@ be spawned:
   parallel "LANG=C grep -E 'ls | wc >> c' {}" ::: foo
 @end verbatim
 
-It is impossible to tell the difference between these without parsing
-the string (is the @strong{|} a pipe in shell or an alternation in a @strong{grep}
-regexp?  Is @strong{LANG=C} a command in @strong{csh} or setting a variable in
-@strong{bash}? Is @strong{}>> redirection or part of a regexp?).
+It is impossible to tell how @strong{| wc }>>@strong{ c} should be interpreted
+without parsing the string (is the @strong{|} a pipe in shell or an
+alternation in a @strong{grep} regexp?  Is @strong{LANG=C} a command in @strong{csh} or
+setting a variable in @strong{bash}? Is @strong{}>> redirection or part of a
+regexp?).
 
-On top of this wrapper scripts will often require a shell to be
+On top of this, wrapper scripts will often require a shell to be
 spawned.
 
 The downside is that you need to quote special shell chars twice:

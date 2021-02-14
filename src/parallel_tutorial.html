@@ -267,12 +267,12 @@
 <pre><code>  SERVER1=server.example.com
   SERVER2=server2.example.net</code></pre>
 
-<p>So you must be able to do this:</p>
+<p>So you must be able to do this without entering a password:</p>
 
 <pre><code>  ssh $SERVER1 echo works
   ssh $SERVER2 echo works</code></pre>
 
-<p>It can be setup by running &#39;ssh-keygen -t dsa; ssh-copy-id $SERVER1&#39; and using an empty passphrase.</p>
+<p>It can be setup by running &#39;ssh-keygen -t dsa; ssh-copy-id $SERVER1&#39; and using an empty passphrase, or you can use <b>ssh-agent</b>.</p>
 
 </dd>
 </dl>
@@ -1554,7 +1554,8 @@
 <p>And a graphic bar can be shown with <b>--bar</b> and <b>zenity</b>:</p>
 
 <pre><code>  seq 1000 | parallel -j10 --bar &#39;(echo -n {};sleep 0.1)&#39; \
-    2&gt; &gt;(zenity --progress --auto-kill --auto-close)</code></pre>
+    2&gt; &gt;(perl -pe &#39;BEGIN{$/=&quot;\r&quot;;$|=1};s/\r/\n/g&#39; |
+         zenity --progress --auto-kill --auto-close)</code></pre>
 
 <p>A logfile of the jobs completed so far can be generated with <b>--joblog</b>:</p>
 
@@ -2231,7 +2232,7 @@
 
 <p>The simplest is to use a CSV file as the storage table:</p>
 
-<pre><code>  parallel --sqlandworker csv:////%2Ftmp%2Flog.csv \
+<pre><code>  parallel --sqlandworker csv:///%2Ftmp/log.csv \
     seq ::: 10 ::: 12 13 14
   cat /tmp/log.csv</code></pre>
 
@@ -2261,7 +2262,7 @@
 
 <p>If the output is big you may want to put it into files using <b>--results</b>:</p>
 
-<pre><code>  parallel --results outdir --sqlandworker csv:////%2Ftmp%2Flog2.csv \
+<pre><code>  parallel --results outdir --sqlandworker csv:///%2Ftmp/log2.csv \
     seq ::: 10 ::: 12 13 14
   cat /tmp/log2.csv</code></pre>
 
@@ -2289,7 +2290,7 @@
 <pre><code>  mysql://scott:tiger@my.example.com/mydatabase/mytable
   postgresql://scott:tiger@pg.example.com/mydatabase/mytable
   sqlite3:///%2Ftmp%2Fmydatabase/mytable
-  csv:////%2Ftmp%2Flog.csv</code></pre>
+  csv:///%2Ftmp/log.csv</code></pre>
 
 <p>To refer to <b>/tmp/mydatabase</b> with <b>sqlite</b> or <b>csv</b> you need to encode the <b>/</b> as <b>%2F</b>.</p>
 
@@ -2937,9 +2938,9 @@
 
 <p>Output:</p>
 
-<pre><code>  GNU parallel 20180122
-  Copyright (C) 2007-2018
-  Ole Tange and Free Software Foundation, Inc.
+<pre><code>  GNU parallel 20210122
+  Copyright (C) 2007-2021 Ole Tange, http://ole.tange.dk and Free Software
+  Foundation, Inc.
   License GPLv3+: GNU GPL version 3 or later &lt;http://gnu.org/licenses/gpl.html&gt;
   This is free software: you are free to change and redistribute it.
   GNU parallel comes with no warranty.
@@ -3080,7 +3081,7 @@
 </li>
 </ul>
 
-<p>(C) 2013-2019 Ole Tange, FDLv1.3 (See fdl.txt)</p>
+<p>(C) 2013-2021 Ole Tange, FDLv1.3 (See fdl.txt)</p>
 
 
 </body>

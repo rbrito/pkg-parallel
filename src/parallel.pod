@@ -53,33 +53,50 @@ the line as arguments. If no I<command> is given, the line of input is
 executed. Several lines will be run in parallel. GNU B<parallel> can
 often be used as a substitute for B<xargs> or B<cat | bash>.
 
+
 =head2 Reader's guide
+
+GNU B<parallel> includes the 4 types of documentation: Tutorial,
+how-to, reference and explanation.
+
+
+=head3 Tutorial
 
 If you prefer reading a book buy B<GNU Parallel 2018> at
 http://www.lulu.com/shop/ole-tange/gnu-parallel-2018/paperback/product-23558902.html
-or download it at: https://doi.org/10.5281/zenodo.1146014
+or download it at: https://doi.org/10.5281/zenodo.1146014 Read at
+least chapter 1+2. It should take you less than 20 minutes.
 
 Otherwise start by watching the intro videos for a quick introduction:
 http://www.youtube.com/playlist?list=PL284C9FF2488BC6D1
 
-If you need a one page printable cheat sheet you can find it on:
-https://www.gnu.org/software/parallel/parallel_cheat.pdf
+If you want to dive deeper: spend a couple of hours walking through
+the tutorial (B<man parallel_tutorial>). Your command line will love
+you for it.
+
+
+=head3 How-to
 
 You can find a lot of B<EXAMPLE>s of use after the list of B<OPTIONS>
 in B<man parallel> (Use B<LESS=+/EXAMPLE: man parallel>). That will
 give you an idea of what GNU B<parallel> is capable of, and you may
 find a solution you can simply adapt to your situation.
 
-If you want to dive even deeper: spend a couple of hours walking
-through the tutorial (B<man parallel_tutorial>). Your command line
-will love you for it.
 
-Finally you may want to look at the rest of the manual (B<man
-parallel>) if you have special needs not already covered.
+=head3 Reference
+
+If you need a one page printable cheat sheet you can find it on:
+https://www.gnu.org/software/parallel/parallel_cheat.pdf
+
+The man page is the reference for all options.
+
+
+=head3 Design discussion
 
 If you want to know the design decisions behind GNU B<parallel>, try:
 B<man parallel_design>. This is also a good intro if you intend to
 change GNU B<parallel>.
+
 
 
 =head1 OPTIONS
@@ -192,6 +209,30 @@ number.
 
 The replacement string B<{%}> can be changed with B<--slotreplace>.
 
+If the job needs to be retried (e.g using B<--retries> or
+B<--retry-failed>) the job slot is not automatically updated. You
+should then instead use B<$PARALLEL_JOBSLOT>:
+
+  $ do_test() {
+      id="$3 {%}=$1 PARALLEL_JOBSLOT=$2"
+      echo run "$id";
+      sleep 1
+      # fail if {%} is odd
+      return `echo $1%2 | bc`
+    }
+  $ export -f do_test
+  $ parallel -j3 --jl mylog do_test {%} \$PARALLEL_JOBSLOT {} ::: A B C D
+  run A {%}=1 PARALLEL_JOBSLOT=1
+  run B {%}=2 PARALLEL_JOBSLOT=2
+  run C {%}=3 PARALLEL_JOBSLOT=3
+  run D {%}=1 PARALLEL_JOBSLOT=1
+  $ parallel --retry-failed -j3 --jl mylog do_test {%} \$PARALLEL_JOBSLOT {} ::: A B C D
+  run A {%}=1 PARALLEL_JOBSLOT=1
+  run C {%}=3 PARALLEL_JOBSLOT=2
+  run D {%}=1 PARALLEL_JOBSLOT=3
+
+Notice how {%} and $PARALLEL_JOBSLOT differ in the retry run of C and D.
+
 To understand replacement strings see B<{}>.
 
 
@@ -281,6 +322,10 @@ perl quote a string
 
 do not quote current replacement string
 
+=item Z<> B<hash(val)>
+
+compute B::hash(val)
+
 =item Z<> B<total_jobs()>
 
 number of jobs in total
@@ -296,6 +341,20 @@ sequence number of job
 =item Z<> B<@arg>
 
 the arguments
+
+=item Z<> B<yyyy_mm_dd_hh_mm_ss()>
+
+=item Z<> B<yyyy_mm_dd_hh_mm()>
+
+=item Z<> B<yyyy_mm_dd()>
+
+=item Z<> B<yyyymmddhhmmss()>
+
+=item Z<> B<yyyymmddhhmm()>
+
+=item Z<> B<yyyymmdd()>
+
+time functions
 
 =back
 
@@ -408,7 +467,7 @@ contains B<a b c>.  B<-a foo> B<-a bar> will result in the combinations
 (1,a) (1,b) (1,c) (2,a) (2,b) (2,c). This is useful for replacing
 nested for-loops.
 
-See also B<--link> and B<{>I<n>B<}>.
+See also: B<--link> and B<{>I<n>B<}>.
 
 
 =item B<--arg-file-sep> I<sep-str>
@@ -440,8 +499,8 @@ completed, estimated seconds left, and number of jobs started.
 It is compatible with B<zenity>:
 
   seq 1000 | parallel -j30 --bar '(echo {};sleep 0.1)' \
-    2> >(zenity --progress --auto-kill) | wc
-
+    2> >(perl -pe 'BEGIN{$/="\r";$|=1};s/\r/\n/g' |
+         zenity --progress --auto-kill) | wc
 
 =item B<--basefile> I<file>
 
@@ -469,7 +528,7 @@ basename of input line.
 Use the replacement string I<replace-str> instead of B<{/.}> for basename of input line without extension.
 
 
-=item B<--bin> I<binexpr> (alpha testing)
+=item B<--bin> I<binexpr>
 
 Use I<binexpr> as binning key and bin input to the jobs.
 
@@ -490,7 +549,7 @@ I<bincol> is small (<10), slower if it is big (>100).
 
 B<--bin> requires B<--pipe> and a fixed numeric value for B<--jobs>.
 
-See also B<--shard>, B<--group-by>, B<--roundrobin>.
+See also: B<--shard>, B<--group-by>, B<--roundrobin>.
 
 
 =item B<--bg>
@@ -562,6 +621,21 @@ jobslots process a large amount of data.
 See B<--pipe> and B<--pipepart> for use of this.
 
 
+=item B<--blocktimeout> I<duration>
+
+=item B<--bt> I<duration>
+
+Time out for reading block when using B<--pipe>. If it takes longer
+than I<duration> to read a full block, use the partial block read so
+far.
+
+I<duration> must be in whole seconds, but can be expressed as floats
+postfixed with B<s>, B<m>, B<h>, or B<d> which would multiply the
+float by 1, 60, 3600, or 86400. Thus these are equivalent:
+B<--blocktimeout 100000> and B<--blocktimeout 1d3.5h16.6m4s>.
+
+
+
 =item B<--cat>
 
 Create a temporary file with content. Normally B<--pipe>/B<--pipepart>
@@ -571,7 +645,7 @@ you can do: B<parallel --pipe --cat wc {}>.
 
 Implies B<--pipe> unless B<--pipepart> is used.
 
-See also B<--fifo>.
+See also: B<--fifo>.
 
 
 =item B<--cleanup>
@@ -655,6 +729,19 @@ Even quoted newlines are parsed correctly:
 When used with B<--pipe> only pass full CSV-records.
 
 
+=item B<--delay> I<mytime> (beta testing)
+
+Delay starting next job by I<mytime>. GNU B<parallel> will pause
+I<mytime> after starting each job. I<mytime> is normally in seconds,
+but can be floats postfixed with B<s>, B<m>, B<h>, or B<d> which would
+multiply the float by 1, 60, 3600, or 86400. Thus these are
+equivalent: B<--delay 100000> and B<--delay 1d3.5h16.6m4s>.
+
+If you append 'auto' to I<mytime> (e.g. 13m3sauto) GNU B<parallel> will
+automatically try to find the optimal value: If a job fails, I<mytime>
+is doubled. If a job succeeds, I<mytime> is decreased by 10%.
+
+
 =item B<--delimiter> I<delim>
 
 =item B<-d> I<delim>
@@ -676,22 +763,6 @@ Use the replacement string I<replace-str> instead of B<{//}> for
 dirname of input line.
 
 
-=item B<-E> I<eof-str>
-
-Set the end of file string to I<eof-str>.  If the end of file string
-occurs as a line of input, the rest of the input is not read.  If
-neither B<-E> nor B<-e> is used, no end of file string is used.
-
-
-=item B<--delay> I<mytime>
-
-Delay starting next job by I<mytime>. GNU B<parallel> will pause
-I<mytime> after starting each job. I<mytime> is normally in seconds,
-but can be floats postfixed with B<s>, B<m>, B<h>, or B<d> which would
-multiply the float by 1, 60, 3600, or 86400. Thus these are
-equivalent: B<--delay 100000> and B<--delay 1d3.5h16.6m4s>.
-
-
 =item B<--dry-run>
 
 Print the job to run on stdout (standard output), but do not run the
@@ -700,6 +771,13 @@ generates (for remote jobs, B<--tmux>, B<--nice>, B<--pipe>,
 B<--pipepart>, B<--fifo> and B<--cat>). Do not count on this
 literally, though, as the job may be scheduled on another computer or
 the local computer if : is in the list.
+
+
+=item B<-E> I<eof-str>
+
+Set the end of file string to I<eof-str>.  If the end of file string
+occurs as a line of input, the rest of the input is not read.  If
+neither B<-E> nor B<-e> is used, no end of file string is used.
 
 
 =item B<--eof>[=I<eof-str>]
@@ -768,7 +846,7 @@ foreground (opposite B<--bg>), and wait for completion of the command
 before exiting.
 
 
-See also B<--bg>, B<man sem>.
+See also: B<--bg>, B<man sem>.
 
 
 =item B<--fifo>
@@ -782,7 +860,7 @@ Beware: If data is not read from the fifo, the job will block forever.
 
 Implies B<--pipe> unless B<--pipepart> is used.
 
-See also B<--cat>.
+See also: B<--cat>.
 
 
 =item B<--filter-hosts>
@@ -823,7 +901,7 @@ B<--group> is the default. Can be reversed with B<-u>.
 See also: B<--line-buffer> B<--ungroup>
 
 
-=item B<--group-by> I<val>
+=item B<--group-by> I<val> (beta testing)
 
 Group input by value. Combined with B<--pipe>/B<--pipepart>
 B<--group-by> groups lines with the same value into a record.
@@ -893,7 +971,7 @@ UserID when grouping:
   cat table.csv | parallel --pipe --colsep , --header : \
     --group-by 'UserID s/\D//g' -kN1 wc
 
-See also B<--shard>, B<--roundrobin>.
+See also: B<--shard>, B<--roundrobin>.
 
 
 =item B<--help>
@@ -1013,9 +1091,9 @@ B<--header :> is an alias for B<--header '.*\n'>.
 If I<regexp> is a number, it is a fixed number of lines.
 
 
-=item B<--hostgroups>
+=item B<--hostgroups> (alpha testing)
 
-=item B<--hgrp>
+=item B<--hgrp> (alpha testing)
 
 Enable hostgroups on arguments. If an argument contains '@' the string
 after '@' will be removed and treated as a list of hostgroups on which
@@ -1033,7 +1111,7 @@ B<my_grp1_arg> may be run on either B<myserver1> or B<myserver2>,
 B<third> may be run on either B<myserver1> or B<myserver3>,
 but B<arg_for_grp2> will only be run on B<myserver2>.
 
-See also: B<--sshlogin>.
+See also: B<--sshlogin>, B<$PARALLEL_HOSTGROUPS>, B<$PARALLEL_ARGHOSTGROUPS>.
 
 
 =item B<-I> I<replace-str>
@@ -1073,7 +1151,7 @@ If the host is long, you can use B<column -t> to pretty print it:
 
   cat joblog | column -t
 
-See also B<--resume> B<--resume-failed>.
+See also: B<--resume> B<--resume-failed>.
 
 
 =item B<--jobs> I<N>
@@ -1316,21 +1394,6 @@ run remote and are very fast to run. This is disabled for sshlogins
 that specify their own ssh command.
 
 
-=item B<--xargs>
-
-Multiple arguments. Insert as many arguments as the command line
-length permits.
-
-If B<{}> is not used the arguments will be appended to the
-line.  If B<{}> is used multiple times each B<{}> will be replaced
-with all the arguments.
-
-Support for B<--xargs> with B<--sshlogin> is limited and may fail.
-
-See also B<-X> for context replace. If in doubt use B<-X> as that will
-most likely do what is needed.
-
-
 =item B<-m>
 
 Multiple arguments. Insert as many arguments as the command line
@@ -1364,6 +1427,34 @@ to be run later.
 B<--retries> must be set to determine how many times GNU B<parallel>
 should retry a given job.
 
+See also: B<--memsuspend>
+
+
+=item B<--memsuspend> I<size> (alpha testing)
+
+Suspend jobs when there is less than 2 * I<size> memory free. The
+I<size> can be postfixed with K, M, G, T, P, k, m, g, t, or p which
+would multiply the size with 1024, 1048576, 1073741824, 1099511627776,
+1125899906842624, 1000, 1000000, 1000000000, 1000000000000, or
+1000000000000000, respectively.
+
+If the available memory falls below 2 * I<size>, GNU B<parallel>
+will suspend some of the running jobs. If the available memory falls
+below I<size>, only one job will be running.
+
+If a single job takes up at most I<size> RAM, all jobs will complete
+without running out of memory. If you have swap available, you can
+usually lower I<size> to around half the size of a single job - with
+the slight risk of swapping a little.
+
+Jobs will be resumed when more RAM is available - typically when the
+oldest job completes.
+
+B<--memsuspend> only works on local jobs because there is no obvious
+way to suspend remote jobs.
+
+See also: B<--memfree>
+
 
 =item B<--minversion> I<version>
 
@@ -1373,6 +1464,43 @@ GNU B<parallel> is less than I<version> the exit code is
 
 This is useful for scripts that depend on features only available from
 a certain version of GNU B<parallel>.
+
+
+=item B<--max-args>=I<max-args>
+
+=item B<-n> I<max-args>
+
+Use at most I<max-args> arguments per command line.  Fewer than
+I<max-args> arguments will be used if the size (see the B<-s> option)
+is exceeded, unless the B<-x> option is given, in which case
+GNU B<parallel> will exit.
+
+B<-n 0> means read one argument, but insert 0 arguments on the command
+line.
+
+Implies B<-X> unless B<-m> is set.
+
+
+=item B<--max-replace-args>=I<max-args>
+
+=item B<-N> I<max-args>
+
+Use at most I<max-args> arguments per command line. Like B<-n> but
+also makes replacement strings B<{1}> .. B<{>I<max-args>B<}> that
+represents argument 1 .. I<max-args>. If too few args the B<{>I<n>B<}> will
+be empty.
+
+B<-N 0> means read one argument, but insert 0 arguments on the command
+line.
+
+This will set the owner of the homedir to the user:
+
+  tr ':' '\n' < /etc/passwd | parallel -N7 chown {1} {6}
+
+Implies B<-X> unless B<-m> or B<--pipe> is set.
+
+When used with B<--pipe> B<-N> is the number of records to read. This
+is somewhat slower than B<--block>.
 
 
 =item B<--nonall>
@@ -1412,9 +1540,9 @@ of each job is saved in a file and the filename is then printed.
 See also: B<--results>
 
 
-=item B<--pipe>
+=item B<--pipe> (beta testing)
 
-=item B<--spreadstdin>
+=item B<--spreadstdin> (beta testing)
 
 Spread input to jobs on stdin (standard input). Read a block of data
 from stdin (standard input) and give one block of data as input to one
@@ -1484,13 +1612,21 @@ Activate additional replacement strings: {+/} {+.} {+..} {+...} {..}
 '{foo}' and {} = {+/}/{/} = {.}.{+.} = {+/}/{/.}.{+.} = {..}.{+..} =
 {+/}/{/..}.{+..} = {...}.{+...} = {+/}/{/...}.{+...}
 
-B<{##}> is the number of jobs to be run. It is incompatible with
+B<{##}> is the total number of jobs to be run. It is incompatible with
 B<-X>/B<-m>/B<--xargs>.
 
 B<{choose_k}> is inspired by n choose k: Given a list of n elements,
 choose k. k is the number of input sources and n is the number of
 arguments in an input source.  The content of the input sources must
 be the same and the arguments must be unique.
+
+Shorthands for variables:
+
+  {slot}        $PARALLEL_JOBSLOT (see {%})
+  {sshlogin}    $PARALLEL_SSHLOGIN
+  {host}        $PARALLEL_SSHHOST
+  {agrp}        $PARALLEL_ARGHOSTGROUPS
+  {hgrp}        $PARALLEL_HOSTGROUPS
 
 The following dynamic replacement strings are also activated. They are
 inspired by bash's parameter expansion:
@@ -1521,44 +1657,7 @@ everything at startup.
 By sending GNU B<parallel> SIGUSR2 you can toggle turning on/off
 B<--progress> on a running GNU B<parallel> process.
 
-See also B<--eta> and B<--bar>.
-
-
-=item B<--max-args>=I<max-args>
-
-=item B<-n> I<max-args>
-
-Use at most I<max-args> arguments per command line.  Fewer than
-I<max-args> arguments will be used if the size (see the B<-s> option)
-is exceeded, unless the B<-x> option is given, in which case
-GNU B<parallel> will exit.
-
-B<-n 0> means read one argument, but insert 0 arguments on the command
-line.
-
-Implies B<-X> unless B<-m> is set.
-
-
-=item B<--max-replace-args>=I<max-args>
-
-=item B<-N> I<max-args>
-
-Use at most I<max-args> arguments per command line. Like B<-n> but
-also makes replacement strings B<{1}> .. B<{>I<max-args>B<}> that
-represents argument 1 .. I<max-args>. If too few args the B<{>I<n>B<}> will
-be empty.
-
-B<-N 0> means read one argument, but insert 0 arguments on the command
-line.
-
-This will set the owner of the homedir to the user:
-
-  tr ':' '\n' < /etc/passwd | parallel -N7 chown {1} {6}
-
-Implies B<-X> unless B<-m> or B<--pipe> is set.
-
-When used with B<--pipe> B<-N> is the number of records to read. This
-is somewhat slower than B<--block>.
+See also: B<--eta> and B<--bar>.
 
 
 =item B<--max-line-length-allowed>
@@ -1696,7 +1795,7 @@ B<--memfree> may give better results, so try using that first.
 Record current environment variables in ~/.parallel/ignored_vars. This
 is useful before using B<--env _>.
 
-See also B<--env>, B<--session>.
+See also: B<--env>, B<--session>.
 
 
 =item B<--recstart> I<startstring>
@@ -1807,7 +1906,16 @@ B<-.csv>/B<-.tsv> are special: It will give the file on stdout
 (standard output).
 
 
-B<Replacement string output file>
+B<JSON file output> (beta testing)
+
+If I<name> ends in B<.json> the output will be a JSON-file
+named I<name>.
+
+B<-.json> is special: It will give the file on stdout (standard
+output).
+
+
+B<Replacement string output file> (beta testing)
 
 If I<name> contains a replacement string and the replaced result does
 not end in /, then the standard output will be stored in a file named
@@ -1853,7 +1961,7 @@ will generate the files:
   my_foo/stderr
   my_foo/stdout
 
-See also B<--files>, B<--tag>, B<--header>, B<--joblog>.
+See also: B<--files>, B<--tag>, B<--header>, B<--joblog>.
 
 
 =item B<--resume>
@@ -1865,7 +1973,7 @@ sequence numbers in B<--joblog> then the input, the command, and
 B<--joblog> all have to remain unchanged; otherwise GNU B<parallel>
 may run wrong commands.
 
-See also B<--joblog>, B<--results>, B<--resume-failed>, B<--retries>.
+See also: B<--joblog>, B<--results>, B<--resume-failed>, B<--retries>.
 
 
 =item B<--resume-failed>
@@ -1878,7 +1986,7 @@ numbers in B<--joblog> then the input, the command, and B<--joblog>
 all have to remain unchanged; otherwise GNU B<parallel> may run wrong
 commands.
 
-See also B<--joblog>, B<--resume>, B<--retry-failed>, B<--retries>.
+See also: B<--joblog>, B<--resume>, B<--retry-failed>, B<--retries>.
 
 
 =item B<--retry-failed>
@@ -1948,7 +2056,7 @@ line:
   6	[...]	2	0	echo 5;sleep .5; exit 2
   4	[...]	1	0	echo 7;sleep .7; exit 1
 
-See also B<--joblog>, B<--resume>, B<--resume-failed>, B<--retries>.
+See also: B<--joblog>, B<--resume>, B<--resume-failed>, B<--retries>.
 
 
 =item B<--retries> I<n>
@@ -2015,7 +2123,7 @@ impossible to track which input block corresponds to which output.
 
 B<--roundrobin> implies B<--pipe>, except if B<--pipepart> is given.
 
-See also B<--group-by>, B<--shard>.
+See also: B<--group-by>, B<--shard>.
 
 
 =item B<--rpl> 'I<tag> I<perl expression>'
@@ -2140,7 +2248,7 @@ Used with B<--fg>, B<--wait>, and B<--semaphorename>.
 
 The command B<sem> is an alias for B<parallel --semaphore>.
 
-See also B<man sem>.
+See also: B<man sem>.
 
 
 =item B<--semaphorename> I<name>
@@ -2158,7 +2266,7 @@ The semaphore is stored in ~/.parallel/semaphores/
 
 Implies B<--semaphore>.
 
-See also B<man sem>.
+See also: B<man sem>.
 
 
 =item B<--semaphoretimeout> I<secs>
@@ -2171,7 +2279,7 @@ If I<secs> < 0: If the semaphore is not released within I<secs> seconds, exit.
 
 Implies B<--semaphore>.
 
-See also B<man sem>.
+See also: B<man sem>.
 
 
 =item B<--seqreplace> I<replace-str>
@@ -2188,7 +2296,7 @@ variables with names in B<$PARALLEL_IGNORED_NAMES> will not be copied.
 
 Only supported in B<Ash, Bash, Dash, Ksh, Sh, and Zsh>.
 
-See also B<--env>, B<--record-env>.
+See also: B<--env>, B<--record-env>.
 
 
 =item B<--shard> I<shardexpr>
@@ -2210,7 +2318,7 @@ I<shardcol> is small (<10), slower if it is big (>100).
 
 B<--shard> requires B<--pipe> and a fixed numeric value for B<--jobs>.
 
-See also B<--bin>, B<--group-by>, B<--roundrobin>.
+See also: B<--bin>, B<--group-by>, B<--roundrobin>.
 
 
 =item B<--shebang>
@@ -2333,7 +2441,11 @@ E.g.
   sql:oracle://scott:tiger@ora.example.com/xe/parjob
   postgresql://scott:tiger@pg.example.com/pgdb/parjob
   pg:///parjob
-  sqlite3:///pardb/parjob
+  sqlite3:///%2Ftmp%2Fpardb.sqlite/parjob
+  csv:///%2Ftmp%2Fpardb/parjob
+
+Notice how / in the path of sqlite and CVS must be encoded as
+%2F. Except the last / in CSV which must be a /.
 
 It can also be an alias from ~/.sql/aliases:
 
@@ -2365,11 +2477,12 @@ be overridden with B<--ssh>. It can also be set on a per server
 basis (see B<--sshlogin>).
 
 
-=item B<--sshdelay> I<secs>
+=item B<--sshdelay> I<mytime> (beta testing)
 
-Delay starting next ssh by I<secs> seconds. GNU B<parallel> will pause
-I<secs> seconds after starting each ssh. I<secs> can be less than 1
-seconds.
+Delay starting next ssh by I<mytime>. GNU B<parallel> will not start
+another ssh for the next I<mytime>.
+
+For details on I<mytime> see B<--delay>.
 
 
 =item B<-S> I<[@hostgroups/][ncpus/]sshlogin[,[@hostgroups/][ncpus/]sshlogin[,...]]>
@@ -2610,7 +2723,7 @@ B<--timeout 1d3.5h16.6m4s>.
 
 Print the job to be run on stderr (standard error).
 
-See also B<-v>, B<-p>.
+See also: B<-v>, B<-p>.
 
 
 =item B<--transfer>
@@ -2815,7 +2928,7 @@ Wait for all commands to complete.
 
 Used with B<--semaphore> or B<--sqlmaster>.
 
-See also B<man sem>.
+See also: B<man sem>.
 
 
 =item B<-X>
@@ -2835,7 +2948,7 @@ unexpected results if B<{}> is used as part of a word.
 
 Support for B<-X> with B<--sshlogin> is limited and may fail.
 
-See also B<-m>.
+See also: B<-m>.
 
 
 =item B<--exit>
@@ -2845,8 +2958,22 @@ See also B<-m>.
 Exit if the size (see the B<-s> option) is exceeded.
 
 
-=back
+=item B<--xargs>
 
+Multiple arguments. Insert as many arguments as the command line
+length permits.
+
+If B<{}> is not used the arguments will be appended to the
+line.  If B<{}> is used multiple times each B<{}> will be replaced
+with all the arguments.
+
+Support for B<--xargs> with B<--sshlogin> is limited and may fail.
+
+See also B<-X> for context replace. If in doubt use B<-X> as that will
+most likely do what is needed.
+
+
+=back
 
 =head1 EXAMPLE: Working as xargs -n1. Argument appending
 
@@ -3079,6 +3206,17 @@ To test a program with different parameters:
 
 If B<my_program> fails a red FAIL will be printed followed by the failing
 command; otherwise a green OK will be printed followed by the command.
+
+
+=head1 EXAMPLE: Continously show the latest line of output
+
+It can be useful to monitor the output of running jobs.
+
+This shows the most recent output line until a job finishes. After
+which the output of the job is printed in full:
+
+  parallel '{} | tee >(cat >&3)' ::: 'command 1' 'command 2' \
+    3> >(perl -ne '$|=1;chomp;printf"%.'$COLUMNS's\r",$_." "x100')
 
 
 =head1 EXAMPLE: Log rotate
@@ -3724,7 +3862,7 @@ way to know for certain is to test and measure.
 
 =head2 Limiting factor: RAM
 
-The normal B<grep -f regexs.txt bigfile> works no matter the size of
+The normal B<grep -f regexps.txt bigfile> works no matter the size of
 bigfile, but if regexps.txt is so big it cannot fit into memory, then
 you need to split this.
 
@@ -3753,7 +3891,7 @@ is much faster.
 
 If it still does not fit in memory you can do this:
 
-  parallel --pipepart -a regexps.txt --block 1M grep -Ff - -n bigfile | \
+  parallel --pipepart -a regexps.txt --block 1M grep -F -f - -n bigfile | \
     sort -un | perl -pe 's/^\d+://'
 
 The 1M should be your free memory divided by the number of CPU threads and
@@ -3778,13 +3916,13 @@ If you can live with duplicated lines and wrong order, it is faster to do:
 If the CPU is the limiting factor parallelization should be done on
 the regexps:
 
-  cat regexp.txt | parallel --pipe -L1000 --roundrobin --compress \
+  cat regexps.txt | parallel --pipe -L1000 --roundrobin --compress \
     grep -f - -n bigfile | \
     sort -un | perl -pe 's/^\d+://'
 
 The command will start one B<grep> per CPU and read I<bigfile> one
 time per CPU, but as that is done in parallel, all reads except the
-first will be cached in RAM. Depending on the size of I<regexp.txt> it
+first will be cached in RAM. Depending on the size of I<regexps.txt> it
 may be faster to use B<--block 10m> instead of B<-L1000>.
 
 Some storage systems perform better when reading multiple chunks in
@@ -3792,13 +3930,13 @@ parallel. This is true for some RAID systems and for some network file
 systems. To parallelize the reading of I<bigfile>:
 
   parallel --pipepart --block 100M -a bigfile -k --compress \
-    grep -f regexp.txt
+    grep -f regexps.txt
 
 This will split I<bigfile> into 100MB chunks and run B<grep> on each of
-these chunks. To parallelize both reading of I<bigfile> and I<regexp.txt>
-combine the two using B<--fifo>:
+these chunks. To parallelize both reading of I<bigfile> and I<regexps.txt>
+combine the two using B<--cat>:
 
-  parallel --pipepart --block 100M -a bigfile --fifo cat regexp.txt \
+  parallel --pipepart --block 100M -a bigfile --cat cat regexps.txt \
     \| parallel --pipe -L1000 --roundrobin grep -f - {}
 
 If a line matches multiple regexps, the line may be duplicated.
@@ -3980,6 +4118,14 @@ output.
 If you have a lot of hosts use '-j0' to access more hosts in parallel.
 
 
+=head1 EXAMPLE: Running 'sudo' on remote computers
+
+Put the password into passwordfile then run:
+
+  parallel --ssh 'cat passwordfile | ssh' --nonall \
+    -S user@server1,user@server2 sudo -S ls -l /root
+
+
 =head1 EXAMPLE: Using remote computers behind NAT wall
 
 If the workers are behind a NAT wall, you need some trickery to get to
@@ -4137,39 +4283,40 @@ the columns. To keep the spaces:
 
 GNU B<parallel> can output to a database table and a CSV-file:
 
-  DBURL=csv:///%2Ftmp%2Fmy.csv
-  DBTABLEURL=$DBURL/mytable
-  parallel --sqlandworker $DBTABLEURL seq ::: {1..10}
+  dburl=csv:///%2Ftmp%2Fmydir
+  dbtableurl=$dburl/mytable.csv
+  parallel --sqlandworker $dbtableurl seq ::: {1..10}
 
 It is rather slow and takes up a lot of CPU time because GNU
 B<parallel> parses the whole CSV file for each update.
 
 A better approach is to use an SQLite-base and then convert that to CSV:
 
-  DBURL=sqlite3:///%2Ftmp%2Fmy.sqlite
-  DBTABLEURL=$DBURL/mytable
-  parallel --sqlandworker $DBTABLEURL seq ::: {1..10}
-  sql $DBURL '.headers on' '.mode csv' 'SELECT * FROM mytable;'
+  dburl=sqlite3:///%2Ftmp%2Fmy.sqlite
+  dbtableurl=$dburl/mytable
+  parallel --sqlandworker $dbtableurl seq ::: {1..10}
+  sql $dburl '.headers on' '.mode csv' 'SELECT * FROM mytable;'
 
 This takes around a second per job.
 
 If you have access to a real database system, such as PostgreSQL, it
 is even faster:
 
-  DBURL=pg://user:pass@host/mydb
-  DBTABLEURL=$DBURL/mytable
-  parallel --sqlandworker $DBTABLEURL seq ::: {1..10}
-  sql $DBURL \
+  dburl=pg://user:pass@host/mydb
+  dbtableurl=$dburl/mytable
+  parallel --sqlandworker $dbtableurl seq ::: {1..10}
+  sql $dburl \
     "COPY (SELECT * FROM mytable) TO stdout DELIMITER ',' CSV HEADER;"
 
 Or MySQL:
 
-  DBURL=mysql://user:pass@host/mydb
-  DBTABLEURL=$DBURL/mytable
-  parallel --sqlandworker $DBTABLEURL seq ::: {1..10}
-  sql -p -B $DBURL "SELECT * FROM mytable;" > mytable.tsv
-  perl -pe 's/"/""/g; s/\t/","/g; s/^/"/; s/$/"/; s/\\\\/\\/g;
-    s/\\t/\t/g; s/\\n/\n/g;' mytable.tsv
+  dburl=mysql://user:pass@host/mydb
+  dbtableurl=$dburl/mytable
+  parallel --sqlandworker $dbtableurl seq ::: {1..10}
+  sql -p -B $dburl "SELECT * FROM mytable;" > mytable.tsv
+  perl -pe 's/"/""/g; s/\t/","/g; s/^/"/; s/$/"/;
+    %s=("\\" => "\\", "t" => "\t", "n" => "\n");
+    s/\\([\\tn])/$s{$1}/g;' mytable.tsv
 
 
 =head1 EXAMPLE: Output to CSV-file for R
@@ -4754,13 +4901,42 @@ the currently running jobs are finished before exiting.
 Dir where GNU B<parallel> stores config files, semaphores, and caches
 information between invocations. Default: $HOME/.parallel.
 
+
+=item $PARALLEL_ARGHOSTGROUPS
+
+When using B<--hostgroups> GNU B<parallel> sets this to the hostgroups
+of the job.
+
+Remember to quote the $, so it gets evaluated by the correct shell. Or
+use B<--plus> and {agrp}.
+
+
+=item $PARALLEL_HOSTGROUPS
+
+When using B<--hostgroups> GNU B<parallel> sets this to the hostgroups
+of the sshlogin that the job is run on.
+
+Remember to quote the $, so it gets evaluated by the correct shell. Or
+use B<--plus> and {hgrp}.
+
+
+=item $PARALLEL_JOBSLOT
+
+Set by GNU B<parallel> and can be used in jobs run by GNU B<parallel>.
+Remember to quote the $, so it gets evaluated by the correct shell. Or
+use B<--plus> and {slot}.
+
+$PARALLEL_JOBSLOT is the jobslot of the job. It is equal to {%} unless
+the job is being retried. See {%} for details.
+
+
 =item $PARALLEL_PID
 
-The environment variable $PARALLEL_PID is set by GNU B<parallel> and
-is visible to the jobs started from GNU B<parallel>. This makes it
-possible for the jobs to communicate directly to GNU B<parallel>.
-Remember to quote the $, so it gets evaluated by the correct
-shell.
+Set by GNU B<parallel> and can be used in jobs run by GNU B<parallel>.
+Remember to quote the $, so it gets evaluated by the correct shell.
+
+This makes it possible for the jobs to communicate directly to GNU
+B<parallel>.
 
 B<Example:> If each of the jobs tests a solution and one of jobs finds
 the solution the job can tell GNU B<parallel> not to start more jobs
@@ -4800,17 +4976,36 @@ $SHELL. If undefined use:
 
 =item $PARALLEL_SSH
 
-GNU B<parallel> defaults to using B<ssh> for remote access. This can
-be overridden with $PARALLEL_SSH, which again can be overridden with
-B<--ssh>. It can also be set on a per server basis (see
-B<--sshlogin>).
+GNU B<parallel> defaults to using the B<ssh> command for remote
+access. This can be overridden with $PARALLEL_SSH, which again can be
+overridden with B<--ssh>. It can also be set on a per server basis
+(see B<--sshlogin>).
+
+
+=item $PARALLEL_SSHHOST
+
+Set by GNU B<parallel> and can be used in jobs run by GNU B<parallel>.
+Remember to quote the $, so it gets evaluated by the correct shell. Or
+use B<--plus> and {host}.
+
+
+$PARALLEL_SSHHOST is the host part of an sshlogin line. E.g.
+
+  4//usr/bin/specialssh user@host
+
+becomes:
+
+  host
 
 
 =item $PARALLEL_SSHLOGIN
 
-The environment variable $PARALLEL_SSHLOGIN is set by GNU B<parallel>
-and is visible to the jobs started from GNU B<parallel>. The value is
-the sshlogin line with number of cores removed. E.g.
+Set by GNU B<parallel> and can be used in jobs run by GNU B<parallel>.
+Remember to quote the $, so it gets evaluated by the correct shell. Or
+use B<--plus> and {sshlogin}.
+
+
+The value is the sshlogin line with number of cores removed. E.g.
 
   4//usr/bin/specialssh user@host
 
@@ -4821,14 +5016,17 @@ becomes:
 
 =item $PARALLEL_SEQ
 
-$PARALLEL_SEQ will be set to the sequence number of the job
-running. Remember to quote the $, so it gets evaluated by the correct
-shell.
+Set by GNU B<parallel> and can be used in jobs run by GNU B<parallel>.
+Remember to quote the $, so it gets evaluated by the correct shell.
+
+$PARALLEL_SEQ is the sequence number of the job running.
 
 B<Example:>
 
   seq 10 | parallel -N2 \
     echo seq:'$'PARALLEL_SEQ arg1:{1} arg2:{2}
+
+{#} is a shorthand for $PARALLEL_SEQ.
 
 
 =item $PARALLEL_TMUX
@@ -4858,7 +5056,7 @@ can be written as:
   cat list | PARALLEL='-kvj1 -S myssh\ user@server' \
     parallel echo
 
-Notice the \ in the middle is needed because 'myssh' and 'user@server'
+Notice the \ after 'myssh' is needed because 'myssh' and 'user@server'
 must be one argument.
 
 =back
@@ -5083,7 +5281,7 @@ Your bug report should always include:
 
 The error message you get (if any). If the error message is not from
 GNU B<parallel> you need to show why you think GNU B<parallel> caused
-these.
+this.
 
 =item *
 
@@ -5095,21 +5293,22 @@ version.
 =item *
 
 A minimal, complete, and verifiable example (See description on
-http://stackoverflow.com/help/mcve).
+https://stackoverflow.com/help/mcve).
 
-It should be a complete example that others can run that shows the problem
-including all files needed to run the example. This should preferably
-be small and simple, so try to remove as many options as possible. A
-combination of B<yes>, B<seq>, B<cat>, B<echo>, and B<sleep> can
-reproduce most errors. If your example requires large files, see if
-you can make them by something like B<seq 1000000> > B<file> or B<yes
-| head -n 10000000> > B<file>.
+It should be a complete example that others can run which shows the
+problem including all files needed to run the example. This should
+preferably be small and simple, so try to remove as many options as
+possible. A combination of B<yes>, B<seq>, B<cat>, B<echo>, B<wc>, and
+B<sleep> can reproduce most errors. If your example requires large
+files, see if you can make them with something like B<seq 100000000> >
+B<bigfile> or B<yes | head -n 1000000000> > B<file>. If you need
+multiple columns: B<paste <(seq 1000) <(seq 1000 1999)>
 
 If your example requires remote execution, see if you can use
 B<localhost> - maybe using another login.
 
-If you have access to a different system, test if the MCVE shows the
-problem on that system.
+If you have access to a different system (maybe a VirtualBox on your
+own machine), test if the MCVE shows the problem on that system.
 
 =item *
 
@@ -5157,8 +5356,8 @@ Copyright (C) 2007-10-18 Ole Tange, http://ole.tange.dk
 
 Copyright (C) 2008-2010 Ole Tange, http://ole.tange.dk
 
-Copyright (C) 2010-2019 Ole Tange,
-http://ole.tange.dk and Free Software Foundation, Inc.
+Copyright (C) 2010-2021 Ole Tange, http://ole.tange.dk and Free
+Software Foundation, Inc.
 
 Parts of the manual concerning B<xargs> compatibility is inspired by
 the manual of B<xargs> from GNU findutils 4.4.2.
@@ -5283,9 +5482,9 @@ For remote usage it uses B<rsync> with B<ssh>.
 
 =head1 SEE ALSO
 
-B<ssh>(1), B<ssh-agent>(1), B<sshpass>(1), B<ssh-copy-id>(1),
-B<rsync>(1), B<find>(1), B<xargs>(1), B<dirname>(1), B<make>(1),
-B<pexec>(1), B<ppss>(1), B<xjobs>(1), B<prll>(1), B<dxargs>(1),
-B<mdm>(1)
+B<parallel_tutorial>(1), B<env_parallel>(1), B<parset>(1),
+B<parsort>(1), B<parallel_alternatives>(1), B<parallel_design>(7),
+B<niceload>(1), B<sql>(1), B<ssh>(1), B<ssh-agent>(1), B<sshpass>(1),
+B<ssh-copy-id>(1), B<rsync>(1)
 
 =cut
