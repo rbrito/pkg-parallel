@@ -1,4 +1,4 @@
-parallel (20191222-0~4.gbp93ae51) UNRELEASED; urgency=medium
+parallel (20210122-1) UNRELEASED; urgency=medium
 
   ** SNAPSHOT build @93ae51898ae2550c82e172506632b4088597e5d0 **
 
@@ -26,8 +26,9 @@ parallel (20191222-0~4.gbp93ae51) UNRELEASED; urgency=medium
     + Follow cme's advice remove depends on perl.
     + Set Rules-Requires-Root to no.
     + State compliancy with Policy 4.5.1.
+  * New upstream version
 
- -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 03:53:41 -0300
+ -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 04:00:10 -0300
 
 parallel (20161222-1.1) unstable; urgency=medium
 
