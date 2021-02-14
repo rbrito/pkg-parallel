@@ -1,10 +1,4 @@
 #!/usr/bin/make -f
-
-CURVER=$(shell dpkg-parsechangelog --show-field Version)
-DEBVER=$(shell echo $(CURVER) | cut -d- -f1)
-UPVER=$(shell echo $(DEBVER) | cut -d+ -f1)
-
-
 %:
 	dh $@
 
@@ -23,21 +17,6 @@ override_dh_clean:
 	find src/ -name '*.texi' -delete
 	find src/ -name '*.1' -delete
 	find src/ -name '*.html' -delete
-
-get-orig-source:
-	uscan --verbose \
-		--download-version $(UPVER) \
-		--no-symlink \
-		--force-download \
-		--destdir .
-	tar xvf	parallel-$(UPVER).tar.bz2
-	find parallel-$(UPVER)/src/ -name '*.pdf' -delete
-	find parallel-$(UPVER)/src/ -name '*.texi' -delete
-	find parallel-$(UPVER)/src/ -name '*.1' -delete
-	find parallel-$(UPVER)/src/ -name '*.html' -delete
-	tar cf parallel_$(DEBVER).orig.tar parallel-$(UPVER)
-	gzip -9 parallel_$(DEBVER).orig.tar
-	rm -vrf parallel-$(UPVER)/ parallel-$(UPVER).tar.bz2
 
 override_dh_auto_test:
 	# disable for the moment
