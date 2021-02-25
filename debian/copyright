@@ -2,6 +2,11 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: GNU Parallel
 Upstream-Contact: Ole Tange <ole@tange.dk>
 Source: https://ftpmirror.gnu.org/parallel/
+Files-Excluded: src/*.{1,7}
+ src/*.html
+ src/*.pdf
+ src/*.texi
+Comment: The files excluded are automatically generated from the source files.
 
 Files: *
 Copyright: 2007-2019, Ole Tange and Free Software Foundation, Inc.
