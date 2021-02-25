@@ -9,7 +9,7 @@ Files-Excluded: src/*.{1,7}
 Comment: The files excluded are automatically generated from the source files.
 
 Files: *
-Copyright: 2007-2019, Ole Tange and Free Software Foundation, Inc.
+Copyright: 2007-2021, Ole Tange and Free Software Foundation, Inc.
 License: GPL-3+
 
 Files: debian/*
