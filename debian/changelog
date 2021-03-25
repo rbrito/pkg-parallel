@@ -1,9 +1,13 @@
-parallel (20210122-0~0.gbpfe630c) UNRELEASED; urgency=medium
+parallel (20210322-0~1.gbpe48907) UNRELEASED; urgency=medium
 
-  ** SNAPSHOT build @fe630c42f741e46eabf67787f0b8a40a09511b3c **
+  ** SNAPSHOT build @e48907c1b30cb47b4ba5f2cab39af90db728a82b **
 
-  * New upstream version 20210122
-  * debian/copyright: Extend my copyright years.
+  * New upstream version 20210322
+  * debian/copyright:
+    + Extend my copyright years.
+    + Use source with https prefix.
+    + Add Files-Excluded entries.
+    + Extend upstream copyright years.
   * debian/README.source: Update instructions to build the package.
   * debian/{compat,control}: Update to new notation and level 12.
   * Update my email address.
@@ -27,9 +31,14 @@ parallel (20210122-0~0.gbpfe630c) UNRELEASED; urgency=medium
     + Set Rules-Requires-Root to no.
     + State compliancy with Policy 4.5.1.
   * Add salsa-ci file (routine-update)
-  * watch file standard 4 (routine-update)
+  * debian/rules:
+    + Disable running the testsuite. Upstream doesn't ship it.
+  * debian/watch:
+    + Use https instead of plain ftp.
+    + watch file standard 4 (routine-update)
+  * debian/parallel.{dirs,install}: Remove redundant files.
 
- -- Rogério Brito <rbrito@gmail.com>  Sun, 14 Feb 2021 04:00:19 -0300
+ -- Rogério Brito <rbrito@gmail.com>  Thu, 25 Mar 2021 17:34:09 -0300
 
 parallel (20161222-1.1) unstable; urgency=medium
 
