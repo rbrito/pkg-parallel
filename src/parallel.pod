@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GFDL-1.3-or-later
+# SPDX-License-Identifier: CC-BY-SA-4.0
+
 =encoding utf8
 
 =head1 NAME
@@ -299,14 +303,20 @@ directory (if any) and extension removed.
 To understand positional replacement strings see B<{>I<n>B<}>.
 
 
-=item B<{=>I<perl expression>B<=}>
+=item B<{=>I<perl expression>B<=}> (beta testing)
 
 Replace with calculated I<perl expression>. B<$_> will contain the
 same as B<{}>. After evaluating I<perl expression> B<$_> will be used
 as the value. It is recommended to only change $_ but you have full
 access to all of GNU B<parallel>'s internal functions and data
-structures. A few convenience functions and data structures have been
-made:
+structures.
+
+The expression must give the same result if evaluated twice -
+otherwise the behaviour is undefined. E.g. this will not work as expected:
+
+    parallel echo '{= $_= ++$wrong_counter =}' ::: a b c
+
+A few convenience functions and data structures have been made:
 
 =over 15
 
@@ -729,7 +739,7 @@ Even quoted newlines are parsed correctly:
 When used with B<--pipe> only pass full CSV-records.
 
 
-=item B<--delay> I<mytime> (beta testing)
+=item B<--delay> I<mytime>
 
 Delay starting next job by I<mytime>. GNU B<parallel> will pause
 I<mytime> after starting each job. I<mytime> is normally in seconds,
@@ -863,6 +873,16 @@ Implies B<--pipe> unless B<--pipepart> is used.
 See also: B<--cat>.
 
 
+=item B<--filter> I<filter> (beta testing)
+
+Only run jobs where I<filter> is true. I<filter> can contain
+replacement strings and Perl code. Example:
+
+   parallel --filter '{1} < {2}+1' echo ::: {1..3} ::: {1..3}
+
+Outputs: 1,1 1,2 1,3 2,2 2,3 3,3
+
+
 =item B<--filter-hosts>
 
 Remove down hosts. For each remote host: check that login through ssh
@@ -901,7 +921,7 @@ B<--group> is the default. Can be reversed with B<-u>.
 See also: B<--line-buffer> B<--ungroup>
 
 
-=item B<--group-by> I<val> (beta testing)
+=item B<--group-by> I<val>
 
 Group input by value. Combined with B<--pipe>/B<--pipepart>
 B<--group-by> groups lines with the same value into a record.
@@ -1091,9 +1111,9 @@ B<--header :> is an alias for B<--header '.*\n'>.
 If I<regexp> is a number, it is a fixed number of lines.
 
 
-=item B<--hostgroups> (alpha testing)
+=item B<--hostgroups>
 
-=item B<--hgrp> (alpha testing)
+=item B<--hgrp>
 
 Enable hostgroups on arguments. If an argument contains '@' the string
 after '@' will be removed and treated as a list of hostgroups on which
@@ -1353,9 +1373,9 @@ mix. Compare:
 See also: B<--group> B<--ungroup>
 
 
-=item B<--xapply>
+=item B<--xapply> (beta testing)
 
-=item B<--link>
+=item B<--link> (beta testing)
 
 Link input sources. Read multiple input sources like B<xapply>. If
 multiple input sources are given, one argument will be read from each
@@ -1430,7 +1450,7 @@ should retry a given job.
 See also: B<--memsuspend>
 
 
-=item B<--memsuspend> I<size> (alpha testing)
+=item B<--memsuspend> I<size>
 
 Suspend jobs when there is less than 2 * I<size> memory free. The
 I<size> can be postfixed with K, M, G, T, P, k, m, g, t, or p which
@@ -1540,9 +1560,9 @@ of each job is saved in a file and the filename is then printed.
 See also: B<--results>
 
 
-=item B<--pipe> (beta testing)
+=item B<--pipe>
 
-=item B<--spreadstdin> (beta testing)
+=item B<--spreadstdin>
 
 Spread input to jobs on stdin (standard input). Read a block of data
 from stdin (standard input) and give one block of data as input to one
@@ -1614,6 +1634,10 @@ Activate additional replacement strings: {+/} {+.} {+..} {+...} {..}
 
 B<{##}> is the total number of jobs to be run. It is incompatible with
 B<-X>/B<-m>/B<--xargs>.
+
+B<{0%}> zero-padded jobslot. (alpha testing)
+
+B<{0#}> zero-padded sequence number. (alpha testing)
 
 B<{choose_k}> is inspired by n choose k: Given a list of n elements,
 choose k. k is the number of input sources and n is the number of
@@ -1906,7 +1930,7 @@ B<-.csv>/B<-.tsv> are special: It will give the file on stdout
 (standard output).
 
 
-B<JSON file output> (beta testing)
+B<JSON file output>
 
 If I<name> ends in B<.json> the output will be a JSON-file
 named I<name>.
@@ -1915,7 +1939,7 @@ B<-.json> is special: It will give the file on stdout (standard
 output).
 
 
-B<Replacement string output file> (beta testing)
+B<Replacement string output file>
 
 If I<name> contains a replacement string and the replaced result does
 not end in /, then the standard output will be stored in a file named
@@ -2477,7 +2501,7 @@ be overridden with B<--ssh>. It can also be set on a per server
 basis (see B<--sshlogin>).
 
 
-=item B<--sshdelay> I<mytime> (beta testing)
+=item B<--sshdelay> I<mytime>
 
 Delay starting next ssh by I<mytime>. GNU B<parallel> will not start
 another ssh for the next I<mytime>.
@@ -2612,6 +2636,34 @@ job slot number.
 
 Silent.  The job to be run will not be printed. This is the default.
 Can be reversed with B<-v>.
+
+
+=item B<--template> I<file>=I<repl> (beta testing)
+
+=item B<--tmpl> I<file>=I<repl> (beta testing)
+
+Copy I<file> to I<repl>. All replacement strings in the contents of
+I<file> will be replaced. All replacement strings in the name I<repl>
+will be replaced.
+
+With B<--cleanup> the new file will be removed when the job is done.
+
+If I<my.tmpl> contains this:
+
+  Xval: {x}
+  Yval: {y}
+  FixedValue: 9
+  # x with 2 decimals
+  DecimalX: {=x $_=sprintf("%.2f",$_) =}
+  TenX: {=x $_=$_*10 =}
+  RandomVal: {=1 $_=rand() =}
+
+it can be used like this:
+
+  myprog() { echo Using "$@"; cat "$@"; }
+  export -f myprog
+  parallel --cleanup --header : --tmpl my.tmpl={#}.t myprog {#}.t \
+    ::: x 1.234 2.345 3.45678 ::: y 1 2 3
 
 
 =item B<--tty>
@@ -2975,7 +3027,9 @@ most likely do what is needed.
 
 =back
 
-=head1 EXAMPLE: Working as xargs -n1. Argument appending
+=head1 EXAMPLES
+
+=head2 EXAMPLE: Working as xargs -n1. Argument appending
 
 GNU B<parallel> can work similar to B<xargs -n1>.
 
@@ -2992,7 +3046,7 @@ FUBAR in all files in this dir and subdirs:
 Note B<-q> is needed because of the space in 'FOO BAR'.
 
 
-=head1 EXAMPLE: Simple network scanner
+=head2 EXAMPLE: Simple network scanner
 
 B<prips> can generate IP-addresses from CIDR notation. With GNU
 B<parallel> you can build a simple network scanner to see which
@@ -3003,7 +3057,7 @@ addresses respond to B<ping>:
       'ping -c 1 {} >/dev/null && echo {}' 2>/dev/null
 
 
-=head1 EXAMPLE: Reading arguments from command line
+=head2 EXAMPLE: Reading arguments from command line
 
 GNU B<parallel> can take the arguments from command line instead of
 stdin (standard input). To compress all html files in the current dir
@@ -3016,7 +3070,7 @@ To convert *.wav to *.mp3 using LAME running one process per CPU run:
   parallel lame {} -o {.}.mp3 ::: *.wav
 
 
-=head1 EXAMPLE: Inserting multiple arguments
+=head2 EXAMPLE: Inserting multiple arguments
 
 When moving a lot of files like this: B<mv *.log destdir> you will
 sometimes get the error:
@@ -3037,7 +3091,7 @@ In many shells you can also use B<printf>:
   printf '%s\0' *.log | parallel -0 -m mv {} destdir
 
 
-=head1 EXAMPLE: Context replace
+=head2 EXAMPLE: Context replace
 
 To remove the files I<pict0000.jpg> .. I<pict9999.jpg> you could do:
 
@@ -3059,7 +3113,7 @@ This will also only run B<rm> as many times needed to keep the command
 line length short enough.
 
 
-=head1 EXAMPLE: Compute intensive jobs and substitution
+=head2 EXAMPLE: Compute intensive jobs and substitution
 
 If ImageMagick is installed this will generate a thumbnail of a jpg
 file:
@@ -3088,7 +3142,7 @@ make files like ./foo/bar_thumb.jpg:
     parallel convert -geometry 120 {} {.}_thumb.jpg
 
 
-=head1 EXAMPLE: Substitution and redirection
+=head2 EXAMPLE: Substitution and redirection
 
 This will generate an uncompressed version of .gz-files next to the .gz-file:
 
@@ -3099,12 +3153,12 @@ solution is to quote the whole command:
 
   parallel "zcat {} >{.}" ::: *.gz
 
-Other special shell characters (such as * ; $ > < | >> <<) also need
+Other special shell characters (such as * ; $ > < |  >> <<) also need
 to be put in quotes, as they may otherwise be interpreted by the shell
 and not given to GNU B<parallel>.
 
 
-=head1 EXAMPLE: Composed commands
+=head2 EXAMPLE: Composed commands
 
 A job can consist of several commands. This will print the number of
 files in each directory:
@@ -3139,7 +3193,7 @@ Find the files in a list that do not exist
   cat file_list | parallel 'if [ ! -e {} ] ; then echo {}; fi'
 
 
-=head1 EXAMPLE: Composed command with perl replacement string
+=head2 EXAMPLE: Composed command with perl replacement string
 
 You have a bunch of file. You want them sorted into dirs. The dir of
 each file should be named the first letter of the file name.
@@ -3147,7 +3201,7 @@ each file should be named the first letter of the file name.
   parallel 'mkdir -p {=s/(.).*/$1/=}; mv {} {=s/(.).*/$1/=}' ::: *
 
 
-=head1 EXAMPLE: Composed command with multiple input sources
+=head2 EXAMPLE: Composed command with multiple input sources
 
 You have a dir with files named as 24 hours in 5 minute intervals:
 00:00, 00:05, 00:10 .. 23:55. You want to find the files missing:
@@ -3156,7 +3210,7 @@ You have a dir with files named as 24 hours in 5 minute intervals:
     ::: {00..23} ::: {00..55..5}
 
 
-=head1 EXAMPLE: Calling Bash functions
+=head2 EXAMPLE: Calling Bash functions
 
 If the composed command is longer than a line, it becomes hard to
 read. In Bash you can use functions. Just remember to B<export -f> the
@@ -3189,7 +3243,7 @@ can copy the full environment without having to B<export -f>
 anything. See B<env_parallel>.
 
 
-=head1 EXAMPLE: Function tester
+=head2 EXAMPLE: Function tester
 
 To test a program with different parameters:
 
@@ -3208,7 +3262,7 @@ If B<my_program> fails a red FAIL will be printed followed by the failing
 command; otherwise a green OK will be printed followed by the command.
 
 
-=head1 EXAMPLE: Continously show the latest line of output
+=head2 EXAMPLE: Continously show the latest line of output
 
 It can be useful to monitor the output of running jobs.
 
@@ -3219,7 +3273,7 @@ which the output of the job is printed in full:
     3> >(perl -ne '$|=1;chomp;printf"%.'$COLUMNS's\r",$_." "x100')
 
 
-=head1 EXAMPLE: Log rotate
+=head2 EXAMPLE: Log rotate
 
 Log rotation renames a logfile to an extension with a higher number:
 log.1 becomes log.2, log.2 becomes log.3, and so on. The oldest log is
@@ -3231,7 +3285,7 @@ the log:
   mv log log.1
 
 
-=head1 EXAMPLE: Removing file extension when processing files
+=head2 EXAMPLE: Removing file extension when processing files
 
 When processing files removing the file extension using B<{.}> is
 often useful.
@@ -3255,7 +3309,7 @@ Put all converted in the same directory:
     parallel lame {} -o mydir/{/.}.mp3
 
 
-=head1 EXAMPLE: Removing strings from the argument
+=head2 EXAMPLE: Removing strings from the argument
 
 If you have directory with tar.gz files and want these extracted in
 the corresponding dir (e.g foo.tar.gz will be extracted in the dir
@@ -3277,7 +3331,7 @@ To remove a string anywhere you can use regular expressions with
   parallel --plus echo {/demo_/} ::: demo_mycode remove_demo_here
 
 
-=head1 EXAMPLE: Download 24 images for each of the past 30 days
+=head2 EXAMPLE: Download 24 images for each of the past 30 days
 
 Let us assume a website stores images like:
 
@@ -3299,7 +3353,7 @@ B<$(date -d "today -$1 days" +%Y%m%d)> will give the dates in
 YYYYMMDD with B<$1> days subtracted.
 
 
-=head1 EXAMPLE: Download world map from NASA
+=head2 EXAMPLE: Download world map from NASA
 
 NASA provides tiles to download on earthdata.nasa.gov. Download tiles
 for Blue Marble world map and create a 10240x20480 map.
@@ -3317,7 +3371,7 @@ for Blue Marble world map and create a 10240x20480 map.
   convert -append line{0..19}.jpg world.jpg
 
 
-=head1 EXAMPLE: Download Apollo-11 images from NASA using jq
+=head2 EXAMPLE: Download Apollo-11 images from NASA using jq
 
 Search NASA using their API to get JSON for images related to 'apollo
 11' and has 'moon landing' in the description.
@@ -3344,7 +3398,7 @@ B<parallel> finally uses B<wget> to fetch the images.
     parallel wget
 
 
-=head1 EXAMPLE: Download video playlist in parallel
+=head2 EXAMPLE: Download video playlist in parallel
 
 B<youtube-dl> is an excellent tool to download videos. It can,
 however, not download videos in parallel. This takes a playlist and
@@ -3357,7 +3411,7 @@ downloads 10 videos in parallel.
       youtube-dl --playlist-start {#} --playlist-end {#} '"https://$url"'
 
 
-=head1 EXAMPLE: Prepend last modified date (ISO8601) to file name
+=head2 EXAMPLE: Prepend last modified date (ISO8601) to file name
 
   parallel mv {} '{= $a=pQ($_); $b=$_;' \
     '$_=qx{date -r "$a" +%FT%T}; chomp; $_="$_ $b" =}' ::: *
@@ -3365,7 +3419,7 @@ downloads 10 videos in parallel.
 B<{=> and B<=}> mark a perl expression. B<pQ> perl-quotes the
 string. B<date +%FT%T> is the date in ISO8601 with time.
 
-=head1 EXAMPLE: Save output in ISO8601 dirs
+=head2 EXAMPLE: Save output in ISO8601 dirs
 
 Save output from B<ps aux> every second into dirs named
 yyyy-mm-ddThh:mm:ss+zz:zz.
@@ -3374,7 +3428,7 @@ yyyy-mm-ddThh:mm:ss+zz:zz.
     --results '{= $_=`date -Isec`; chomp=}/' ps aux
 
 
-=head1 EXAMPLE: Digital clock with "blinking" :
+=head2 EXAMPLE: Digital clock with "blinking" :
 
 The : in a digital clock blinks. To make every other line have a ':'
 and the rest a ' ' a perl expression is used to look at the 3rd input
@@ -3384,7 +3438,7 @@ source. If the value modulo 2 is 1: Use ":" otherwise use " ":
     ::: {0..12} ::: {0..5} ::: {0..9}
 
 
-=head1 EXAMPLE: Aggregating content of files
+=head2 EXAMPLE: Aggregating content of files
 
 This:
 
@@ -3404,7 +3458,7 @@ So you end up with x1z1 .. x5z5 each containing the content of all
 values of y.
 
 
-=head1 EXAMPLE: Breadth first parallel web crawler/mirrorer
+=head2 EXAMPLE: Breadth first parallel web crawler/mirrorer
 
 This script below will crawl and mirror a URL in parallel.  It
 downloads first pages that are 1 click down, then 2 clicks down, then
@@ -3451,7 +3505,7 @@ URLs and the process is started over until no unseen links are found.
   rm -f $URLLIST $URLLIST2 $SEEN
 
 
-=head1 EXAMPLE: Process files from a tar file while unpacking
+=head2 EXAMPLE: Process files from a tar file while unpacking
 
 If the files to be processed are in a tar file then unpacking one file
 and processing it immediately may be faster than first unpacking all
@@ -3464,7 +3518,7 @@ The Perl one-liner is needed to make sure the file is complete before
 handing it to GNU B<parallel>.
 
 
-=head1 EXAMPLE: Rewriting a for-loop and a while-read-loop
+=head2 EXAMPLE: Rewriting a for-loop and a while-read-loop
 
 for-loops like this:
 
@@ -3529,7 +3583,7 @@ can both be rewritten as:
   export -f doit
   cat list | parallel doit
 
-=head1 EXAMPLE: Rewriting nested for-loops
+=head2 EXAMPLE: Rewriting nested for-loops
 
 Nested for-loops like this:
 
@@ -3556,7 +3610,7 @@ can be written like this:
   parallel echo {1} {2} ::: red green blue ::: S M L XL XXL | sort
 
 
-=head1 EXAMPLE: Finding the lowest difference between files
+=head2 EXAMPLE: Finding the lowest difference between files
 
 B<diff> is good for finding differences in text files. B<diff | wc -l>
 gives an indication of the size of the difference. To find the
@@ -3568,7 +3622,7 @@ This way it is possible to see if some files are closer to other
 files.
 
 
-=head1 EXAMPLE: for-loops with column names
+=head2 EXAMPLE: for-loops with column names
 
 When doing multiple nested for-loops it can be easier to keep track of
 the loop variable if is is named instead of just having a number. Use
@@ -3584,7 +3638,7 @@ This also works if the input file is a file with columns:
     parallel --colsep '\t' --header : echo {Name} {E-mail address}
 
 
-=head1 EXAMPLE: All combinations in a list
+=head2 EXAMPLE: All combinations in a list
 
 GNU B<parallel> makes all combinations when given two lists.
 
@@ -3600,7 +3654,7 @@ B<{choose_k}> works for any number of input sources:
   parallel --plus echo {choose_k} ::: A B C D ::: A B C D ::: A B C D
 
 
-=head1 EXAMPLE: From a to b and b to c
+=head2 EXAMPLE: From a to b and b to c
 
 Assume you have input like:
 
@@ -3628,7 +3682,7 @@ If the input is in the array $a here are two solutions:
   parallel echo {1} - {2} ::: "${a[@]::${#a[@]}-1}" :::+ "${a[@]:1}"
 
 
-=head1 EXAMPLE: Count the differences between all files in a dir
+=head2 EXAMPLE: Count the differences between all files in a dir
 
 Using B<--results> the results are saved in /tmp/diffcount*.
 
@@ -3639,7 +3693,7 @@ To see the difference between file A and file B look at the file
 '/tmp/diffcount/1/A/2/B'.
 
 
-=head1 EXAMPLE: Speeding up fast jobs
+=head2 EXAMPLE: Speeding up fast jobs
 
 Starting a job on the local machine takes around 10 ms. This can be a
 big overhead if the job takes very few ms to run. Often you can group
@@ -3682,7 +3736,7 @@ The overhead is 100000 times smaller namely around 100 nanoseconds per
 job.
 
 
-=head1 EXAMPLE: Using shell variables
+=head2 EXAMPLE: Using shell variables
 
 When using shell variables you need to quote them correctly as they
 may otherwise be interpreted by the shell.
@@ -3721,7 +3775,7 @@ If you use them in a function you just quote as you normally would do:
   parallel myfunc ::: '!'
 
 
-=head1 EXAMPLE: Group output lines
+=head2 EXAMPLE: Group output lines
 
 When running jobs that output data, you often do not want the output
 of multiple jobs to run together. GNU B<parallel> defaults to grouping
@@ -3742,7 +3796,7 @@ Compare the output of:
     https://ftpmirror.gnu.org/parallel/parallel-20{}0822.tar.bz2 \
     ::: {12..16}
 
-=head1 EXAMPLE: Tag output lines
+=head2 EXAMPLE: Tag output lines
 
 GNU B<parallel> groups the output lines, but it can be hard to see
 where the different jobs begin. B<--tag> prepends the argument to make
@@ -3763,7 +3817,7 @@ Check the uptime of the servers in I<~/.parallel/sshloginfile>:
   parallel --tag -S .. --nonall uptime
 
 
-=head1 EXAMPLE: Colorize output
+=head2 EXAMPLE: Colorize output
 
 Give each job a new color. Most terminals support ANSI colors with the
 escape code "\033[30;3Xm" where 0 <= X <= 7:
@@ -3778,7 +3832,7 @@ To get rid of the initial \t (which comes from B<--tagstring>):
     ... | perl -pe 's/\t//'
 
 
-=head1 EXAMPLE: Keep order of output same as order of input
+=head2 EXAMPLE: Keep order of output same as order of input
 
 Normally the output of a job will be printed as soon as it
 completes. Sometimes you want the order of the output to remain the
@@ -3826,7 +3880,7 @@ combined in the correct order.
     {}0000000-{}9999999 http://example.com/the/big/file > file
 
 
-=head1 EXAMPLE: Parallel grep
+=head2 EXAMPLE: Parallel grep
 
 B<grep -r> greps recursively through directories. On multicore CPUs
 GNU B<parallel> can often speed this up.
@@ -3836,7 +3890,7 @@ GNU B<parallel> can often speed this up.
 This will run 1.5 job per CPU, and give 1000 arguments to B<grep>.
 
 
-=head1 EXAMPLE: Grepping n lines for m regular expressions.
+=head2 EXAMPLE: Grepping n lines for m regular expressions.
 
 The simplest solution to grep a big file for a lot of regexps is:
 
@@ -3860,7 +3914,7 @@ on the disk system it may be faster or slower to parallelize. The only
 way to know for certain is to test and measure.
 
 
-=head2 Limiting factor: RAM
+=head3 Limiting factor: RAM
 
 The normal B<grep -f regexps.txt bigfile> works no matter the size of
 bigfile, but if regexps.txt is so big it cannot fit into memory, then
@@ -3911,7 +3965,7 @@ If you can live with duplicated lines and wrong order, it is faster to do:
   parallel --pipepart -a regexps.txt --block $percpu --compress \
     grep -F -f - bigfile
 
-=head2 Limiting factor: CPU
+=head3 Limiting factor: CPU
 
 If the CPU is the limiting factor parallelization should be done on
 the regexps:
@@ -3941,13 +3995,13 @@ combine the two using B<--cat>:
 
 If a line matches multiple regexps, the line may be duplicated.
 
-=head2 Bigger problem
+=head3 Bigger problem
 
 If the problem is too big to be solved by this, you are probably ready
 for Lucene.
 
 
-=head1 EXAMPLE: Using remote computers
+=head2 EXAMPLE: Using remote computers
 
 To run commands on a remote computer SSH needs to be set up and you
 must be able to login without entering a password (The commands
@@ -4021,7 +4075,7 @@ has 8 CPUs.
   seq 10 | parallel --sshlogin 8/server.example.com echo
 
 
-=head1 EXAMPLE: Transferring of files
+=head2 EXAMPLE: Transferring of files
 
 To recompress gzipped files with B<bzip2> using a remote computer run:
 
@@ -4092,7 +4146,7 @@ the special short hand I<-S ..> can be used:
     --trc {.}.bz2 "zcat {} | bzip2 -9 >{.}.bz2"
 
 
-=head1 EXAMPLE: Distributing work to local and remote computers
+=head2 EXAMPLE: Distributing work to local and remote computers
 
 Convert *.mp3 to *.ogg running one process per CPU on local computer
 and server2:
@@ -4101,7 +4155,7 @@ and server2:
     'mpg321 -w - {} | oggenc -q0 - -o {.}.ogg' ::: *.mp3
 
 
-=head1 EXAMPLE: Running the same command on remote computers
+=head2 EXAMPLE: Running the same command on remote computers
 
 To run the command B<uptime> on remote computers you can do:
 
@@ -4118,7 +4172,7 @@ output.
 If you have a lot of hosts use '-j0' to access more hosts in parallel.
 
 
-=head1 EXAMPLE: Running 'sudo' on remote computers
+=head2 EXAMPLE: Running 'sudo' on remote computers
 
 Put the password into passwordfile then run:
 
@@ -4126,7 +4180,7 @@ Put the password into passwordfile then run:
     -S user@server1,user@server2 sudo -S ls -l /root
 
 
-=head1 EXAMPLE: Using remote computers behind NAT wall
+=head2 EXAMPLE: Using remote computers behind NAT wall
 
 If the workers are behind a NAT wall, you need some trickery to get to
 them.
@@ -4155,7 +4209,7 @@ can simply:
 
   parallel -S host1,host2,host3 echo ::: This does work
 
-=head2 No jumphost, but port forwards
+=head3 No jumphost, but port forwards
 
 If there is no jumphost but each server has port 22 forwarded from the
 firewall (e.g. the firewall's port 22001 = port 22 on host1, 22002 = host2,
@@ -4174,7 +4228,7 @@ And then use host{1..3}.v as normal hosts:
 
   parallel -S host1.v,host2.v,host3.v echo ::: a b c
 
-=head2 No jumphost, no port forwards
+=head3 No jumphost, no port forwards
 
 If ports cannot be forwarded, you need some sort of VPN to traverse
 the NAT-wall. TOR is one options for that, as it is very easy to get
@@ -4202,7 +4256,7 @@ If not all hosts are accessible through TOR:
 See more B<ssh> tricks on https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Proxies_and_Jump_Hosts
 
 
-=head1 EXAMPLE: Parallelizing rsync
+=head2 EXAMPLE: Parallelizing rsync
 
 B<rsync> is a great tool, but sometimes it will not fill up the
 available bandwidth. Running multiple B<rsync> in parallel can fix
@@ -4228,7 +4282,7 @@ are called digits.png (e.g. 000000.png) you might be able to do:
   seq -w 0 99 | parallel rsync -Havessh fooserver:src/*{}.png destdir/
 
 
-=head1 EXAMPLE: Use multiple inputs in one command
+=head2 EXAMPLE: Use multiple inputs in one command
 
 Copy files like foo.es.ext to foo.ext:
 
@@ -4257,7 +4311,7 @@ Alternative version:
   find . -type f | sort | parallel convert {} {#}.png
 
 
-=head1 EXAMPLE: Use a table as input
+=head2 EXAMPLE: Use a table as input
 
 Content of table_file.tsv:
 
@@ -4279,7 +4333,7 @@ the columns. To keep the spaces:
   parallel -a table_file.tsv --trim n --colsep '\t' cmd -o {2} -i {1}
 
 
-=head1 EXAMPLE: Output to database
+=head2 EXAMPLE: Output to database
 
 GNU B<parallel> can output to a database table and a CSV-file:
 
@@ -4319,7 +4373,7 @@ Or MySQL:
     s/\\([\\tn])/$s{$1}/g;' mytable.tsv
 
 
-=head1 EXAMPLE: Output to CSV-file for R
+=head2 EXAMPLE: Output to CSV-file for R
 
 If you have no need for the advanced job distribution control that a
 database provides, but you simply want output into a CSV file that you
@@ -4332,7 +4386,7 @@ can read into R or LibreCalc, then you can use B<--results>:
   > write(as.character(mydf[2,c("Stdout")]),'')
 
 
-=head1 EXAMPLE: Use XML as input
+=head2 EXAMPLE: Use XML as input
 
 The show Aflyttet on Radio 24syv publishes an RSS feed with their audio
 podcasts on: http://arkiv.radio24syv.dk/audiopodcast/channel/4466232
@@ -4345,7 +4399,7 @@ using GNU B<parallel>:
     parallel -u wget '{= s/ url="//; s/"//; =}'
 
 
-=head1 EXAMPLE: Run the same command 10 times
+=head2 EXAMPLE: Run the same command 10 times
 
 If you want to run the same command with the same arguments 10 times
 in parallel you can do:
@@ -4353,7 +4407,7 @@ in parallel you can do:
   seq 10 | parallel -n0 my_command my_args
 
 
-=head1 EXAMPLE: Working as cat | sh. Resource inexpensive jobs and evaluation
+=head2 EXAMPLE: Working as cat | sh. Resource inexpensive jobs and evaluation
 
 GNU B<parallel> can work similar to B<cat | sh>.
 
@@ -4378,7 +4432,7 @@ To run 100 processes simultaneously do:
 As there is not a I<command> the jobs will be evaluated by the shell.
 
 
-=head1 EXAMPLE: Call program with FASTA sequence
+=head2 EXAMPLE: Call program with FASTA sequence
 
 FASTA files have the format:
 
@@ -4397,7 +4451,7 @@ To call B<myprog> with the sequence as argument run:
       'read a; echo Name: "$a"; myprog $(tr -d "\n")'
 
 
-=head1 EXAMPLE: Processing a big file using more CPUs
+=head2 EXAMPLE: Processing a big file using more CPUs
 
 To process a big file or some output you can use B<--pipe> to split up
 the data into blocks and pipe the blocks into the processing program.
@@ -4434,7 +4488,7 @@ the parts directly to the program:
     parallel -Xj1 sort -m {} ';' rm {} >bigfile.sort
 
 
-=head1 EXAMPLE: Grouping input lines
+=head2 EXAMPLE: Grouping input lines
 
 When processing with B<--pipe> you may have lines grouped by a
 value. Here is I<my.csv>:
@@ -4473,7 +4527,7 @@ If your program can process multiple customers replace B<-N1> with a
 reasonable B<--blocksize>.
 
 
-=head1 EXAMPLE: Running more than 250 jobs workaround
+=head2 EXAMPLE: Running more than 250 jobs workaround
 
 If you need to run a massive amount of jobs in parallel, then you will
 likely hit the filehandle limit which is often around 250 jobs. If you
@@ -4492,7 +4546,7 @@ RAM to do this, and you may need to increase /proc/sys/kernel/pid_max):
     parallel --pipe -N 250 --roundrobin -j250 parallel -j250 your_prg
 
 
-=head1 EXAMPLE: Working as mutex and counting semaphore
+=head2 EXAMPLE: Working as mutex and counting semaphore
 
 The command B<sem> is an alias for B<parallel --semaphore>.
 
@@ -4525,7 +4579,7 @@ same time:
   seq 3 | parallel sem --id mymutex sed -i -e '1i{}' myfile
 
 
-=head1 EXAMPLE: Mutex for a script
+=head2 EXAMPLE: Mutex for a script
 
 Assume a script is called from cron or from a web service, but only
 one instance can be run at a time. With B<sem> and B<--shebang-wrap>
@@ -4556,7 +4610,7 @@ Here B<python>:
   print "exclusively";
 
 
-=head1 EXAMPLE: Start editor with filenames from stdin (standard input)
+=head2 EXAMPLE: Start editor with filenames from stdin (standard input)
 
 You can use GNU B<parallel> to start interactive programs like emacs or vi:
 
@@ -4567,7 +4621,7 @@ If there are more files than will fit on a single command line, the
 editor will be started again with the remaining files.
 
 
-=head1 EXAMPLE: Running sudo
+=head2 EXAMPLE: Running sudo
 
 B<sudo> requires a password to run a command as root. It caches the
 access, so you only need to enter the password again if you have not
@@ -4590,7 +4644,7 @@ or:
 This way you only have to enter the sudo password once.
 
 
-=head1 EXAMPLE: GNU Parallel as queue system/batch manager
+=head2 EXAMPLE: GNU Parallel as queue system/batch manager
 
 GNU B<parallel> can work as a simple job queue system or batch manager.
 The idea is to put the jobs into a file and have GNU B<parallel> read
@@ -4640,17 +4694,19 @@ changes.
 There is a a small issue when using GNU B<parallel> as queue
 system/batch manager: You have to submit JobSlot number of jobs before
 they will start, and after that you can submit one at a time, and job
-will start immediately if free slots are available.  Output from the
-running or completed jobs are held back and will only be printed when
-JobSlots more jobs has been started (unless you use --ungroup or
+will start immediately if free slots are available.
+
+Output from the running or completed jobs are held back and will only
+be printed when the next job is started (unless you use --ungroup or
 --line-buffer, in which case the output from the jobs are printed
-immediately).  E.g. if you have 10 jobslots then the output from the
-first completed job will only be printed when job 11 has started, and
-the output of second completed job will only be printed when job 12
-has started.
+immediately).
+
+E.g. if you have 10 jobslots then the output from the first completed
+job will only be printed when job 11 has started, and the output of
+second completed job will only be printed when job 12 has started.
 
 
-=head1 EXAMPLE: GNU Parallel as dir processor
+=head2 EXAMPLE: GNU Parallel as dir processor
 
 If you have a dir in which users drop files that needs to be processed
 you can do this on GNU/Linux (If you know what B<inotifywait> is
@@ -4676,7 +4732,7 @@ Using GNU B<parallel> as dir processor has the same limitations as
 using GNU B<parallel> as queue system/batch manager.
 
 
-=head1 EXAMPLE: Locate the missing package
+=head2 EXAMPLE: Locate the missing package
 
 If you have downloaded source and tried compiling it, you may have seen:
 
@@ -5092,8 +5148,8 @@ is seen as a relative path from current dir.
 Example: Profile for running a command on every sshlogin in
 ~/.ssh/sshlogins and prepend the output with the sshlogin:
 
-  echo --tag -S .. --nonall > ~/.parallel/n
-  parallel -Jn uptime
+  echo --tag -S .. --nonall > ~/.parallel/nonall_profile
+  parallel -J nonall_profile uptime
 
 Example: Profile for running every command with B<-j-1> and B<nice>
 
@@ -5270,6 +5326,11 @@ not exist with PostgreSQL.
 Report bugs to <bug-parallel@gnu.org> or
 https://savannah.gnu.org/bugs/?func=additem&group=parallel
 
+When you write your report, please keep in mind, that you must give
+the reader enough information to be able to run exactly what you
+run. So you need to include all data and programs that you use to
+show the problem.
+
 See a perfect bug report on
 https://lists.gnu.org/archive/html/bug-parallel/2015-01/msg00000.html
 
@@ -5298,17 +5359,22 @@ https://stackoverflow.com/help/mcve).
 It should be a complete example that others can run which shows the
 problem including all files needed to run the example. This should
 preferably be small and simple, so try to remove as many options as
-possible. A combination of B<yes>, B<seq>, B<cat>, B<echo>, B<wc>, and
-B<sleep> can reproduce most errors. If your example requires large
-files, see if you can make them with something like B<seq 100000000> >
-B<bigfile> or B<yes | head -n 1000000000> > B<file>. If you need
-multiple columns: B<paste <(seq 1000) <(seq 1000 1999)>
+possible.
+
+A combination of B<yes>, B<seq>, B<cat>, B<echo>, B<wc>, and B<sleep>
+can reproduce most errors.
+
+If your example requires large files, see if you can make them with
+something like B<seq 100000000> > B<bigfile> or B<yes | head -n
+1000000000> > B<file>. If you need multiple columns: B<paste <(seq
+1000) <(seq 1000 1999)>
 
 If your example requires remote execution, see if you can use
 B<localhost> - maybe using another login.
 
 If you have access to a different system (maybe a VirtualBox on your
-own machine), test if the MCVE shows the problem on that system.
+own machine), test if your MCVE shows the problem on that system. If
+it does not, read below.
 
 =item *
 
@@ -5340,6 +5406,31 @@ done through you. That will put more burden on you and it is extra
 important you give any information that help. In general the problem
 will be fixed faster and with less work for you if you can reproduce
 the error on a VirtualBox.
+
+=head2 In summary
+
+Your report must include:
+
+=over 2
+
+=item *
+
+B<parallel --version>
+
+=item *
+
+output + error message
+
+=item *
+
+full example including all files
+
+=item *
+
+VirtualBox image, if you cannot reproduce it on other systems
+
+=back
+
 
 
 =head1 AUTHOR
@@ -5380,11 +5471,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =head2 Documentation license I
 
-Permission is granted to copy, distribute and/or modify this documentation
-under the terms of the GNU Free Documentation License, Version 1.3 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the file fdl.txt.
+Permission is granted to copy, distribute and/or modify this
+documentation under the terms of the GNU Free Documentation License,
+Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, with no Front-Cover Texts, and
+with no Back-Cover Texts.  A copy of the license is included in the
+file LICENSES/GFDL-1.3-or-later.txt.
 
 =head2 Documentation license II
 
@@ -5467,7 +5559,8 @@ license terms of this work.
 
 =back
 
-A copy of the full license is included in the file as cc-by-sa.txt.
+A copy of the full license is included in the file as
+LICENCES/CC-BY-SA-4.0.txt
 
 
 =head1 DEPENDENCIES

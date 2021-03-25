@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GFDL-1.3-or-later
+# SPDX-License-Identifier: CC-BY-SA-4.0
+
 =head1 GNU Parallel Tutorial
 
 This tutorial shows off much of GNU B<parallel>'s functionality. The
@@ -3161,7 +3165,8 @@ https://my.fsf.org/donate/
 
 =back
 
-(C) 2013-2021 Ole Tange, FDLv1.3 (See fdl.txt)
+(C) 2013-2021 Ole Tange, GFDLv1.3+ (See
+LICENSES/GFDL-1.3-or-later.txt)
 
 
 =cut

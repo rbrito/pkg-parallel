@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GFDL-1.3-or-later
+# SPDX-License-Identifier: CC-BY-SA-4.0
+
 =encoding utf8
 
 =head1 NAME
@@ -27,86 +31,184 @@ years.
 
 The following features are in some of the comparable tools:
 
-B<Inputs>
- I1. Arguments can be read from stdin
- I2. Arguments can be read from a file
- I3. Arguments can be read from multiple files
- I4. Arguments can be read from command line
- I5. Arguments can be read from a table
- I6. Arguments can be read from the same file using #! (shebang)
- I7. Line oriented input as default (Quoting of special chars not needed)
+=head3 Inputs
 
-B<Manipulation of input>
- M1. Composed command
- M2. Multiple arguments can fill up an execution line
- M3. Arguments can be put anywhere in the execution line
- M4. Multiple arguments can be put anywhere in the execution line
- M5. Arguments can be replaced with context
- M6. Input can be treated as the complete command line
+=over
 
-B<Outputs>
- O1. Grouping output so output from different jobs do not mix
- O2. Send stderr (standard error) to stderr (standard error)
- O3. Send stdout (standard output) to stdout (standard output)
- O4. Order of output can be same as order of input
- O5. Stdout only contains stdout (standard output) from the command
- O6. Stderr only contains stderr (standard error) from the command
- O7. Buffering on disk
- O8. Cleanup of temporary files if killed
- O9. Test if disk runs full during run
- O10. Output of a line bigger than 4 GB
+=item I1. Arguments can be read from stdin
 
-B<Execution>
- E1. Running jobs in parallel
- E2. List running jobs
- E3. Finish running jobs, but do not start new jobs
- E4. Number of running jobs can depend on number of cpus
- E5. Finish running jobs, but do not start new jobs after first failure
- E6. Number of running jobs can be adjusted while running
- E7. Only spawn new jobs if load is less than a limit
+=item I2. Arguments can be read from a file
 
-B<Remote execution>
- R1. Jobs can be run on remote computers
- R2. Basefiles can be transferred
- R3. Argument files can be transferred
- R4. Result files can be transferred
- R5. Cleanup of transferred files
- R6. No config files needed
- R7. Do not run more than SSHD's MaxStartups can handle
- R8. Configurable SSH command
- R9. Retry if connection breaks occasionally
+=item I3. Arguments can be read from multiple files
 
-B<Semaphore>
- S1. Possibility to work as a mutex
- S2. Possibility to work as a counting semaphore
+=item I4. Arguments can be read from command line
 
-B<Legend>
- - = no
- x = not applicable
- ID = yes
+=item I5. Arguments can be read from a table
+
+=item I6. Arguments can be read from the same file using #! (shebang)
+
+=item I7. Line oriented input as default (Quoting of special chars not needed)
+
+=back
+
+
+=head3 Manipulation of input
+
+=over
+
+=item M1. Composed command
+
+=item M2. Multiple arguments can fill up an execution line
+
+=item M3. Arguments can be put anywhere in the execution line
+
+=item M4. Multiple arguments can be put anywhere in the execution line
+
+=item M5. Arguments can be replaced with context
+
+=item M6. Input can be treated as the complete command line
+
+=back
+
+
+=head3 Outputs
+
+=over
+
+=item O1. Grouping output so output from different jobs do not mix
+
+=item O2. Send stderr (standard error) to stderr (standard error)
+
+=item O3. Send stdout (standard output) to stdout (standard output)
+
+=item O4. Order of output can be same as order of input
+
+=item O5. Stdout only contains stdout (standard output) from the command
+
+=item O6. Stderr only contains stderr (standard error) from the command
+
+=item O7. Buffering on disk
+
+=item O8. Cleanup of temporary files if killed
+
+=item O9. Test if disk runs full during run
+
+=item O10. Output of a line bigger than 4 GB
+
+=back
+
+
+=head3 Execution
+
+=over
+
+=item E1. Running jobs in parallel
+
+=item E2. List running jobs
+
+=item E3. Finish running jobs, but do not start new jobs
+
+=item E4. Number of running jobs can depend on number of cpus
+
+=item E5. Finish running jobs, but do not start new jobs after first failure
+
+=item E6. Number of running jobs can be adjusted while running
+
+=item E7. Only spawn new jobs if load is less than a limit
+
+=back
+
+
+=head3 Remote execution
+
+=over
+
+=item R1. Jobs can be run on remote computers
+
+=item R2. Basefiles can be transferred
+
+=item R3. Argument files can be transferred
+
+=item R4. Result files can be transferred
+
+=item R5. Cleanup of transferred files
+
+=item R6. No config files needed
+
+=item R7. Do not run more than SSHD's MaxStartups can handle
+
+=item R8. Configurable SSH command
+
+=item R9. Retry if connection breaks occasionally
+
+=back
+
+
+=head3 Semaphore
+
+=over
+
+=item S1. Possibility to work as a mutex
+
+=item S2. Possibility to work as a counting semaphore
+
+=back
+
+
+=head3 Legend
+
+=over
+
+=item - = no
+
+=item x = not applicable
+
+=item ID = yes
+
+=back
 
 As every new version of the programs are not tested the table may be
 outdated. Please file a bug report if you find errors (See REPORTING
 BUGS).
 
 parallel:
-I1 I2 I3 I4 I5 I6 I7
-M1 M2 M3 M4 M5 M6
-O1 O2 O3 O4 O5 O6 O7 O8 O9 O10
-E1 E2 E3 E4 E5 E6 E7
-R1 R2 R3 R4 R5 R6 R7 R8 R9
-S1 S2
+
+=over
+
+=item I1 I2 I3 I4 I5 I6 I7
+
+=item M1 M2 M3 M4 M5 M6
+
+=item O1 O2 O3 O4 O5 O6 O7 O8 O9 O10
+
+=item E1 E2 E3 E4 E5 E6 E7
+
+=item R1 R2 R3 R4 R5 R6 R7 R8 R9
+
+=item S1 S2
+
+=back
 
 
 =head2 DIFFERENCES BETWEEN xargs AND GNU Parallel
 
 Summary (see legend above):
-I1 I2 - - - - -
-- M2 M3 - - -
-- O2 O3 - O5 O6
-E1 - - - - - -
-- - - - - x - - -
-- -
+
+=over
+
+=item I1 I2 - - - - -
+
+=item - M2 M3 - - -
+
+=item - O2 O3 - O5 O6
+
+=item E1 - - - - - -
+
+=item - - - - - x - - -
+
+=item - -
+
+=back
 
 B<xargs> offers some of the same possibilities as GNU B<parallel>.
 
@@ -197,12 +299,22 @@ https://www.gnu.org/software/findutils/
 =head2 DIFFERENCES BETWEEN find -exec AND GNU Parallel
 
 Summary (see legend above):
--  -  -  x  -  x  -
--  M2 M3 -  -  -  -
--  O2 O3 O4 O5 O6
--  -  -  -  -  -  -
--  -  -  -  -  -  -  -  -
-x  x
+
+=over
+
+=item -  -  -  x  -  x  -
+
+=item -  M2 M3 -  -  -  -
+
+=item -  O2 O3 O4 O5 O6
+
+=item -  -  -  -  -  -  -
+
+=item -  -  -  -  -  -  -  -  -
+
+=item x  x
+
+=back
 
 B<find -exec> offers some of the same possibilities as GNU B<parallel>.
 
@@ -216,12 +328,22 @@ https://www.gnu.org/software/findutils/ (Last checked: 2019-01)
 =head2 DIFFERENCES BETWEEN make -j AND GNU Parallel
 
 Summary (see legend above):
--  -  -  -  -  -  -
--  -  -  -  -  -
-O1 O2 O3 -  x  O6
-E1 -  -  -  E5 -
--  -  -  -  -  -  -  -  -
--  -
+
+=over
+
+=item -  -  -  -  -  -  -
+
+=item -  -  -  -  -  -
+
+=item O1 O2 O3 -  x  O6
+
+=item E1 -  -  -  E5 -
+
+=item -  -  -  -  -  -  -  -  -
+
+=item -  -
+
+=back
 
 B<make -j> can run jobs in parallel, but requires a crafted Makefile
 to do this. That results in extra quoting to get filenames containing
@@ -239,12 +361,22 @@ https://www.gnu.org/software/make/ (Last checked: 2019-01)
 =head2 DIFFERENCES BETWEEN ppss AND GNU Parallel
 
 Summary (see legend above):
-I1 I2 - - - - I7
-M1 - M3 - - M6
-O1 - - x - -
-E1 E2 ?E3 E4 - - -
-R1 R2 R3 R4 - - ?R7 ? ?
-- -
+
+=over
+
+=item I1 I2 - - - - I7
+
+=item M1 - M3 - - M6
+
+=item O1 - - x - -
+
+=item E1 E2 ?E3 E4 - - -
+
+=item R1 R2 R3 R4 - - ?R7 ? ?
+
+=item - -
+
+=back
 
 B<ppss> is also a tool for running jobs in parallel.
 
@@ -324,12 +456,22 @@ https://github.com/louwrentius/PPSS
 =head2 DIFFERENCES BETWEEN pexec AND GNU Parallel
 
 Summary (see legend above):
-I1 I2 - I4 I5 - -
-M1 - M3 - - M6
-O1 O2 O3 - O5 O6
-E1 - - E4 - E6 -
-R1 - - - - R6 - - -
-S1 -
+
+=over
+
+=item I1 I2 - I4 I5 - -
+
+=item M1 - M3 - - M6
+
+=item O1 O2 O3 - O5 O6
+
+=item E1 - - E4 - E6 -
+
+=item R1 - - - - R6 - - -
+
+=item S1 -
+
+=back
 
 B<pexec> is also a tool for running jobs in parallel.
 
@@ -647,12 +789,22 @@ https://github.com/cheusov/paexec
 =head2 DIFFERENCES BETWEEN map(sitaramc) AND GNU Parallel
 
 Summary (see legend above):
-I1 - - I4 - - (I7)
-M1 (M2) M3 (M4) M5 M6
-- O2 O3 - O5 - - N/A N/A O10
-E1 - - - - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item I1 - - I4 - - (I7)
+
+=item M1 (M2) M3 (M4) M5 M6
+
+=item - O2 O3 - O5 - - N/A N/A O10
+
+=item E1 - - - - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 (I7): Only under special circumstances. See below.
 
@@ -1963,12 +2115,22 @@ https://github.com/fd0/machma (Last checked: 2019-06)
 =head2 DIFFERENCES BETWEEN interlace AND GNU Parallel
 
 Summary (see legend above):
-- I2 I3 I4 - - -
-M1 - M3 - - M6
-- O2 O3 - - - - x x
-E1 E2 - - - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item - I2 I3 I4 - - -
+
+=item M1 - M3 - - M6
+
+=item - O2 O3 - - - - x x
+
+=item E1 E2 - - - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 B<interlace> is built for network analysis to run network tools in parallel.
 
@@ -2340,12 +2502,22 @@ https://github.com/amritb/with-this.git (Last checked: 2019-03)
 =head2 DIFFERENCES BETWEEN Tollef's parallel (moreutils) AND GNU Parallel
 
 Summary (see legend above):
-- - - I4 - - I7
-- - M3 - - M6
-- O2 O3 - O5 O6 - x x
-E1 - - - - - E7
-- x x x x x x x x
-- -
+
+=over
+
+=item - - - I4 - - I7
+
+=item - - M3 - - M6
+
+=item - O2 O3 - O5 O6 - x x
+
+=item E1 - - - - - E7
+
+=item - x x x x x x x x
+
+=item - -
+
+=back
 
 =head3 EXAMPLES FROM Tollef's parallel MANUAL
 
@@ -2366,12 +2538,22 @@ B<GNU> parallel -j 3 ::: ls df "echo hi"
 =head2 DIFFERENCES BETWEEN rargs AND GNU Parallel
 
 Summary (see legend above):
-I1 - - - - - I7
-- - M3 M4 - -
-- O2 O3 - O5 O6 - O8 -
-E1 - - E4 - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item I1 - - - - - I7
+
+=item - - M3 M4 - -
+
+=item - O2 O3 - O5 O6 - O8 -
+
+=item E1 - - E4 - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 B<rargs> has elegant ways of doing named regexp capture and field ranges.
 
@@ -2425,12 +2607,22 @@ https://github.com/lotabout/rargs (Last checked: 2020-01)
 =head2 DIFFERENCES BETWEEN threader AND GNU Parallel
 
 Summary (see legend above):
-I1 - - - - - -
-M1 - M3 - - M6
-O1 - O3 - O5 - - N/A N/A
-E1 - - E4 - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item I1 - - - - - -
+
+=item M1 - M3 - - M6
+
+=item O1 - O3 - O5 - - N/A N/A
+
+=item E1 - - E4 - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 Newline separates arguments, but newline at the end of file is treated
 as an empty argument. So this runs 2 jobs:
@@ -2447,12 +2639,22 @@ https://github.com/voodooEntity/threader (Last checked: 2020-04)
 =head2 DIFFERENCES BETWEEN runp AND GNU Parallel
 
 Summary (see legend above):
-I1 I2 - - - - -
-M1 - (M3) - - M6
-O1 O2 O3 - O5 O6 - N/A N/A -
-E1 - - - - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item I1 I2 - - - - -
+
+=item M1 - (M3) - - M6
+
+=item O1 O2 O3 - O5 O6 - N/A N/A -
+
+=item E1 - - - - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 (M3): You can add a prefix and a postfix to the input, so it means you can
 only insert the argument on the command line once.
@@ -2575,12 +2777,22 @@ https://github.com/jreisinger/runp (Last checked: 2020-04)
 =head2 DIFFERENCES BETWEEN papply AND GNU Parallel
 
 Summary (see legend above):
-- - - I4 - - -
-M1 - M3 - - M6
-- - O3 - O5 - - N/A N/A O10
-E1 - - E4 - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item - - - I4 - - -
+
+=item M1 - M3 - - M6
+
+=item - - O3 - O5 - - N/A N/A O10
+
+=item E1 - - E4 - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 B<papply> does not print the output if the command fails:
 
@@ -2621,12 +2833,22 @@ https://pypi.org/project/papply/ (Last checked: 2020-04)
 =head2 DIFFERENCES BETWEEN async AND GNU Parallel
 
 Summary (see legend above):
-- - - I4 - - I7
-- - - - - M6
-- O2 O3 - O5 O6 - N/A N/A O10
-E1 - - E4 - E6 -
-- - - - - - - - -
-S1 S2
+
+=over
+
+=item - - - I4 - - I7
+
+=item - - - - - M6
+
+=item - O2 O3 - O5 O6 - N/A N/A O10
+
+=item E1 - - E4 - E6 -
+
+=item - - - - - - - - -
+
+=item S1 S2
+
+=back
 
 B<async> is very similary to GNU B<parallel>'s B<--semaphore> mode
 (aka B<sem>). B<async> requires the user to start a server process.
@@ -2698,12 +2920,22 @@ https://github.com/ctbur/async/ (Last checked: 2020-11)
 =head2 DIFFERENCES BETWEEN pardi AND GNU Parallel
 
 Summary (see legend above):
-I1 I2 - - - - I7
-M1 - - - - M6
-O1 O2 O3 O4 O5 - O7 - - O10
-E1 - - E4 - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item I1 I2 - - - - I7
+
+=item M1 - - - - M6
+
+=item O1 O2 O3 O4 O5 - O7 - - O10
+
+=item E1 - - E4 - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 B<pardi> is very similar to B<parallel --pipe --cat>: It reads blocks
 of data and not arguments. So it cannot insert an argument in the
@@ -2756,12 +2988,22 @@ https://github.com/UnixJunkie/pardi (Last checked: 2021-01)
 =head2 DIFFERENCES BETWEEN bthread AND GNU Parallel
 
 Summary (see legend above):
-- - - I4 -  - -
-- - - - - M6
-O1 - O3 - - - O7 O8 - -
-E1 - - - - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item - - - I4 -  - -
+
+=item - - - - - M6
+
+=item O1 - O3 - - - O7 O8 - -
+
+=item E1 - - - - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 B<bthread> takes around 1 sec per MB of output. The maximal output
 line length is 1073741759.
@@ -2775,12 +3017,22 @@ https://gitlab.com/netikras/bthread (Last checked: 2021-01)
 =head2 DIFFERENCES BETWEEN simple_gpu_scheduler AND GNU Parallel
 
 Summary (see legend above):
-I1 - - - - - I7
-M1 - - - - M6
-- O2 O3 - - O6 - N/A N/A O10
-E1 - - - - - -
-- - - - - - - - -
-- -
+
+=over
+
+=item I1 - - - - - I7
+
+=item M1 - - - - M6
+
+=item - O2 O3 - - O6 - x x O10
+
+=item E1 - - - - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
 
 =head3 EXAMPLES FROM simple_gpu_scheduler MANUAL
 
@@ -2862,10 +3114,8 @@ Distributed Resource Management Application API to make jobs run with
 different cluster software.
 
 
-=head3 Future support in GNU Parallel
-
-B<Future> versions of GNU B<parallel> may support templates
-with replacement strings. Such as:
+GNU B<parallel> B<--tmpl> supports templates with replacement
+strings. Such as:
 
   Xval: {x}
   Yval: {y}
@@ -2873,41 +3123,112 @@ with replacement strings. Such as:
   # x with 2 decimals
   DecimalX: {=x $_=sprintf("%.2f",$_) =}
   TenX: {=x $_=$_*10 =}
-  RandomVal: {= $_=rand() =}
+  RandomVal: {=1 $_=rand() =}
 
 that can be used like:
 
-  parallel --header : --tmpl my.tmpl {#}.t myprog {#}.t \
+  parallel --header : --tmpl my.tmpl={#}.t myprog {#}.t \
     ::: x 1 2 3 ::: y 1 2 3
 
-Filtering may also be supported as:
+Filtering is supported as:
 
   parallel --filter '{1} > {2}' echo ::: 1 2 3 ::: 1 2 3
-
-which will basically do:
-
-  parallel echo '{= $arg[1] > $arg[2] and skip() =}' ::: 1 2 3 ::: 1 2 3
 
 https://github.com/eviatarbach/parasweep (Last checked: 2021-01)
 
 
-=head2 Todo
+=head2 DIFFERENCES BETWEEN parallel-bash AND GNU Parallel
+
+Summary (see legend above):
+
+=over
+
+=item I1 I2 - - - - -
+
+=item - - M3 - - M6
+
+=item - O2 O3 - O5 O6 - O8 x O10
+
+=item E1 - - - - - -
+
+=item - - - - - - - - -
+
+=item - -
+
+=back
+
+B<parallel-bash> is written in pure bash. It is really fast (overhead
+of ~0.05 ms/job compared to GNU B<parallel>'s ~3 ms/job). So if your
+jobs are extremely short lived, and you can live with the quite
+limited command, this may be useful.
+
+B<parallel-bash> will not start the first job, until it has read all
+input. The input can at most be 20935 lines and the lines cannot be
+all be empty.
+
+Ctrl-C does not stop spawning new jobs. Ctrl-Z does not suspend
+running jobs.
+
+
+=head3 EXAMPLES FROM parallel-bash
+
+  1$ some_input | parallel-bash -p 5 -c echo
+
+  1$ some_input | parallel -j 5 echo
+
+  2$ parallel-bash -p 5 -c echo < some_file
+
+  2$ parallel -j 5 echo < some_file
+
+  3$ parallel-bash -p 5 -c echo <<< 'some string'
+
+  3$ parallel -j 5 -c echo <<< 'some string'
+
+  4$ something | parallel-bash -p 5 -c echo {} {}
+
+  4$ something | parallel -j 5 echo {} {}
 
 https://reposhub.com/python/command-line-tools/Akianonymus-parallel-bash.html
+(Last checked: 2021-02)
+
+
+=head2 DIFFERENCES BETWEEN bash-concurrent AND GNU Parallel
+
+B<bash-concurrent> is more an alternative to B<make> than to GNU
+B<parallel>. Its input is very similar to a Makefile, where jobs
+depend on other jobs.
+
+It has a nice progress indicator where you can see which jobs
+completed successfully, which jobs are currently running, which jobs
+failed, and which jobs were skipped due to a depending job failed.
+The indicator does not deal well with resizing the window.
+
+Output is cached in tempfiles on disk, but is only shown if there is
+an error, so it is not meant to be part of a UNIX pipeline. If
+B<bash-concurrent> crashes these tempfiles are not removed.
+
+It uses an O(n*n) algorithm, so if you have 1000 independent jobs it
+takes 22 seconds to start it.
+
+https://github.com/themattrix/bash-concurrent
+(Last checked: 2021-02)
+
+
+=head2 Todo
+
+https://github.com/mylanconnolly/parallel
+
+https://github.com/krashanoff/parallel
 
 https://github.com/Nukesor/pueue
 
-PASH: Light-touch Data-Parallel Shell Processing
-
 https://arxiv.org/pdf/2012.15443.pdf KumQuat
 
-https://arxiv.org/pdf/2007.09436.pdf
+https://arxiv.org/pdf/2007.09436.pdf PaSH: Light-touch Data-Parallel Shell Processing
 
 https://github.com/JeiKeiLim/simple_distribute_job
 
-https://github.com/Akianonymus/parallel-bash
-
-https://github.com/reggi/pkgrun
+https://github.com/reggi/pkgrun - not obvious how to use
 
 https://github.com/benoror/better-npm-run - not obvious how to use
 
@@ -2919,6 +3240,36 @@ https://github.com/flesler/parallel
 
 https://github.com/Julian/Verge
 
+http://manpages.ubuntu.com/manpages/xenial/man1/tsp.1.html
+
+http://vicerveza.homeunix.net/~viric/soft/ts/
+
+https://github.com/chapmanjacobd/que
+
+https://github.com/ExpectationMax/simple_gpu_scheduler
+    simple_gpu_scheduler --gpus 0 1 2 < gpu_commands.txt
+    parallel -j3 --shuf CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =} {=uq;=}' < gpu_commands.txt
+
+    simple_hypersearch "python3 train_dnn.py --lr {lr} --batch_size {bs}" -p lr 0.001 0.0005 0.0001 -p bs 32 64 128 | simple_gpu_scheduler --gpus 0,1,2
+    parallel --header : --shuf -j3 -v CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =}' python3 train_dnn.py --lr {lr} --batch_size {bs} ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
+
+    simple_hypersearch "python3 train_dnn.py --lr {lr} --batch_size {bs}" --n-samples 5 -p lr 0.001 0.0005 0.0001 -p bs 32 64 128 | simple_gpu_scheduler --gpus 0,1,2
+    parallel --header : --shuf CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1; seq() > 5 and skip() =}' python3 train_dnn.py --lr {lr} --batch_size {bs} ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
+
+    touch gpu.queue
+    tail -f -n 0 gpu.queue | simple_gpu_scheduler --gpus 0,1,2 &
+    echo "my_command_with | and stuff > logfile" >> gpu.queue
+
+    touch gpu.queue
+    tail -f -n 0 gpu.queue | parallel -j3 CUDA_VISIBLE_DEVICES='{=1 $_=slot()-1 =} {=uq;=}' &
+    # Needed to fill job slots once
+    seq 3 | parallel echo true >> gpu.queue
+    # Add jobs
+    echo "my_command_with | and stuff > logfile" >> gpu.queue
+    # Needed to flush output from completed jobs
+    seq 3 | parallel echo true >> gpu.queue
+
+https://github.com/Overv/outrun#outrun
 
 =head1 TESTING OTHER TOOLS
 
@@ -3186,11 +3537,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 =head2 Documentation license I
 
-Permission is granted to copy, distribute and/or modify this documentation
-under the terms of the GNU Free Documentation License, Version 1.3 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the file fdl.txt.
+Permission is granted to copy, distribute and/or modify this
+documentation under the terms of the GNU Free Documentation License,
+Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, with no Front-Cover Texts, and
+with no Back-Cover Texts.  A copy of the license is included in the
+file LICENSES/GFDL-1.3-or-later.txt.
 
 =head2 Documentation license II
 
@@ -3273,7 +3625,8 @@ license terms of this work.
 
 =back
 
-A copy of the full license is included in the file as cc-by-sa.txt.
+A copy of the full license is included in the file as
+LICENCES/CC-BY-SA-4.0.txt
 
 
 =head1 DEPENDENCIES

@@ -24,6 +24,9 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 # or write to the Free Software Foundation, Inc., 51 Franklin St,
 # Fifth Floor, Boston, MA 02110-1301 USA
+#
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 env_parallel() {
     # env_parallel.ksh
@@ -365,7 +368,7 @@ _parset_main() {
 	return 255
     fi
     if [ "$_parset_NAME" = "--version" ] ; then
-	echo "parset 20210122 (GNU parallel `parallel --minversion 1`)"
+	echo "parset 20210322 (GNU parallel `parallel --minversion 1`)"
 	echo "Copyright (C) 2007-2021 Ole Tange, http://ole.tange.dk and Free Software"
 	echo "Foundation, Inc."
 	echo "License GPLv3+: GNU GPL version 3 or later <https://gnu.org/licenses/gpl.html>"

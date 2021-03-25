@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PARALLEL 1"
-.TH PARALLEL 1 "2021-01-21" "20210122" "parallel"
+.TH PARALLEL 1 "2021-03-21" "20210222" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -400,14 +400,22 @@ input source \fIn\fR (when used with \fB\-a\fR or \fB::::\fR) or with the
 directory (if any) and extension removed.
 .Sp
 To understand positional replacement strings see \fB{\fR\fIn\fR\fB}\fR.
-.IP "\fB{=\fR\fIperl expression\fR\fB=}\fR" 4
-.IX Item "{=perl expression=}"
+.IP "\fB{=\fR\fIperl expression\fR\fB=}\fR (beta testing)" 4
+.IX Item "{=perl expression=} (beta testing)"
 Replace with calculated \fIperl expression\fR. \fB\f(CB$_\fB\fR will contain the
 same as \fB{}\fR. After evaluating \fIperl expression\fR \fB\f(CB$_\fB\fR will be used
 as the value. It is recommended to only change \f(CW$_\fR but you have full
 access to all of \s-1GNU\s0 \fBparallel\fR's internal functions and data
-structures. A few convenience functions and data structures have been
-made:
+structures.
+.Sp
+The expression must give the same result if evaluated twice \-
+otherwise the behaviour is undefined. E.g. this will not work as expected:
+.Sp
+.Vb 1
+\&    parallel echo \*(Aq{= $_= ++$wrong_counter =}\*(Aq ::: a b c
+.Ve
+.Sp
+A few convenience functions and data structures have been made:
 .RS 4
 .IP " \fBQ(\fR\fIstring\fR\fB)\fR" 15
 .IX Item " Q(string)"
@@ -813,8 +821,8 @@ Even quoted newlines are parsed correctly:
 .Ve
 .Sp
 When used with \fB\-\-pipe\fR only pass full CSV-records.
-.IP "\fB\-\-delay\fR \fImytime\fR (beta testing)" 4
-.IX Item "--delay mytime (beta testing)"
+.IP "\fB\-\-delay\fR \fImytime\fR" 4
+.IX Item "--delay mytime"
 Delay starting next job by \fImytime\fR. \s-1GNU\s0 \fBparallel\fR will pause
 \&\fImytime\fR after starting each job. \fImytime\fR is normally in seconds,
 but can be floats postfixed with \fBs\fR, \fBm\fR, \fBh\fR, or \fBd\fR which would
@@ -932,6 +940,16 @@ Beware: If data is not read from the fifo, the job will block forever.
 Implies \fB\-\-pipe\fR unless \fB\-\-pipepart\fR is used.
 .Sp
 See also: \fB\-\-cat\fR.
+.IP "\fB\-\-filter\fR \fIfilter\fR (beta testing)" 4
+.IX Item "--filter filter (beta testing)"
+Only run jobs where \fIfilter\fR is true. \fIfilter\fR can contain
+replacement strings and Perl code. Example:
+.Sp
+.Vb 1
+\&   parallel \-\-filter \*(Aq{1} < {2}+1\*(Aq echo ::: {1..3} ::: {1..3}
+.Ve
+.Sp
+Outputs: 1,1 1,2 1,3 2,2 2,3 3,3
 .IP "\fB\-\-filter\-hosts\fR" 4
 .IX Item "--filter-hosts"
 Remove down hosts. For each remote host: check that login through ssh
@@ -964,8 +982,8 @@ means output from different commands can get mixed.
 \&\fB\-\-group\fR is the default. Can be reversed with \fB\-u\fR.
 .Sp
 See also: \fB\-\-line\-buffer\fR \fB\-\-ungroup\fR
-.IP "\fB\-\-group\-by\fR \fIval\fR (beta testing)" 4
-.IX Item "--group-by val (beta testing)"
+.IP "\fB\-\-group\-by\fR \fIval\fR" 4
+.IX Item "--group-by val"
 Group input by value. Combined with \fB\-\-pipe\fR/\fB\-\-pipepart\fR
 \&\fB\-\-group\-by\fR groups lines with the same value into a record.
 .Sp
@@ -1137,11 +1155,11 @@ For \fB\-\-pipe\fR the matched header will be prepended to each output.
 \&\fB\-\-header :\fR is an alias for \fB\-\-header '.*\en'\fR.
 .Sp
 If \fIregexp\fR is a number, it is a fixed number of lines.
-.IP "\fB\-\-hostgroups\fR (alpha testing)" 4
-.IX Item "--hostgroups (alpha testing)"
+.IP "\fB\-\-hostgroups\fR" 4
+.IX Item "--hostgroups"
 .PD 0
-.IP "\fB\-\-hgrp\fR (alpha testing)" 4
-.IX Item "--hgrp (alpha testing)"
+.IP "\fB\-\-hgrp\fR" 4
+.IX Item "--hgrp"
 .PD
 Enable hostgroups on arguments. If an argument contains '@' the string
 after '@' will be removed and treated as a list of hostgroups on which
@@ -1396,11 +1414,11 @@ mix. Compare:
 .Ve
 .Sp
 See also: \fB\-\-group\fR \fB\-\-ungroup\fR
-.IP "\fB\-\-xapply\fR" 4
-.IX Item "--xapply"
+.IP "\fB\-\-xapply\fR (beta testing)" 4
+.IX Item "--xapply (beta testing)"
 .PD 0
-.IP "\fB\-\-link\fR" 4
-.IX Item "--link"
+.IP "\fB\-\-link\fR (beta testing)" 4
+.IX Item "--link (beta testing)"
 .PD
 Link input sources. Read multiple input sources like \fBxapply\fR. If
 multiple input sources are given, one argument will be read from each
@@ -1471,8 +1489,8 @@ to be run later.
 should retry a given job.
 .Sp
 See also: \fB\-\-memsuspend\fR
-.IP "\fB\-\-memsuspend\fR \fIsize\fR (alpha testing)" 4
-.IX Item "--memsuspend size (alpha testing)"
+.IP "\fB\-\-memsuspend\fR \fIsize\fR" 4
+.IX Item "--memsuspend size"
 Suspend jobs when there is less than 2 * \fIsize\fR memory free. The
 \&\fIsize\fR can be postfixed with K, M, G, T, P, k, m, g, t, or p which
 would multiply the size with 1024, 1048576, 1073741824, 1099511627776,
@@ -1575,11 +1593,11 @@ Instead of printing the output to stdout (standard output) the output
 of each job is saved in a file and the filename is then printed.
 .Sp
 See also: \fB\-\-results\fR
-.IP "\fB\-\-pipe\fR (beta testing)" 4
-.IX Item "--pipe (beta testing)"
+.IP "\fB\-\-pipe\fR" 4
+.IX Item "--pipe"
 .PD 0
-.IP "\fB\-\-spreadstdin\fR (beta testing)" 4
-.IX Item "--spreadstdin (beta testing)"
+.IP "\fB\-\-spreadstdin\fR" 4
+.IX Item "--spreadstdin"
 .PD
 Spread input to jobs on stdin (standard input). Read a block of data
 from stdin (standard input) and give one block of data as input to one
@@ -1641,6 +1659,10 @@ Activate additional replacement strings: {+/} {+.} {+..} {+...} {..}
 .Sp
 \&\fB{##}\fR is the total number of jobs to be run. It is incompatible with
 \&\fB\-X\fR/\fB\-m\fR/\fB\-\-xargs\fR.
+.Sp
+\&\fB{0%}\fR zero-padded jobslot. (alpha testing)
+.Sp
+\&\fB{0#}\fR zero-padded sequence number. (alpha testing)
 .Sp
 \&\fB{choose_k}\fR is inspired by n choose k: Given a list of n elements,
 choose k. k is the number of input sources and n is the number of
@@ -1921,7 +1943,7 @@ separated value file.
 \&\fB\-.csv\fR/\fB\-.tsv\fR are special: It will give the file on stdout
 (standard output).
 .Sp
-\&\fB\s-1JSON\s0 file output\fR (beta testing)
+\&\fB\s-1JSON\s0 file output\fR
 .Sp
 If \fIname\fR ends in \fB.json\fR the output will be a JSON-file
 named \fIname\fR.
@@ -1929,7 +1951,7 @@ named \fIname\fR.
 \&\fB\-.json\fR is special: It will give the file on stdout (standard
 output).
 .Sp
-\&\fBReplacement string output file\fR (beta testing)
+\&\fBReplacement string output file\fR
 .Sp
 If \fIname\fR contains a replacement string and the replaced result does
 not end in /, then the standard output will be stored in a file named
@@ -2503,8 +2525,8 @@ table will not be ':' but instead the hostname of the machine.
 \&\s-1GNU\s0 \fBparallel\fR defaults to using \fBssh\fR for remote access. This can
 be overridden with \fB\-\-ssh\fR. It can also be set on a per server
 basis (see \fB\-\-sshlogin\fR).
-.IP "\fB\-\-sshdelay\fR \fImytime\fR (beta testing)" 4
-.IX Item "--sshdelay mytime (beta testing)"
+.IP "\fB\-\-sshdelay\fR \fImytime\fR" 4
+.IX Item "--sshdelay mytime"
 Delay starting next ssh by \fImytime\fR. \s-1GNU\s0 \fBparallel\fR will not start
 another ssh for the next \fImytime\fR.
 .Sp
@@ -2640,6 +2662,38 @@ job slot number.
 .IX Item "--silent"
 Silent.  The job to be run will not be printed. This is the default.
 Can be reversed with \fB\-v\fR.
+.IP "\fB\-\-template\fR \fIfile\fR=\fIrepl\fR (beta testing)" 4
+.IX Item "--template file=repl (beta testing)"
+.PD 0
+.IP "\fB\-\-tmpl\fR \fIfile\fR=\fIrepl\fR (beta testing)" 4
+.IX Item "--tmpl file=repl (beta testing)"
+.PD
+Copy \fIfile\fR to \fIrepl\fR. All replacement strings in the contents of
+\&\fIfile\fR will be replaced. All replacement strings in the name \fIrepl\fR
+will be replaced.
+.Sp
+With \fB\-\-cleanup\fR the new file will be removed when the job is done.
+.Sp
+If \fImy.tmpl\fR contains this:
+.Sp
+.Vb 7
+\&  Xval: {x}
+\&  Yval: {y}
+\&  FixedValue: 9
+\&  # x with 2 decimals
+\&  DecimalX: {=x $_=sprintf("%.2f",$_) =}
+\&  TenX: {=x $_=$_*10 =}
+\&  RandomVal: {=1 $_=rand() =}
+.Ve
+.Sp
+it can be used like this:
+.Sp
+.Vb 4
+\&  myprog() { echo Using "$@"; cat "$@"; }
+\&  export \-f myprog
+\&  parallel \-\-cleanup \-\-header : \-\-tmpl my.tmpl={#}.t myprog {#}.t \e
+\&    ::: x 1.234 2.345 3.45678 ::: y 1 2 3
+.Ve
 .IP "\fB\-\-tty\fR" 4
 .IX Item "--tty"
 Open terminal tty. If \s-1GNU\s0 \fBparallel\fR is used for starting a program
@@ -2982,8 +3036,10 @@ Support for \fB\-\-xargs\fR with \fB\-\-sshlogin\fR is limited and may fail.
 .Sp
 See also \fB\-X\fR for context replace. If in doubt use \fB\-X\fR as that will
 most likely do what is needed.
-.SH "EXAMPLE: Working as xargs \-n1. Argument appending"
-.IX Header "EXAMPLE: Working as xargs -n1. Argument appending"
+.SH "EXAMPLES"
+.IX Header "EXAMPLES"
+.SS "\s-1EXAMPLE:\s0 Working as xargs \-n1. Argument appending"
+.IX Subsection "EXAMPLE: Working as xargs -n1. Argument appending"
 \&\s-1GNU\s0 \fBparallel\fR can work similar to \fBxargs \-n1\fR.
 .PP
 To compress all html files using \fBgzip\fR run:
@@ -3001,8 +3057,8 @@ If the file names may contain a newline use \fB\-0\fR. Substitute \s-1FOO BAR\s0
 .Ve
 .PP
 Note \fB\-q\fR is needed because of the space in '\s-1FOO BAR\s0'.
-.SH "EXAMPLE: Simple network scanner"
-.IX Header "EXAMPLE: Simple network scanner"
+.SS "\s-1EXAMPLE:\s0 Simple network scanner"
+.IX Subsection "EXAMPLE: Simple network scanner"
 \&\fBprips\fR can generate IP-addresses from \s-1CIDR\s0 notation. With \s-1GNU\s0
 \&\fBparallel\fR you can build a simple network scanner to see which
 addresses respond to \fBping\fR:
@@ -3012,8 +3068,8 @@ addresses respond to \fBping\fR:
 \&    parallel \-\-timeout 2 \-j0 \e
 \&      \*(Aqping \-c 1 {} >/dev/null && echo {}\*(Aq 2>/dev/null
 .Ve
-.SH "EXAMPLE: Reading arguments from command line"
-.IX Header "EXAMPLE: Reading arguments from command line"
+.SS "\s-1EXAMPLE:\s0 Reading arguments from command line"
+.IX Subsection "EXAMPLE: Reading arguments from command line"
 \&\s-1GNU\s0 \fBparallel\fR can take the arguments from command line instead of
 stdin (standard input). To compress all html files in the current dir
 using \fBgzip\fR run:
@@ -3027,8 +3083,8 @@ To convert *.wav to *.mp3 using \s-1LAME\s0 running one process per \s-1CPU\s0 r
 .Vb 1
 \&  parallel lame {} \-o {.}.mp3 ::: *.wav
 .Ve
-.SH "EXAMPLE: Inserting multiple arguments"
-.IX Header "EXAMPLE: Inserting multiple arguments"
+.SS "\s-1EXAMPLE:\s0 Inserting multiple arguments"
+.IX Subsection "EXAMPLE: Inserting multiple arguments"
 When moving a lot of files like this: \fBmv *.log destdir\fR you will
 sometimes get the error:
 .PP
@@ -3054,8 +3110,8 @@ In many shells you can also use \fBprintf\fR:
 .Vb 1
 \&  printf \*(Aq%s\e0\*(Aq *.log | parallel \-0 \-m mv {} destdir
 .Ve
-.SH "EXAMPLE: Context replace"
-.IX Header "EXAMPLE: Context replace"
+.SS "\s-1EXAMPLE:\s0 Context replace"
+.IX Subsection "EXAMPLE: Context replace"
 To remove the files \fIpict0000.jpg\fR .. \fIpict9999.jpg\fR you could do:
 .PP
 .Vb 1
@@ -3080,8 +3136,8 @@ You could also run:
 .PP
 This will also only run \fBrm\fR as many times needed to keep the command
 line length short enough.
-.SH "EXAMPLE: Compute intensive jobs and substitution"
-.IX Header "EXAMPLE: Compute intensive jobs and substitution"
+.SS "\s-1EXAMPLE:\s0 Compute intensive jobs and substitution"
+.IX Subsection "EXAMPLE: Compute intensive jobs and substitution"
 If ImageMagick is installed this will generate a thumbnail of a jpg
 file:
 .PP
@@ -3115,8 +3171,8 @@ make files like ./foo/bar_thumb.jpg:
 \&  find . \-name \*(Aq*.jpg\*(Aq | \e
 \&    parallel convert \-geometry 120 {} {.}_thumb.jpg
 .Ve
-.SH "EXAMPLE: Substitution and redirection"
-.IX Header "EXAMPLE: Substitution and redirection"
+.SS "\s-1EXAMPLE:\s0 Substitution and redirection"
+.IX Subsection "EXAMPLE: Substitution and redirection"
 This will generate an uncompressed version of .gz\-files next to the .gz\-file:
 .PP
 .Vb 1
@@ -3130,11 +3186,11 @@ solution is to quote the whole command:
 \&  parallel "zcat {} >{.}" ::: *.gz
 .Ve
 .PP
-Other special shell characters (such as * ; $ > < | >> <<) also need
+Other special shell characters (such as * ; $ > < |  >> <<) also need
 to be put in quotes, as they may otherwise be interpreted by the shell
 and not given to \s-1GNU\s0 \fBparallel\fR.
-.SH "EXAMPLE: Composed commands"
-.IX Header "EXAMPLE: Composed commands"
+.SS "\s-1EXAMPLE:\s0 Composed commands"
+.IX Subsection "EXAMPLE: Composed commands"
 A job can consist of several commands. This will print the number of
 files in each directory:
 .PP
@@ -3178,16 +3234,16 @@ Find the files in a list that do not exist
 .Vb 1
 \&  cat file_list | parallel \*(Aqif [ ! \-e {} ] ; then echo {}; fi\*(Aq
 .Ve
-.SH "EXAMPLE: Composed command with perl replacement string"
-.IX Header "EXAMPLE: Composed command with perl replacement string"
+.SS "\s-1EXAMPLE:\s0 Composed command with perl replacement string"
+.IX Subsection "EXAMPLE: Composed command with perl replacement string"
 You have a bunch of file. You want them sorted into dirs. The dir of
 each file should be named the first letter of the file name.
 .PP
 .Vb 1
 \&  parallel \*(Aqmkdir \-p {=s/(.).*/$1/=}; mv {} {=s/(.).*/$1/=}\*(Aq ::: *
 .Ve
-.SH "EXAMPLE: Composed command with multiple input sources"
-.IX Header "EXAMPLE: Composed command with multiple input sources"
+.SS "\s-1EXAMPLE:\s0 Composed command with multiple input sources"
+.IX Subsection "EXAMPLE: Composed command with multiple input sources"
 You have a dir with files named as 24 hours in 5 minute intervals:
 00:00, 00:05, 00:10 .. 23:55. You want to find the files missing:
 .PP
@@ -3195,8 +3251,8 @@ You have a dir with files named as 24 hours in 5 minute intervals:
 \&  parallel [ \-f {1}:{2} ] "||" echo {1}:{2} does not exist \e
 \&    ::: {00..23} ::: {00..55..5}
 .Ve
-.SH "EXAMPLE: Calling Bash functions"
-.IX Header "EXAMPLE: Calling Bash functions"
+.SS "\s-1EXAMPLE:\s0 Calling Bash functions"
+.IX Subsection "EXAMPLE: Calling Bash functions"
 If the composed command is longer than a line, it becomes hard to
 read. In Bash you can use functions. Just remember to \fBexport \-f\fR the
 function.
@@ -3230,8 +3286,8 @@ To do this on remote servers you need to transfer the function using
 If your environment (aliases, variables, and functions) is small you
 can copy the full environment without having to \fBexport \-f\fR
 anything. See \fBenv_parallel\fR.
-.SH "EXAMPLE: Function tester"
-.IX Header "EXAMPLE: Function tester"
+.SS "\s-1EXAMPLE:\s0 Function tester"
+.IX Subsection "EXAMPLE: Function tester"
 To test a program with different parameters:
 .PP
 .Vb 10
@@ -3249,8 +3305,8 @@ To test a program with different parameters:
 .PP
 If \fBmy_program\fR fails a red \s-1FAIL\s0 will be printed followed by the failing
 command; otherwise a green \s-1OK\s0 will be printed followed by the command.
-.SH "EXAMPLE: Continously show the latest line of output"
-.IX Header "EXAMPLE: Continously show the latest line of output"
+.SS "\s-1EXAMPLE:\s0 Continously show the latest line of output"
+.IX Subsection "EXAMPLE: Continously show the latest line of output"
 It can be useful to monitor the output of running jobs.
 .PP
 This shows the most recent output line until a job finishes. After
@@ -3260,8 +3316,8 @@ which the output of the job is printed in full:
 \&  parallel \*(Aq{} | tee >(cat >&3)\*(Aq ::: \*(Aqcommand 1\*(Aq \*(Aqcommand 2\*(Aq \e
 \&    3> >(perl \-ne \*(Aq$|=1;chomp;printf"%.\*(Aq$COLUMNS\*(Aqs\er",$_." "x100\*(Aq)
 .Ve
-.SH "EXAMPLE: Log rotate"
-.IX Header "EXAMPLE: Log rotate"
+.SS "\s-1EXAMPLE:\s0 Log rotate"
+.IX Subsection "EXAMPLE: Log rotate"
 Log rotation renames a logfile to an extension with a higher number:
 log.1 becomes log.2, log.2 becomes log.3, and so on. The oldest log is
 removed. To avoid overwriting files the process starts backwards from
@@ -3272,8 +3328,8 @@ the log:
 \&  seq 9 \-1 1 | parallel \-j1 mv log.{} log.\*(Aq{= $_++ =}\*(Aq
 \&  mv log log.1
 .Ve
-.SH "EXAMPLE: Removing file extension when processing files"
-.IX Header "EXAMPLE: Removing file extension when processing files"
+.SS "\s-1EXAMPLE:\s0 Removing file extension when processing files"
+.IX Subsection "EXAMPLE: Removing file extension when processing files"
 When processing files removing the file extension using \fB{.}\fR is
 often useful.
 .PP
@@ -3302,8 +3358,8 @@ Put all converted in the same directory:
 \&  find sounddir \-type f \-name \*(Aq*.wav\*(Aq | \e
 \&    parallel lame {} \-o mydir/{/.}.mp3
 .Ve
-.SH "EXAMPLE: Removing strings from the argument"
-.IX Header "EXAMPLE: Removing strings from the argument"
+.SS "\s-1EXAMPLE:\s0 Removing strings from the argument"
+.IX Subsection "EXAMPLE: Removing strings from the argument"
 If you have directory with tar.gz files and want these extracted in
 the corresponding dir (e.g foo.tar.gz will be extracted in the dir
 foo) you can do:
@@ -3330,8 +3386,8 @@ To remove a string anywhere you can use regular expressions with
 .Vb 1
 \&  parallel \-\-plus echo {/demo_/} ::: demo_mycode remove_demo_here
 .Ve
-.SH "EXAMPLE: Download 24 images for each of the past 30 days"
-.IX Header "EXAMPLE: Download 24 images for each of the past 30 days"
+.SS "\s-1EXAMPLE:\s0 Download 24 images for each of the past 30 days"
+.IX Subsection "EXAMPLE: Download 24 images for each of the past 30 days"
 Let us assume a website stores images like:
 .PP
 .Vb 1
@@ -3354,8 +3410,8 @@ download images for the past 30 days:
 .PP
 \&\fB$(date \-d \*(L"today \-$1 days\*(R" +%Y%m%d)\fR will give the dates in
 \&\s-1YYYYMMDD\s0 with \fB\f(CB$1\fB\fR days subtracted.
-.SH "EXAMPLE: Download world map from NASA"
-.IX Header "EXAMPLE: Download world map from NASA"
+.SS "\s-1EXAMPLE:\s0 Download world map from \s-1NASA\s0"
+.IX Subsection "EXAMPLE: Download world map from NASA"
 \&\s-1NASA\s0 provides tiles to download on earthdata.nasa.gov. Download tiles
 for Blue Marble world map and create a 10240x20480 map.
 .PP
@@ -3372,8 +3428,8 @@ for Blue Marble world map and create a 10240x20480 map.
 \&  parallel eval convert +append {}_{0..39}.jpg line{}.jpg ::: {0..19}
 \&  convert \-append line{0..19}.jpg world.jpg
 .Ve
-.SH "EXAMPLE: Download Apollo\-11 images from NASA using jq"
-.IX Header "EXAMPLE: Download Apollo-11 images from NASA using jq"
+.SS "\s-1EXAMPLE:\s0 Download Apollo\-11 images from \s-1NASA\s0 using jq"
+.IX Subsection "EXAMPLE: Download Apollo-11 images from NASA using jq"
 Search \s-1NASA\s0 using their \s-1API\s0 to get \s-1JSON\s0 for images related to 'apollo
 11' and has 'moon landing' in the description.
 .PP
@@ -3399,8 +3455,8 @@ the URLs of all images. \fBgrep\fR filters out the \fIlarge\fR images, and
 \&    grep large |
 \&    parallel wget
 .Ve
-.SH "EXAMPLE: Download video playlist in parallel"
-.IX Header "EXAMPLE: Download video playlist in parallel"
+.SS "\s-1EXAMPLE:\s0 Download video playlist in parallel"
+.IX Subsection "EXAMPLE: Download video playlist in parallel"
 \&\fByoutube-dl\fR is an excellent tool to download videos. It can,
 however, not download videos in parallel. This takes a playlist and
 downloads 10 videos in parallel.
@@ -3412,8 +3468,8 @@ downloads 10 videos in parallel.
 \&    parallel \-\-tagstring {#} \-\-lb \-j10 \e
 \&      youtube\-dl \-\-playlist\-start {#} \-\-playlist\-end {#} \*(Aq"https://$url"\*(Aq
 .Ve
-.SH "EXAMPLE: Prepend last modified date (ISO8601) to file name"
-.IX Header "EXAMPLE: Prepend last modified date (ISO8601) to file name"
+.SS "\s-1EXAMPLE:\s0 Prepend last modified date (\s-1ISO8601\s0) to file name"
+.IX Subsection "EXAMPLE: Prepend last modified date (ISO8601) to file name"
 .Vb 2
 \&  parallel mv {} \*(Aq{= $a=pQ($_); $b=$_;\*(Aq \e
 \&    \*(Aq$_=qx{date \-r "$a" +%FT%T}; chomp; $_="$_ $b" =}\*(Aq ::: *
@@ -3421,8 +3477,8 @@ downloads 10 videos in parallel.
 .PP
 \&\fB{=\fR and \fB=}\fR mark a perl expression. \fBpQ\fR perl-quotes the
 string. \fBdate +%FT%T\fR is the date in \s-1ISO8601\s0 with time.
-.SH "EXAMPLE: Save output in ISO8601 dirs"
-.IX Header "EXAMPLE: Save output in ISO8601 dirs"
+.SS "\s-1EXAMPLE:\s0 Save output in \s-1ISO8601\s0 dirs"
+.IX Subsection "EXAMPLE: Save output in ISO8601 dirs"
 Save output from \fBps aux\fR every second into dirs named
 yyyy\-mm\-ddThh:mm:ss+zz:zz.
 .PP
@@ -3430,9 +3486,9 @@ yyyy\-mm\-ddThh:mm:ss+zz:zz.
 \&  seq 1000 | parallel \-N0 \-j1 \-\-delay 1 \e
 \&    \-\-results \*(Aq{= $_=\`date \-Isec\`; chomp=}/\*(Aq ps aux
 .Ve
-.ie n .SH "EXAMPLE: Digital clock with ""blinking"" :"
-.el .SH "EXAMPLE: Digital clock with ``blinking'' :"
-.IX Header "EXAMPLE: Digital clock with blinking :"
+.ie n .SS "\s-1EXAMPLE:\s0 Digital clock with ""blinking"" :"
+.el .SS "\s-1EXAMPLE:\s0 Digital clock with ``blinking'' :"
+.IX Subsection "EXAMPLE: Digital clock with blinking :"
 The : in a digital clock blinks. To make every other line have a ':'
 and the rest a ' ' a perl expression is used to look at the 3rd input
 source. If the value modulo 2 is 1: Use \*(L":\*(R" otherwise use \*(L" \*(R":
@@ -3441,8 +3497,8 @@ source. If the value modulo 2 is 1: Use \*(L":\*(R" otherwise use \*(L" \*(R":
 \&  parallel \-k echo {1}\*(Aq{=3 $_=$_%2?":":" "=}\*(Aq{2}{3} \e
 \&    ::: {0..12} ::: {0..5} ::: {0..9}
 .Ve
-.SH "EXAMPLE: Aggregating content of files"
-.IX Header "EXAMPLE: Aggregating content of files"
+.SS "\s-1EXAMPLE:\s0 Aggregating content of files"
+.IX Subsection "EXAMPLE: Aggregating content of files"
 This:
 .PP
 .Vb 2
@@ -3465,8 +3521,8 @@ For all values of x and z it runs commands like:
 .PP
 So you end up with x1z1 .. x5z5 each containing the content of all
 values of y.
-.SH "EXAMPLE: Breadth first parallel web crawler/mirrorer"
-.IX Header "EXAMPLE: Breadth first parallel web crawler/mirrorer"
+.SS "\s-1EXAMPLE:\s0 Breadth first parallel web crawler/mirrorer"
+.IX Subsection "EXAMPLE: Breadth first parallel web crawler/mirrorer"
 This script below will crawl and mirror a \s-1URL\s0 in parallel.  It
 downloads first pages that are 1 click down, then 2 clicks down, then
 3; instead of the normal depth first, where the first link link on
@@ -3514,8 +3570,8 @@ URLs and the process is started over until no unseen links are found.
 \&
 \&  rm \-f $URLLIST $URLLIST2 $SEEN
 .Ve
-.SH "EXAMPLE: Process files from a tar file while unpacking"
-.IX Header "EXAMPLE: Process files from a tar file while unpacking"
+.SS "\s-1EXAMPLE:\s0 Process files from a tar file while unpacking"
+.IX Subsection "EXAMPLE: Process files from a tar file while unpacking"
 If the files to be processed are in a tar file then unpacking one file
 and processing it immediately may be faster than first unpacking all
 files.
@@ -3527,8 +3583,8 @@ files.
 .PP
 The Perl one-liner is needed to make sure the file is complete before
 handing it to \s-1GNU\s0 \fBparallel\fR.
-.SH "EXAMPLE: Rewriting a for-loop and a while-read-loop"
-.IX Header "EXAMPLE: Rewriting a for-loop and a while-read-loop"
+.SS "\s-1EXAMPLE:\s0 Rewriting a for-loop and a while-read-loop"
+.IX Subsection "EXAMPLE: Rewriting a for-loop and a while-read-loop"
 for-loops like this:
 .PP
 .Vb 3
@@ -3609,8 +3665,8 @@ can both be rewritten as:
 \&  export \-f doit
 \&  cat list | parallel doit
 .Ve
-.SH "EXAMPLE: Rewriting nested for-loops"
-.IX Header "EXAMPLE: Rewriting nested for-loops"
+.SS "\s-1EXAMPLE:\s0 Rewriting nested for-loops"
+.IX Subsection "EXAMPLE: Rewriting nested for-loops"
 Nested for-loops like this:
 .PP
 .Vb 5
@@ -3642,8 +3698,8 @@ can be written like this:
 .Vb 1
 \&  parallel echo {1} {2} ::: red green blue ::: S M L XL XXL | sort
 .Ve
-.SH "EXAMPLE: Finding the lowest difference between files"
-.IX Header "EXAMPLE: Finding the lowest difference between files"
+.SS "\s-1EXAMPLE:\s0 Finding the lowest difference between files"
+.IX Subsection "EXAMPLE: Finding the lowest difference between files"
 \&\fBdiff\fR is good for finding differences in text files. \fBdiff | wc \-l\fR
 gives an indication of the size of the difference. To find the
 differences between all files in the current dir do:
@@ -3654,8 +3710,8 @@ differences between all files in the current dir do:
 .PP
 This way it is possible to see if some files are closer to other
 files.
-.SH "EXAMPLE: for-loops with column names"
-.IX Header "EXAMPLE: for-loops with column names"
+.SS "\s-1EXAMPLE:\s0 for-loops with column names"
+.IX Subsection "EXAMPLE: for-loops with column names"
 When doing multiple nested for-loops it can be easier to keep track of
 the loop variable if is is named instead of just having a number. Use
 \&\fB\-\-header :\fR to let the first argument be an named alias for the
@@ -3672,8 +3728,8 @@ This also works if the input file is a file with columns:
 \&  cat addressbook.tsv | \e
 \&    parallel \-\-colsep \*(Aq\et\*(Aq \-\-header : echo {Name} {E\-mail address}
 .Ve
-.SH "EXAMPLE: All combinations in a list"
-.IX Header "EXAMPLE: All combinations in a list"
+.SS "\s-1EXAMPLE:\s0 All combinations in a list"
+.IX Subsection "EXAMPLE: All combinations in a list"
 \&\s-1GNU\s0 \fBparallel\fR makes all combinations when given two lists.
 .PP
 To make all combinations in a single list with unique values, you
@@ -3690,8 +3746,8 @@ repeat the list and use replacement string \fB{choose_k}\fR:
 .Vb 1
 \&  parallel \-\-plus echo {choose_k} ::: A B C D ::: A B C D ::: A B C D
 .Ve
-.SH "EXAMPLE: From a to b and b to c"
-.IX Header "EXAMPLE: From a to b and b to c"
+.SS "\s-1EXAMPLE:\s0 From a to b and b to c"
+.IX Subsection "EXAMPLE: From a to b and b to c"
 Assume you have input like:
 .PP
 .Vb 5
@@ -3724,8 +3780,8 @@ If the input is in the array \f(CW$a\fR here are two solutions:
 \&    env_parallel \-\-env a echo \*(Aq${a[{=$_\-\-=}]} \- ${a[{}]}\*(Aq
 \&  parallel echo {1} \- {2} ::: "${a[@]::${#a[@]}\-1}" :::+ "${a[@]:1}"
 .Ve
-.SH "EXAMPLE: Count the differences between all files in a dir"
-.IX Header "EXAMPLE: Count the differences between all files in a dir"
+.SS "\s-1EXAMPLE:\s0 Count the differences between all files in a dir"
+.IX Subsection "EXAMPLE: Count the differences between all files in a dir"
 Using \fB\-\-results\fR the results are saved in /tmp/diffcount*.
 .PP
 .Vb 2
@@ -3735,8 +3791,8 @@ Using \fB\-\-results\fR the results are saved in /tmp/diffcount*.
 .PP
 To see the difference between file A and file B look at the file
 \&'/tmp/diffcount/1/A/2/B'.
-.SH "EXAMPLE: Speeding up fast jobs"
-.IX Header "EXAMPLE: Speeding up fast jobs"
+.SS "\s-1EXAMPLE:\s0 Speeding up fast jobs"
+.IX Subsection "EXAMPLE: Speeding up fast jobs"
 Starting a job on the local machine takes around 10 ms. This can be a
 big overhead if the job takes very few ms to run. Often you can group
 small jobs together using \fB\-X\fR which will make the overhead less
@@ -3786,8 +3842,8 @@ E.g.
 .PP
 The overhead is 100000 times smaller namely around 100 nanoseconds per
 job.
-.SH "EXAMPLE: Using shell variables"
-.IX Header "EXAMPLE: Using shell variables"
+.SS "\s-1EXAMPLE:\s0 Using shell variables"
+.IX Subsection "EXAMPLE: Using shell variables"
 When using shell variables you need to quote them correctly as they
 may otherwise be interpreted by the shell.
 .PP
@@ -3833,8 +3889,8 @@ If you use them in a function you just quote as you normally would do:
 \&  export \-f myfunc
 \&  parallel myfunc ::: \*(Aq!\*(Aq
 .Ve
-.SH "EXAMPLE: Group output lines"
-.IX Header "EXAMPLE: Group output lines"
+.SS "\s-1EXAMPLE:\s0 Group output lines"
+.IX Subsection "EXAMPLE: Group output lines"
 When running jobs that output data, you often do not want the output
 of multiple jobs to run together. \s-1GNU\s0 \fBparallel\fR defaults to grouping
 the output of each job, so the output is printed when the job
@@ -3855,8 +3911,8 @@ Compare the output of:
 \&    https://ftpmirror.gnu.org/parallel/parallel\-20{}0822.tar.bz2 \e
 \&    ::: {12..16}
 .Ve
-.SH "EXAMPLE: Tag output lines"
-.IX Header "EXAMPLE: Tag output lines"
+.SS "\s-1EXAMPLE:\s0 Tag output lines"
+.IX Subsection "EXAMPLE: Tag output lines"
 \&\s-1GNU\s0 \fBparallel\fR groups the output lines, but it can be hard to see
 where the different jobs begin. \fB\-\-tag\fR prepends the argument to make
 that more visible:
@@ -3880,8 +3936,8 @@ Check the uptime of the servers in \fI~/.parallel/sshloginfile\fR:
 .Vb 1
 \&  parallel \-\-tag \-S .. \-\-nonall uptime
 .Ve
-.SH "EXAMPLE: Colorize output"
-.IX Header "EXAMPLE: Colorize output"
+.SS "\s-1EXAMPLE:\s0 Colorize output"
+.IX Subsection "EXAMPLE: Colorize output"
 Give each job a new color. Most terminals support \s-1ANSI\s0 colors with the
 escape code \*(L"\e033[30;3Xm\*(R" where 0 <= X <= 7:
 .PP
@@ -3897,8 +3953,8 @@ To get rid of the initial \et (which comes from \fB\-\-tagstring\fR):
 .Vb 1
 \&    ... | perl \-pe \*(Aqs/\et//\*(Aq
 .Ve
-.SH "EXAMPLE: Keep order of output same as order of input"
-.IX Header "EXAMPLE: Keep order of output same as order of input"
+.SS "\s-1EXAMPLE:\s0 Keep order of output same as order of input"
+.IX Subsection "EXAMPLE: Keep order of output same as order of input"
 Normally the output of a job will be printed as soon as it
 completes. Sometimes you want the order of the output to remain the
 same as the order of the input. This is often important, if the output
@@ -3953,8 +4009,8 @@ combined in the correct order.
 \&  seq 0 99 | parallel \-k curl \-r \e
 \&    {}0000000\-{}9999999 http://example.com/the/big/file > file
 .Ve
-.SH "EXAMPLE: Parallel grep"
-.IX Header "EXAMPLE: Parallel grep"
+.SS "\s-1EXAMPLE:\s0 Parallel grep"
+.IX Subsection "EXAMPLE: Parallel grep"
 \&\fBgrep \-r\fR greps recursively through directories. On multicore CPUs
 \&\s-1GNU\s0 \fBparallel\fR can often speed this up.
 .PP
@@ -3963,8 +4019,8 @@ combined in the correct order.
 .Ve
 .PP
 This will run 1.5 job per \s-1CPU,\s0 and give 1000 arguments to \fBgrep\fR.
-.SH "EXAMPLE: Grepping n lines for m regular expressions."
-.IX Header "EXAMPLE: Grepping n lines for m regular expressions."
+.SS "\s-1EXAMPLE:\s0 Grepping n lines for m regular expressions."
+.IX Subsection "EXAMPLE: Grepping n lines for m regular expressions."
 The simplest solution to grep a big file for a lot of regexps is:
 .PP
 .Vb 1
@@ -3989,8 +4045,10 @@ up.
 It is harder to see if disk I/O is the limiting factor, and depending
 on the disk system it may be faster or slower to parallelize. The only
 way to know for certain is to test and measure.
-.SS "Limiting factor: \s-1RAM\s0"
+.PP
+\fILimiting factor: \s-1RAM\s0\fR
 .IX Subsection "Limiting factor: RAM"
+.PP
 The normal \fBgrep \-f regexps.txt bigfile\fR works no matter the size of
 bigfile, but if regexps.txt is so big it cannot fit into memory, then
 you need to split this.
@@ -4051,8 +4109,10 @@ If you can live with duplicated lines and wrong order, it is faster to do:
 \&  parallel \-\-pipepart \-a regexps.txt \-\-block $percpu \-\-compress \e
 \&    grep \-F \-f \- bigfile
 .Ve
-.SS "Limiting factor: \s-1CPU\s0"
+.PP
+\fILimiting factor: \s-1CPU\s0\fR
 .IX Subsection "Limiting factor: CPU"
+.PP
 If the \s-1CPU\s0 is the limiting factor parallelization should be done on
 the regexps:
 .PP
@@ -4086,12 +4146,14 @@ combine the two using \fB\-\-cat\fR:
 .Ve
 .PP
 If a line matches multiple regexps, the line may be duplicated.
-.SS "Bigger problem"
+.PP
+\fIBigger problem\fR
 .IX Subsection "Bigger problem"
+.PP
 If the problem is too big to be solved by this, you are probably ready
 for Lucene.
-.SH "EXAMPLE: Using remote computers"
-.IX Header "EXAMPLE: Using remote computers"
+.SS "\s-1EXAMPLE:\s0 Using remote computers"
+.IX Subsection "EXAMPLE: Using remote computers"
 To run commands on a remote computer \s-1SSH\s0 needs to be set up and you
 must be able to login without entering a password (The commands
 \&\fBssh-copy-id\fR, \fBssh-agent\fR, and \fBsshpass\fR may help you do that).
@@ -4182,8 +4244,8 @@ has 8 CPUs.
 .Vb 1
 \&  seq 10 | parallel \-\-sshlogin 8/server.example.com echo
 .Ve
-.SH "EXAMPLE: Transferring of files"
-.IX Header "EXAMPLE: Transferring of files"
+.SS "\s-1EXAMPLE:\s0 Transferring of files"
+.IX Subsection "EXAMPLE: Transferring of files"
 To recompress gzipped files with \fBbzip2\fR using a remote computer run:
 .PP
 .Vb 3
@@ -4267,8 +4329,8 @@ the special short hand \fI\-S ..\fR can be used:
 \&  find logs/ \-name \*(Aq*.gz\*(Aq | parallel \-S .. \e
 \&    \-\-trc {.}.bz2 "zcat {} | bzip2 \-9 >{.}.bz2"
 .Ve
-.SH "EXAMPLE: Distributing work to local and remote computers"
-.IX Header "EXAMPLE: Distributing work to local and remote computers"
+.SS "\s-1EXAMPLE:\s0 Distributing work to local and remote computers"
+.IX Subsection "EXAMPLE: Distributing work to local and remote computers"
 Convert *.mp3 to *.ogg running one process per \s-1CPU\s0 on local computer
 and server2:
 .PP
@@ -4276,8 +4338,8 @@ and server2:
 \&  parallel \-\-trc {.}.ogg \-S server2,: \e
 \&    \*(Aqmpg321 \-w \- {} | oggenc \-q0 \- \-o {.}.ogg\*(Aq ::: *.mp3
 .Ve
-.SH "EXAMPLE: Running the same command on remote computers"
-.IX Header "EXAMPLE: Running the same command on remote computers"
+.SS "\s-1EXAMPLE:\s0 Running the same command on remote computers"
+.IX Subsection "EXAMPLE: Running the same command on remote computers"
 To run the command \fBuptime\fR on remote computers you can do:
 .PP
 .Vb 1
@@ -4295,16 +4357,16 @@ Remove \fB\-\-tag\fR if you do not want the sshlogin added before the
 output.
 .PP
 If you have a lot of hosts use '\-j0' to access more hosts in parallel.
-.SH "EXAMPLE: Running 'sudo' on remote computers"
-.IX Header "EXAMPLE: Running 'sudo' on remote computers"
+.SS "\s-1EXAMPLE:\s0 Running 'sudo' on remote computers"
+.IX Subsection "EXAMPLE: Running 'sudo' on remote computers"
 Put the password into passwordfile then run:
 .PP
 .Vb 2
 \&  parallel \-\-ssh \*(Aqcat passwordfile | ssh\*(Aq \-\-nonall \e
 \&    \-S user@server1,user@server2 sudo \-S ls \-l /root
 .Ve
-.SH "EXAMPLE: Using remote computers behind NAT wall"
-.IX Header "EXAMPLE: Using remote computers behind NAT wall"
+.SS "\s-1EXAMPLE:\s0 Using remote computers behind \s-1NAT\s0 wall"
+.IX Subsection "EXAMPLE: Using remote computers behind NAT wall"
 If the workers are behind a \s-1NAT\s0 wall, you need some trickery to get to
 them.
 .PP
@@ -4339,8 +4401,10 @@ can simply:
 .Vb 1
 \&  parallel \-S host1,host2,host3 echo ::: This does work
 .Ve
-.SS "No jumphost, but port forwards"
+.PP
+\fINo jumphost, but port forwards\fR
 .IX Subsection "No jumphost, but port forwards"
+.PP
 If there is no jumphost but each server has port 22 forwarded from the
 firewall (e.g. the firewall's port 22001 = port 22 on host1, 22002 = host2,
 22003 = host3) then you can use \fB~/.ssh/config\fR:
@@ -4361,8 +4425,10 @@ And then use host{1..3}.v as normal hosts:
 .Vb 1
 \&  parallel \-S host1.v,host2.v,host3.v echo ::: a b c
 .Ve
-.SS "No jumphost, no port forwards"
+.PP
+\fINo jumphost, no port forwards\fR
 .IX Subsection "No jumphost, no port forwards"
+.PP
 If ports cannot be forwarded, you need some sort of \s-1VPN\s0 to traverse
 the NAT-wall. \s-1TOR\s0 is one options for that, as it is very easy to get
 working.
@@ -4393,8 +4459,8 @@ If not all hosts are accessible through \s-1TOR:\s0
 .Ve
 .PP
 See more \fBssh\fR tricks on https://en.wikibooks.org/wiki/OpenSSH/Cookbook/Proxies_and_Jump_Hosts
-.SH "EXAMPLE: Parallelizing rsync"
-.IX Header "EXAMPLE: Parallelizing rsync"
+.SS "\s-1EXAMPLE:\s0 Parallelizing rsync"
+.IX Subsection "EXAMPLE: Parallelizing rsync"
 \&\fBrsync\fR is a great tool, but sometimes it will not fill up the
 available bandwidth. Running multiple \fBrsync\fR in parallel can fix
 this.
@@ -4423,8 +4489,8 @@ are called digits.png (e.g. 000000.png) you might be able to do:
 .Vb 1
 \&  seq \-w 0 99 | parallel rsync \-Havessh fooserver:src/*{}.png destdir/
 .Ve
-.SH "EXAMPLE: Use multiple inputs in one command"
-.IX Header "EXAMPLE: Use multiple inputs in one command"
+.SS "\s-1EXAMPLE:\s0 Use multiple inputs in one command"
+.IX Subsection "EXAMPLE: Use multiple inputs in one command"
 Copy files like foo.es.ext to foo.ext:
 .PP
 .Vb 1
@@ -4460,8 +4526,8 @@ Alternative version:
 .Vb 1
 \&  find . \-type f | sort | parallel convert {} {#}.png
 .Ve
-.SH "EXAMPLE: Use a table as input"
-.IX Header "EXAMPLE: Use a table as input"
+.SS "\s-1EXAMPLE:\s0 Use a table as input"
+.IX Subsection "EXAMPLE: Use a table as input"
 Content of table_file.tsv:
 .PP
 .Vb 2
@@ -4488,8 +4554,8 @@ the columns. To keep the spaces:
 .Vb 1
 \&  parallel \-a table_file.tsv \-\-trim n \-\-colsep \*(Aq\et\*(Aq cmd \-o {2} \-i {1}
 .Ve
-.SH "EXAMPLE: Output to database"
-.IX Header "EXAMPLE: Output to database"
+.SS "\s-1EXAMPLE:\s0 Output to database"
+.IX Subsection "EXAMPLE: Output to database"
 \&\s-1GNU\s0 \fBparallel\fR can output to a database table and a CSV-file:
 .PP
 .Vb 3
@@ -4534,8 +4600,8 @@ Or MySQL:
 \&    %s=("\e\e" => "\e\e", "t" => "\et", "n" => "\en");
 \&    s/\e\e([\e\etn])/$s{$1}/g;\*(Aq mytable.tsv
 .Ve
-.SH "EXAMPLE: Output to CSV-file for R"
-.IX Header "EXAMPLE: Output to CSV-file for R"
+.SS "\s-1EXAMPLE:\s0 Output to CSV-file for R"
+.IX Subsection "EXAMPLE: Output to CSV-file for R"
 If you have no need for the advanced job distribution control that a
 database provides, but you simply want output into a \s-1CSV\s0 file that you
 can read into R or LibreCalc, then you can use \fB\-\-results\fR:
@@ -4547,8 +4613,8 @@ can read into R or LibreCalc, then you can use \fB\-\-results\fR:
 \&  > print(mydf[2,])
 \&  > write(as.character(mydf[2,c("Stdout")]),\*(Aq\*(Aq)
 .Ve
-.SH "EXAMPLE: Use XML as input"
-.IX Header "EXAMPLE: Use XML as input"
+.SS "\s-1EXAMPLE:\s0 Use \s-1XML\s0 as input"
+.IX Subsection "EXAMPLE: Use XML as input"
 The show Aflyttet on Radio 24syv publishes an \s-1RSS\s0 feed with their audio
 podcasts on: http://arkiv.radio24syv.dk/audiopodcast/channel/4466232
 .PP
@@ -4560,16 +4626,16 @@ using \s-1GNU\s0 \fBparallel\fR:
 \&    xpath \-e "//pubDate[contains(text(),\*(Aq2019\*(Aq)]/../enclosure/@url" | \e
 \&    parallel \-u wget \*(Aq{= s/ url="//; s/"//; =}\*(Aq
 .Ve
-.SH "EXAMPLE: Run the same command 10 times"
-.IX Header "EXAMPLE: Run the same command 10 times"
+.SS "\s-1EXAMPLE:\s0 Run the same command 10 times"
+.IX Subsection "EXAMPLE: Run the same command 10 times"
 If you want to run the same command with the same arguments 10 times
 in parallel you can do:
 .PP
 .Vb 1
 \&  seq 10 | parallel \-n0 my_command my_args
 .Ve
-.SH "EXAMPLE: Working as cat | sh. Resource inexpensive jobs and evaluation"
-.IX Header "EXAMPLE: Working as cat | sh. Resource inexpensive jobs and evaluation"
+.SS "\s-1EXAMPLE:\s0 Working as cat | sh. Resource inexpensive jobs and evaluation"
+.IX Subsection "EXAMPLE: Working as cat | sh. Resource inexpensive jobs and evaluation"
 \&\s-1GNU\s0 \fBparallel\fR can work similar to \fBcat | sh\fR.
 .PP
 A resource inexpensive job is a job that takes very little \s-1CPU,\s0 disk
@@ -4595,8 +4661,8 @@ To run 100 processes simultaneously do:
 .Ve
 .PP
 As there is not a \fIcommand\fR the jobs will be evaluated by the shell.
-.SH "EXAMPLE: Call program with FASTA sequence"
-.IX Header "EXAMPLE: Call program with FASTA sequence"
+.SS "\s-1EXAMPLE:\s0 Call program with \s-1FASTA\s0 sequence"
+.IX Subsection "EXAMPLE: Call program with FASTA sequence"
 \&\s-1FASTA\s0 files have the format:
 .PP
 .Vb 7
@@ -4616,8 +4682,8 @@ To call \fBmyprog\fR with the sequence as argument run:
 \&    parallel \-\-pipe \-N1 \-\-recstart \*(Aq>\*(Aq \-\-rrs \e
 \&      \*(Aqread a; echo Name: "$a"; myprog $(tr \-d "\en")\*(Aq
 .Ve
-.SH "EXAMPLE: Processing a big file using more CPUs"
-.IX Header "EXAMPLE: Processing a big file using more CPUs"
+.SS "\s-1EXAMPLE:\s0 Processing a big file using more CPUs"
+.IX Subsection "EXAMPLE: Processing a big file using more CPUs"
 To process a big file or some output you can use \fB\-\-pipe\fR to split up
 the data into blocks and pipe the blocks into the processing program.
 .PP
@@ -4657,8 +4723,8 @@ the parts directly to the program:
 \&  parallel \-\-pipepart \-\-block 100m \-a bigfile \-\-files sort |\e
 \&    parallel \-Xj1 sort \-m {} \*(Aq;\*(Aq rm {} >bigfile.sort
 .Ve
-.SH "EXAMPLE: Grouping input lines"
-.IX Header "EXAMPLE: Grouping input lines"
+.SS "\s-1EXAMPLE:\s0 Grouping input lines"
+.IX Subsection "EXAMPLE: Grouping input lines"
 When processing with \fB\-\-pipe\fR you may have lines grouped by a
 value. Here is \fImy.csv\fR:
 .PP
@@ -4698,8 +4764,8 @@ a 50 character random string, which we then use as the separator:
 .PP
 If your program can process multiple customers replace \fB\-N1\fR with a
 reasonable \fB\-\-blocksize\fR.
-.SH "EXAMPLE: Running more than 250 jobs workaround"
-.IX Header "EXAMPLE: Running more than 250 jobs workaround"
+.SS "\s-1EXAMPLE:\s0 Running more than 250 jobs workaround"
+.IX Subsection "EXAMPLE: Running more than 250 jobs workaround"
 If you need to run a massive amount of jobs in parallel, then you will
 likely hit the filehandle limit which is often around 250 jobs. If you
 are super user you can raise the limit in /etc/security/limits.conf
@@ -4719,8 +4785,8 @@ RAM\s0 to do this, and you may need to increase /proc/sys/kernel/pid_max):
 \&  cat myinput |\e
 \&    parallel \-\-pipe \-N 250 \-\-roundrobin \-j250 parallel \-j250 your_prg
 .Ve
-.SH "EXAMPLE: Working as mutex and counting semaphore"
-.IX Header "EXAMPLE: Working as mutex and counting semaphore"
+.SS "\s-1EXAMPLE:\s0 Working as mutex and counting semaphore"
+.IX Subsection "EXAMPLE: Working as mutex and counting semaphore"
 The command \fBsem\fR is an alias for \fBparallel \-\-semaphore\fR.
 .PP
 A counting semaphore will allow a given number of jobs to be started
@@ -4756,8 +4822,8 @@ same time:
 .Vb 1
 \&  seq 3 | parallel sem \-\-id mymutex sed \-i \-e \*(Aq1i{}\*(Aq myfile
 .Ve
-.SH "EXAMPLE: Mutex for a script"
-.IX Header "EXAMPLE: Mutex for a script"
+.SS "\s-1EXAMPLE:\s0 Mutex for a script"
+.IX Subsection "EXAMPLE: Mutex for a script"
 Assume a script is called from cron or from a web service, but only
 one instance can be run at a time. With \fBsem\fR and \fB\-\-shebang\-wrap\fR
 the script can be made to wait for other instances to finish. Here in
@@ -4791,8 +4857,8 @@ Here \fBpython\fR:
 \&  time.sleep(5)
 \&  print "exclusively";
 .Ve
-.SH "EXAMPLE: Start editor with filenames from stdin (standard input)"
-.IX Header "EXAMPLE: Start editor with filenames from stdin (standard input)"
+.SS "\s-1EXAMPLE:\s0 Start editor with filenames from stdin (standard input)"
+.IX Subsection "EXAMPLE: Start editor with filenames from stdin (standard input)"
 You can use \s-1GNU\s0 \fBparallel\fR to start interactive programs like emacs or vi:
 .PP
 .Vb 2
@@ -4802,8 +4868,8 @@ You can use \s-1GNU\s0 \fBparallel\fR to start interactive programs like emacs o
 .PP
 If there are more files than will fit on a single command line, the
 editor will be started again with the remaining files.
-.SH "EXAMPLE: Running sudo"
-.IX Header "EXAMPLE: Running sudo"
+.SS "\s-1EXAMPLE:\s0 Running sudo"
+.IX Subsection "EXAMPLE: Running sudo"
 \&\fBsudo\fR requires a password to run a command as root. It caches the
 access, so you only need to enter the password again if you have not
 used \fBsudo\fR for a while.
@@ -4829,8 +4895,8 @@ or:
 .Ve
 .PP
 This way you only have to enter the sudo password once.
-.SH "EXAMPLE: GNU Parallel as queue system/batch manager"
-.IX Header "EXAMPLE: GNU Parallel as queue system/batch manager"
+.SS "\s-1EXAMPLE: GNU\s0 Parallel as queue system/batch manager"
+.IX Subsection "EXAMPLE: GNU Parallel as queue system/batch manager"
 \&\s-1GNU\s0 \fBparallel\fR can work as a simple job queue system or batch manager.
 The idea is to put the jobs into a file and have \s-1GNU\s0 \fBparallel\fR read
 from that continuously. As \s-1GNU\s0 \fBparallel\fR will stop at end of file we
@@ -4889,16 +4955,18 @@ changes.
 There is a a small issue when using \s-1GNU\s0 \fBparallel\fR as queue
 system/batch manager: You have to submit JobSlot number of jobs before
 they will start, and after that you can submit one at a time, and job
-will start immediately if free slots are available.  Output from the
-running or completed jobs are held back and will only be printed when
-JobSlots more jobs has been started (unless you use \-\-ungroup or
+will start immediately if free slots are available.
+.PP
+Output from the running or completed jobs are held back and will only
+be printed when the next job is started (unless you use \-\-ungroup or
 \&\-\-line\-buffer, in which case the output from the jobs are printed
-immediately).  E.g. if you have 10 jobslots then the output from the
-first completed job will only be printed when job 11 has started, and
-the output of second completed job will only be printed when job 12
-has started.
-.SH "EXAMPLE: GNU Parallel as dir processor"
-.IX Header "EXAMPLE: GNU Parallel as dir processor"
+immediately).
+.PP
+E.g. if you have 10 jobslots then the output from the first completed
+job will only be printed when job 11 has started, and the output of
+second completed job will only be printed when job 12 has started.
+.SS "\s-1EXAMPLE: GNU\s0 Parallel as dir processor"
+.IX Subsection "EXAMPLE: GNU Parallel as dir processor"
 If you have a dir in which users drop files that needs to be processed
 you can do this on GNU/Linux (If you know what \fBinotifywait\fR is
 called on other platforms file a bug report):
@@ -4925,8 +4993,8 @@ files. Set up the dir processor as above and unpack into the dir.
 .PP
 Using \s-1GNU\s0 \fBparallel\fR as dir processor has the same limitations as
 using \s-1GNU\s0 \fBparallel\fR as queue system/batch manager.
-.SH "EXAMPLE: Locate the missing package"
-.IX Header "EXAMPLE: Locate the missing package"
+.SS "\s-1EXAMPLE:\s0 Locate the missing package"
+.IX Subsection "EXAMPLE: Locate the missing package"
 If you have downloaded source and tried compiling it, you may have seen:
 .PP
 .Vb 4
@@ -5366,8 +5434,8 @@ Example: Profile for running a command on every sshlogin in
 ~/.ssh/sshlogins and prepend the output with the sshlogin:
 .PP
 .Vb 2
-\&  echo \-\-tag \-S .. \-\-nonall > ~/.parallel/n
-\&  parallel \-Jn uptime
+\&  echo \-\-tag \-S .. \-\-nonall > ~/.parallel/nonall_profile
+\&  parallel \-J nonall_profile uptime
 .Ve
 .PP
 Example: Profile for running every command with \fB\-j\-1\fR and \fBnice\fR
@@ -5543,6 +5611,11 @@ not exist with PostgreSQL.
 Report bugs to <bug\-parallel@gnu.org> or
 https://savannah.gnu.org/bugs/?func=additem&group=parallel
 .PP
+When you write your report, please keep in mind, that you must give
+the reader enough information to be able to run exactly what you
+run. So you need to include all data and programs that you use to
+show the problem.
+.PP
 See a perfect bug report on
 https://lists.gnu.org/archive/html/bug\-parallel/2015\-01/msg00000.html
 .PP
@@ -5563,17 +5636,22 @@ https://stackoverflow.com/help/mcve).
 It should be a complete example that others can run which shows the
 problem including all files needed to run the example. This should
 preferably be small and simple, so try to remove as many options as
-possible. A combination of \fByes\fR, \fBseq\fR, \fBcat\fR, \fBecho\fR, \fBwc\fR, and
-\&\fBsleep\fR can reproduce most errors. If your example requires large
-files, see if you can make them with something like \fBseq 100000000\fR >
-\&\fBbigfile\fR or \fByes | head \-n 1000000000\fR > \fBfile\fR. If you need
-multiple columns: \fBpaste <(seq 1000) <(seq 1000 1999)\fR
+possible.
+.Sp
+A combination of \fByes\fR, \fBseq\fR, \fBcat\fR, \fBecho\fR, \fBwc\fR, and \fBsleep\fR
+can reproduce most errors.
+.Sp
+If your example requires large files, see if you can make them with
+something like \fBseq 100000000\fR > \fBbigfile\fR or \fByes | head \-n
+1000000000\fR > \fBfile\fR. If you need multiple columns: \fBpaste <(seq
+1000) <(seq 1000 1999)\fR
 .Sp
 If your example requires remote execution, see if you can use
 \&\fBlocalhost\fR \- maybe using another login.
 .Sp
 If you have access to a different system (maybe a VirtualBox on your
-own machine), test if the \s-1MCVE\s0 shows the problem on that system.
+own machine), test if your \s-1MCVE\s0 shows the problem on that system. If
+it does not, read below.
 .IP "\(bu" 2
 The output of your example. If your problem is not easily reproduced
 by others, the output might help them figure out the problem.
@@ -5599,6 +5677,17 @@ done through you. That will put more burden on you and it is extra
 important you give any information that help. In general the problem
 will be fixed faster and with less work for you if you can reproduce
 the error on a VirtualBox.
+.SS "In summary"
+.IX Subsection "In summary"
+Your report must include:
+.IP "\(bu" 2
+\&\fBparallel \-\-version\fR
+.IP "\(bu" 2
+output + error message
+.IP "\(bu" 2
+full example including all files
+.IP "\(bu" 2
+VirtualBox image, if you cannot reproduce it on other systems
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 When using \s-1GNU\s0 \fBparallel\fR for a publication please cite:
@@ -5634,11 +5723,12 @@ You should have received a copy of the \s-1GNU\s0 General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .SS "Documentation license I"
 .IX Subsection "Documentation license I"
-Permission is granted to copy, distribute and/or modify this documentation
-under the terms of the \s-1GNU\s0 Free Documentation License, Version 1.3 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the file fdl.txt.
+Permission is granted to copy, distribute and/or modify this
+documentation under the terms of the \s-1GNU\s0 Free Documentation License,
+Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, with no Front-Cover Texts, and
+with no Back-Cover Texts.  A copy of the license is included in the
+file \s-1LICENSES/GFDL\-1\s0.3\-or\-later.txt.
 .SS "Documentation license \s-1II\s0"
 .IX Subsection "Documentation license II"
 You are free:
@@ -5690,7 +5780,8 @@ how the work is used, such as publicity or privacy rights.
 For any reuse or distribution, you must make clear to others the
 license terms of this work.
 .PP
-A copy of the full license is included in the file as cc\-by\-sa.txt.
+A copy of the full license is included in the file as
+\&\s-1LICENCES/CC\-BY\-SA\-4.0\s0.txt
 .SH "DEPENDENCIES"
 .IX Header "DEPENDENCIES"
 \&\s-1GNU\s0 \fBparallel\fR uses Perl, and the Perl modules Getopt::Long,

@@ -20,6 +20,10 @@ doc_DATA = parallel.html env_parallel.html sem.html sql.html		\
 	niceload.texi parallel_tutorial.texi parallel_book.texi		\
 	parallel_design.texi parallel_alternatives.texi parcat.texi	\
 	parset.texi parsort.texi \
+        parallel.rst env_parallel.rst sem.rst sql.rst 			\
+	niceload.rst parallel_tutorial.rst parallel_book.rst		\
+	parallel_design.rst parallel_alternatives.rst parcat.rst	\
+	parset.rst parsort.rst \
 	parallel.pdf env_parallel.pdf sem.pdf sql.pdf niceload.pdf	\
 	parallel_tutorial.pdf parallel_book.pdf parallel_design.pdf	\
 	parallel_alternatives.pdf parcat.pdf parset.pdf	parsort.pdf 	\
@@ -231,6 +235,54 @@ parsort.texi: parsort
 	pod2texi --output="$(srcdir)"/parsort.texi "$(srcdir)"/parsort \
 	|| echo "Warning: pod2texi not found. Using old parsort.texi"
 
+parallel.rst: parallel.pod
+	pod2rst --outfile "$(srcdir)"/parallel.rst --infile="$(srcdir)"/parallel.pod \
+	|| echo "Warning: pod2rst not found. Using old parallel.rst"
+
+env_parallel.rst: env_parallel.pod
+	pod2rst --outfile "$(srcdir)"/env_parallel.rst --infile="$(srcdir)"/env_parallel.pod \
+	|| echo "Warning: pod2rst not found. Using old env_parallel.rst"
+
+parallel_tutorial.rst: parallel_tutorial.pod
+	pod2rst --outfile "$(srcdir)"/parallel_tutorial.rst --infile="$(srcdir)"/parallel_tutorial.pod \
+	|| echo "Warning: pod2rst not found. Using old parallel_tutorial.rst"
+
+parallel_book.rst: parallel_book.pod
+	pod2rst --outfile "$(srcdir)"/parallel_book.rst --infile="$(srcdir)"/parallel_book.pod \
+	|| echo "Warning: pod2rst not found. Using old parallel_book.rst"
+
+parallel_design.rst: parallel_design.pod
+	pod2rst --outfile "$(srcdir)"/parallel_design.rst --infile="$(srcdir)"/parallel_design.pod \
+	|| echo "Warning: pod2rst not found. Using old parallel_design.rst"
+
+parallel_alternatives.rst: parallel_alternatives.pod
+	pod2rst --outfile "$(srcdir)"/parallel_alternatives.rst --infile="$(srcdir)"/parallel_alternatives.pod \
+	|| echo "Warning: pod2rst not found. Using old parallel_alternatives.rst"
+
+sem.rst: sem.pod
+	pod2rst --outfile "$(srcdir)"/sem.rst --infile="$(srcdir)"/sem.pod \
+	|| echo "Warning: pod2rst not found. Using old sem.rst"
+
+sql.rst: sql
+	pod2rst --outfile "$(srcdir)"/sql.rst --infile="$(srcdir)"/sql \
+	|| echo "Warning: pod2rst not found. Using old sql.rst"
+
+niceload.rst: niceload.pod
+	pod2rst --outfile "$(srcdir)"/niceload.rst --infile="$(srcdir)"/niceload.pod \
+	|| echo "Warning: pod2rst not found. Using old niceload.rst"
+
+parcat.rst: parcat.pod
+	pod2rst --outfile "$(srcdir)"/parcat.rst --infile="$(srcdir)"/parcat.pod \
+	|| echo "Warning: pod2rst not found. Using old parcat.rst"
+
+parset.rst: parset.pod
+	pod2rst --outfile "$(srcdir)"/parset.rst --infile="$(srcdir)"/parset.pod \
+	|| echo "Warning: pod2rst not found. Using old parset.rst"
+
+parsort.rst: parsort
+	pod2rst --outfile "$(srcdir)"/parsort.rst --infile="$(srcdir)"/parsort \
+	|| echo "Warning: pod2rst not found. Using old parsort.rst"
+
 parallel.pdf: parallel.pod
 	pod2pdf --output-file "$(srcdir)"/parallel.pdf "$(srcdir)"/parallel.pod --title "GNU Parallel" \
 	|| echo "Warning: pod2pdf not found. Using old parallel.pdf"
@@ -296,10 +348,14 @@ DISTCLEANFILES = parallel.1 env_parallel.1 sem.1 sql.1 niceload.1	\
 	sem.texi sql.texi niceload.texi parallel_tutorial.texi		\
 	parallel_book.texi parallel_design.texi				\
 	parallel_alternatives.texi parcat.texi parset.texi		\
-	parsort.texi parallel.pdf env_parallel.pdf sem.pdf sql.pdf	\
-	niceload.pdf parallel_tutorial.pdf parallel_book.pdf		\
-	parallel_design.pdf parallel_alternatives.pdf parcat.pdf	\
-	parset.pdf parsort.pdf parallel_cheat_bw.pdf
+	parsort.texi \
+	parallel.rst env_parallel.rst sem.rst sql.rst niceload.rst	\
+	parallel_tutorial.rst parallel_book.rst parallel_design.rst	\
+	parallel_alternatives.rst parcat.rst parset.rst parsort.rst	\
+	parallel.pdf env_parallel.pdf sem.pdf sql.pdf niceload.pdf	\
+	parallel_tutorial.pdf parallel_book.pdf parallel_design.pdf	\
+	parallel_alternatives.pdf parcat.pdf parset.pdf parsort.pdf	\
+	parallel_cheat_bw.pdf
 
 EXTRA_DIST = parallel sem sql niceload parcat parset parsort		\
 	env_parallel env_parallel.ash env_parallel.bash			\

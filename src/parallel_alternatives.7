@@ -133,7 +133,7 @@
 .\" ========================================================================
 .\"
 .IX Title "PARALLEL_ALTERNATIVES 7"
-.TH PARALLEL_ALTERNATIVES 7 "2021-01-19" "20201222" "parallel"
+.TH PARALLEL_ALTERNATIVES 7 "2021-03-21" "20210222" "parallel"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -158,84 +158,164 @@ years.
 .IX Subsection "SUMMARY LEGEND"
 The following features are in some of the comparable tools:
 .PP
-\&\fBInputs\fR
- I1. Arguments can be read from stdin
- I2. Arguments can be read from a file
- I3. Arguments can be read from multiple files
- I4. Arguments can be read from command line
- I5. Arguments can be read from a table
- I6. Arguments can be read from the same file using #! (shebang)
- I7. Line oriented input as default (Quoting of special chars not needed)
+\fIInputs\fR
+.IX Subsection "Inputs"
+.IP "I1. Arguments can be read from stdin" 4
+.IX Item "I1. Arguments can be read from stdin"
+.PD 0
+.IP "I2. Arguments can be read from a file" 4
+.IX Item "I2. Arguments can be read from a file"
+.IP "I3. Arguments can be read from multiple files" 4
+.IX Item "I3. Arguments can be read from multiple files"
+.IP "I4. Arguments can be read from command line" 4
+.IX Item "I4. Arguments can be read from command line"
+.IP "I5. Arguments can be read from a table" 4
+.IX Item "I5. Arguments can be read from a table"
+.IP "I6. Arguments can be read from the same file using #! (shebang)" 4
+.IX Item "I6. Arguments can be read from the same file using #! (shebang)"
+.IP "I7. Line oriented input as default (Quoting of special chars not needed)" 4
+.IX Item "I7. Line oriented input as default (Quoting of special chars not needed)"
+.PD
 .PP
-\&\fBManipulation of input\fR
- M1. Composed command
- M2. Multiple arguments can fill up an execution line
- M3. Arguments can be put anywhere in the execution line
- M4. Multiple arguments can be put anywhere in the execution line
- M5. Arguments can be replaced with context
- M6. Input can be treated as the complete command line
+\fIManipulation of input\fR
+.IX Subsection "Manipulation of input"
+.IP "M1. Composed command" 4
+.IX Item "M1. Composed command"
+.PD 0
+.IP "M2. Multiple arguments can fill up an execution line" 4
+.IX Item "M2. Multiple arguments can fill up an execution line"
+.IP "M3. Arguments can be put anywhere in the execution line" 4
+.IX Item "M3. Arguments can be put anywhere in the execution line"
+.IP "M4. Multiple arguments can be put anywhere in the execution line" 4
+.IX Item "M4. Multiple arguments can be put anywhere in the execution line"
+.IP "M5. Arguments can be replaced with context" 4
+.IX Item "M5. Arguments can be replaced with context"
+.IP "M6. Input can be treated as the complete command line" 4
+.IX Item "M6. Input can be treated as the complete command line"
+.PD
 .PP
-\&\fBOutputs\fR
- O1. Grouping output so output from different jobs do not mix
- O2. Send stderr (standard error) to stderr (standard error)
- O3. Send stdout (standard output) to stdout (standard output)
- O4. Order of output can be same as order of input
- O5. Stdout only contains stdout (standard output) from the command
- O6. Stderr only contains stderr (standard error) from the command
- O7. Buffering on disk
- O8. Cleanup of temporary files if killed
- O9. Test if disk runs full during run
- O10. Output of a line bigger than 4 \s-1GB\s0
+\fIOutputs\fR
+.IX Subsection "Outputs"
+.IP "O1. Grouping output so output from different jobs do not mix" 4
+.IX Item "O1. Grouping output so output from different jobs do not mix"
+.PD 0
+.IP "O2. Send stderr (standard error) to stderr (standard error)" 4
+.IX Item "O2. Send stderr (standard error) to stderr (standard error)"
+.IP "O3. Send stdout (standard output) to stdout (standard output)" 4
+.IX Item "O3. Send stdout (standard output) to stdout (standard output)"
+.IP "O4. Order of output can be same as order of input" 4
+.IX Item "O4. Order of output can be same as order of input"
+.IP "O5. Stdout only contains stdout (standard output) from the command" 4
+.IX Item "O5. Stdout only contains stdout (standard output) from the command"
+.IP "O6. Stderr only contains stderr (standard error) from the command" 4
+.IX Item "O6. Stderr only contains stderr (standard error) from the command"
+.IP "O7. Buffering on disk" 4
+.IX Item "O7. Buffering on disk"
+.IP "O8. Cleanup of temporary files if killed" 4
+.IX Item "O8. Cleanup of temporary files if killed"
+.IP "O9. Test if disk runs full during run" 4
+.IX Item "O9. Test if disk runs full during run"
+.IP "O10. Output of a line bigger than 4 \s-1GB\s0" 4
+.IX Item "O10. Output of a line bigger than 4 GB"
+.PD
 .PP
-\&\fBExecution\fR
- E1. Running jobs in parallel
- E2. List running jobs
- E3. Finish running jobs, but do not start new jobs
- E4. Number of running jobs can depend on number of cpus
- E5. Finish running jobs, but do not start new jobs after first failure
- E6. Number of running jobs can be adjusted while running
- E7. Only spawn new jobs if load is less than a limit
+\fIExecution\fR
+.IX Subsection "Execution"
+.IP "E1. Running jobs in parallel" 4
+.IX Item "E1. Running jobs in parallel"
+.PD 0
+.IP "E2. List running jobs" 4
+.IX Item "E2. List running jobs"
+.IP "E3. Finish running jobs, but do not start new jobs" 4
+.IX Item "E3. Finish running jobs, but do not start new jobs"
+.IP "E4. Number of running jobs can depend on number of cpus" 4
+.IX Item "E4. Number of running jobs can depend on number of cpus"
+.IP "E5. Finish running jobs, but do not start new jobs after first failure" 4
+.IX Item "E5. Finish running jobs, but do not start new jobs after first failure"
+.IP "E6. Number of running jobs can be adjusted while running" 4
+.IX Item "E6. Number of running jobs can be adjusted while running"
+.IP "E7. Only spawn new jobs if load is less than a limit" 4
+.IX Item "E7. Only spawn new jobs if load is less than a limit"
+.PD
 .PP
-\&\fBRemote execution\fR
- R1. Jobs can be run on remote computers
- R2. Basefiles can be transferred
- R3. Argument files can be transferred
- R4. Result files can be transferred
- R5. Cleanup of transferred files
- R6. No config files needed
- R7. Do not run more than \s-1SSHD\s0's MaxStartups can handle
- R8. Configurable \s-1SSH\s0 command
- R9. Retry if connection breaks occasionally
+\fIRemote execution\fR
+.IX Subsection "Remote execution"
+.IP "R1. Jobs can be run on remote computers" 4
+.IX Item "R1. Jobs can be run on remote computers"
+.PD 0
+.IP "R2. Basefiles can be transferred" 4
+.IX Item "R2. Basefiles can be transferred"
+.IP "R3. Argument files can be transferred" 4
+.IX Item "R3. Argument files can be transferred"
+.IP "R4. Result files can be transferred" 4
+.IX Item "R4. Result files can be transferred"
+.IP "R5. Cleanup of transferred files" 4
+.IX Item "R5. Cleanup of transferred files"
+.IP "R6. No config files needed" 4
+.IX Item "R6. No config files needed"
+.IP "R7. Do not run more than \s-1SSHD\s0's MaxStartups can handle" 4
+.IX Item "R7. Do not run more than SSHD's MaxStartups can handle"
+.IP "R8. Configurable \s-1SSH\s0 command" 4
+.IX Item "R8. Configurable SSH command"
+.IP "R9. Retry if connection breaks occasionally" 4
+.IX Item "R9. Retry if connection breaks occasionally"
+.PD
 .PP
-\&\fBSemaphore\fR
- S1. Possibility to work as a mutex
- S2. Possibility to work as a counting semaphore
+\fISemaphore\fR
+.IX Subsection "Semaphore"
+.IP "S1. Possibility to work as a mutex" 4
+.IX Item "S1. Possibility to work as a mutex"
+.PD 0
+.IP "S2. Possibility to work as a counting semaphore" 4
+.IX Item "S2. Possibility to work as a counting semaphore"
+.PD
 .PP
-\&\fBLegend\fR
- \- = no
- x = not applicable
- \s-1ID\s0 = yes
+\fILegend\fR
+.IX Subsection "Legend"
+.IP "\- = no" 4
+.IX Item "- = no"
+.PD 0
+.IP "x = not applicable" 4
+.IX Item "x = not applicable"
+.IP "\s-1ID\s0 = yes" 4
+.IX Item "ID = yes"
+.PD
 .PP
 As every new version of the programs are not tested the table may be
 outdated. Please file a bug report if you find errors (See \s-1REPORTING
 BUGS\s0).
 .PP
 parallel:
-I1 I2 I3 I4 I5 I6 I7
-M1 M2 M3 M4 M5 M6
-O1 O2 O3 O4 O5 O6 O7 O8 O9 O10
-E1 E2 E3 E4 E5 E6 E7
-R1 R2 R3 R4 R5 R6 R7 R8 R9
-S1 S2
+.IP "I1 I2 I3 I4 I5 I6 I7" 4
+.IX Item "I1 I2 I3 I4 I5 I6 I7"
+.PD 0
+.IP "M1 M2 M3 M4 M5 M6" 4
+.IX Item "M1 M2 M3 M4 M5 M6"
+.IP "O1 O2 O3 O4 O5 O6 O7 O8 O9 O10" 4
+.IX Item "O1 O2 O3 O4 O5 O6 O7 O8 O9 O10"
+.IP "E1 E2 E3 E4 E5 E6 E7" 4
+.IX Item "E1 E2 E3 E4 E5 E6 E7"
+.IP "R1 R2 R3 R4 R5 R6 R7 R8 R9" 4
+.IX Item "R1 R2 R3 R4 R5 R6 R7 R8 R9"
+.IP "S1 S2" 4
+.IX Item "S1 S2"
+.PD
 .SS "\s-1DIFFERENCES BETWEEN\s0 xargs \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN xargs AND GNU Parallel"
 Summary (see legend above):
-I1 I2 \- \- \- \- \-
-\&\- M2 M3 \- \- \-
-\&\- O2 O3 \- O5 O6
-E1 \- \- \- \- \- \-
-\&\- \- \- \- \- x \- \- \-
-\&\- \-
+.IP "I1 I2 \- \- \- \- \-" 4
+.IX Item "I1 I2 - - - - -"
+.PD 0
+.IP "\- M2 M3 \- \- \-" 4
+.IX Item "- M2 M3 - - -"
+.IP "\- O2 O3 \- O5 O6" 4
+.IX Item "- O2 O3 - O5 O6"
+.IP "E1 \- \- \- \- \- \-" 4
+.IX Item "E1 - - - - - -"
+.IP "\- \- \- \- \- x \- \- \-" 4
+.IX Item "- - - - - x - - -"
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBxargs\fR offers some of the same possibilities as \s-1GNU\s0 \fBparallel\fR.
 .PP
@@ -334,12 +414,18 @@ https://www.gnu.org/software/findutils/
 .SS "\s-1DIFFERENCES BETWEEN\s0 find \-exec \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN find -exec AND GNU Parallel"
 Summary (see legend above):
-\&\-  \-  \-  x  \-  x  \-
-\&\-  M2 M3 \-  \-  \-  \-
-\&\-  O2 O3 O4 O5 O6
-\&\-  \-  \-  \-  \-  \-  \-
-\&\-  \-  \-  \-  \-  \-  \-  \-  \-
-x  x
+.IP "\-  \-  \-  x  \-  x  \-" 4
+.IX Item "- - - x - x -"
+.PD 0
+.IP "\-  M2 M3 \-  \-  \-  \-" 4
+.IX Item "- M2 M3 - - - -"
+.IP "\-  O2 O3 O4 O5 O6" 4
+.IX Item "- O2 O3 O4 O5 O6"
+.IP "\-  \-  \-  \-  \-  \-  \-" 4
+.IP "\-  \-  \-  \-  \-  \-  \-  \-  \-" 4
+.IP "x  x" 4
+.IX Item "x x"
+.PD
 .PP
 \&\fBfind \-exec\fR offers some of the same possibilities as \s-1GNU\s0 \fBparallel\fR.
 .PP
@@ -351,12 +437,16 @@ https://www.gnu.org/software/findutils/ (Last checked: 2019\-01)
 .SS "\s-1DIFFERENCES BETWEEN\s0 make \-j \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN make -j AND GNU Parallel"
 Summary (see legend above):
-\&\-  \-  \-  \-  \-  \-  \-
-\&\-  \-  \-  \-  \-  \-
-O1 O2 O3 \-  x  O6
-E1 \-  \-  \-  E5 \-
-\&\-  \-  \-  \-  \-  \-  \-  \-  \-
-\&\-  \-
+.IP "\-  \-  \-  \-  \-  \-  \-" 4
+.PD 0
+.IP "\-  \-  \-  \-  \-  \-" 4
+.IP "O1 O2 O3 \-  x  O6" 4
+.IX Item "O1 O2 O3 - x O6"
+.IP "E1 \-  \-  \-  E5 \-" 4
+.IX Item "E1 - - - E5 -"
+.IP "\-  \-  \-  \-  \-  \-  \-  \-  \-" 4
+.IP "\-  \-" 4
+.PD
 .PP
 \&\fBmake \-j\fR can run jobs in parallel, but requires a crafted Makefile
 to do this. That results in extra quoting to get filenames containing
@@ -372,12 +462,19 @@ https://www.gnu.org/software/make/ (Last checked: 2019\-01)
 .SS "\s-1DIFFERENCES BETWEEN\s0 ppss \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN ppss AND GNU Parallel"
 Summary (see legend above):
-I1 I2 \- \- \- \- I7
-M1 \- M3 \- \- M6
-O1 \- \- x \- \-
-E1 E2 ?E3 E4 \- \- \-
-R1 R2 R3 R4 \- \- ?R7 ? ?
-\&\- \-
+.IP "I1 I2 \- \- \- \- I7" 4
+.IX Item "I1 I2 - - - - I7"
+.PD 0
+.IP "M1 \- M3 \- \- M6" 4
+.IX Item "M1 - M3 - - M6"
+.IP "O1 \- \- x \- \-" 4
+.IX Item "O1 - - x - -"
+.IP "E1 E2 ?E3 E4 \- \- \-" 4
+.IX Item "E1 E2 ?E3 E4 - - -"
+.IP "R1 R2 R3 R4 \- \- ?R7 ? ?" 4
+.IX Item "R1 R2 R3 R4 - - ?R7 ? ?"
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBppss\fR is also a tool for running jobs in parallel.
 .PP
@@ -458,12 +555,20 @@ https://github.com/louwrentius/PPSS
 .SS "\s-1DIFFERENCES BETWEEN\s0 pexec \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN pexec AND GNU Parallel"
 Summary (see legend above):
-I1 I2 \- I4 I5 \- \-
-M1 \- M3 \- \- M6
-O1 O2 O3 \- O5 O6
-E1 \- \- E4 \- E6 \-
-R1 \- \- \- \- R6 \- \- \-
-S1 \-
+.IP "I1 I2 \- I4 I5 \- \-" 4
+.IX Item "I1 I2 - I4 I5 - -"
+.PD 0
+.IP "M1 \- M3 \- \- M6" 4
+.IX Item "M1 - M3 - - M6"
+.IP "O1 O2 O3 \- O5 O6" 4
+.IX Item "O1 O2 O3 - O5 O6"
+.IP "E1 \- \- E4 \- E6 \-" 4
+.IX Item "E1 - - E4 - E6 -"
+.IP "R1 \- \- \- \- R6 \- \- \-" 4
+.IX Item "R1 - - - - R6 - - -"
+.IP "S1 \-" 4
+.IX Item "S1 -"
+.PD
 .PP
 \&\fBpexec\fR is also a tool for running jobs in parallel.
 .PP
@@ -804,12 +909,18 @@ https://github.com/cheusov/paexec
 .SS "\s-1DIFFERENCES BETWEEN\s0 map(sitaramc) \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN map(sitaramc) AND GNU Parallel"
 Summary (see legend above):
-I1 \- \- I4 \- \- (I7)
-M1 (M2) M3 (M4) M5 M6
-\&\- O2 O3 \- O5 \- \- N/A N/A O10
-E1 \- \- \- \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "I1 \- \- I4 \- \- (I7)" 4
+.IX Item "I1 - - I4 - - (I7)"
+.PD 0
+.IP "M1 (M2) M3 (M4) M5 M6" 4
+.IX Item "M1 (M2) M3 (M4) M5 M6"
+.IP "\- O2 O3 \- O5 \- \- N/A N/A O10" 4
+.IX Item "- O2 O3 - O5 - - N/A N/A O10"
+.IP "E1 \- \- \- \- \- \-" 4
+.IX Item "E1 - - - - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 (I7): Only under special circumstances. See below.
 .PP
@@ -2225,12 +2336,18 @@ https://github.com/fd0/machma (Last checked: 2019\-06)
 .SS "\s-1DIFFERENCES BETWEEN\s0 interlace \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN interlace AND GNU Parallel"
 Summary (see legend above):
-\&\- I2 I3 I4 \- \- \-
-M1 \- M3 \- \- M6
-\&\- O2 O3 \- \- \- \- x x
-E1 E2 \- \- \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "\- I2 I3 I4 \- \- \-" 4
+.IX Item "- I2 I3 I4 - - -"
+.PD 0
+.IP "M1 \- M3 \- \- M6" 4
+.IX Item "M1 - M3 - - M6"
+.IP "\- O2 O3 \- \- \- \- x x" 4
+.IX Item "- O2 O3 - - - - x x"
+.IP "E1 E2 \- \- \- \- \-" 4
+.IX Item "E1 E2 - - - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBinterlace\fR is built for network analysis to run network tools in parallel.
 .PP
@@ -2634,12 +2751,19 @@ https://github.com/amritb/with\-this.git (Last checked: 2019\-03)
 .SS "\s-1DIFFERENCES BETWEEN\s0 Tollef's parallel (moreutils) \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN Tollef's parallel (moreutils) AND GNU Parallel"
 Summary (see legend above):
-\&\- \- \- I4 \- \- I7
-\&\- \- M3 \- \- M6
-\&\- O2 O3 \- O5 O6 \- x x
-E1 \- \- \- \- \- E7
-\&\- x x x x x x x x
-\&\- \-
+.IP "\- \- \- I4 \- \- I7" 4
+.IX Item "- - - I4 - - I7"
+.PD 0
+.IP "\- \- M3 \- \- M6" 4
+.IX Item "- - M3 - - M6"
+.IP "\- O2 O3 \- O5 O6 \- x x" 4
+.IX Item "- O2 O3 - O5 O6 - x x"
+.IP "E1 \- \- \- \- \- E7" 4
+.IX Item "E1 - - - - - E7"
+.IP "\- x x x x x x x x" 4
+.IX Item "- x x x x x x x x"
+.IP "\- \-" 4
+.PD
 .PP
 \fI\s-1EXAMPLES FROM\s0 Tollef's parallel \s-1MANUAL\s0\fR
 .IX Subsection "EXAMPLES FROM Tollef's parallel MANUAL"
@@ -2660,12 +2784,18 @@ E1 \- \- \- \- \- E7
 .SS "\s-1DIFFERENCES BETWEEN\s0 rargs \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN rargs AND GNU Parallel"
 Summary (see legend above):
-I1 \- \- \- \- \- I7
-\&\- \- M3 M4 \- \-
-\&\- O2 O3 \- O5 O6 \- O8 \-
-E1 \- \- E4 \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "I1 \- \- \- \- \- I7" 4
+.IX Item "I1 - - - - - I7"
+.PD 0
+.IP "\- \- M3 M4 \- \-" 4
+.IX Item "- - M3 M4 - -"
+.IP "\- O2 O3 \- O5 O6 \- O8 \-" 4
+.IX Item "- O2 O3 - O5 O6 - O8 -"
+.IP "E1 \- \- E4 \- \- \-" 4
+.IX Item "E1 - - E4 - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBrargs\fR has elegant ways of doing named regexp capture and field ranges.
 .PP
@@ -2727,12 +2857,18 @@ https://github.com/lotabout/rargs (Last checked: 2020\-01)
 .SS "\s-1DIFFERENCES BETWEEN\s0 threader \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN threader AND GNU Parallel"
 Summary (see legend above):
-I1 \- \- \- \- \- \-
-M1 \- M3 \- \- M6
-O1 \- O3 \- O5 \- \- N/A N/A
-E1 \- \- E4 \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "I1 \- \- \- \- \- \-" 4
+.IX Item "I1 - - - - - -"
+.PD 0
+.IP "M1 \- M3 \- \- M6" 4
+.IX Item "M1 - M3 - - M6"
+.IP "O1 \- O3 \- O5 \- \- N/A N/A" 4
+.IX Item "O1 - O3 - O5 - - N/A N/A"
+.IP "E1 \- \- E4 \- \- \-" 4
+.IX Item "E1 - - E4 - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 Newline separates arguments, but newline at the end of file is treated
 as an empty argument. So this runs 2 jobs:
@@ -2749,12 +2885,18 @@ https://github.com/voodooEntity/threader (Last checked: 2020\-04)
 .SS "\s-1DIFFERENCES BETWEEN\s0 runp \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN runp AND GNU Parallel"
 Summary (see legend above):
-I1 I2 \- \- \- \- \-
-M1 \- (M3) \- \- M6
-O1 O2 O3 \- O5 O6 \- N/A N/A \-
-E1 \- \- \- \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "I1 I2 \- \- \- \- \-" 4
+.IX Item "I1 I2 - - - - -"
+.PD 0
+.IP "M1 \- (M3) \- \- M6" 4
+.IX Item "M1 - (M3) - - M6"
+.IP "O1 O2 O3 \- O5 O6 \- N/A N/A \-" 4
+.IX Item "O1 O2 O3 - O5 O6 - N/A N/A -"
+.IP "E1 \- \- \- \- \- \-" 4
+.IX Item "E1 - - - - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 (M3): You can add a prefix and a postfix to the input, so it means you can
 only insert the argument on the command line once.
@@ -2895,12 +3037,18 @@ https://github.com/jreisinger/runp (Last checked: 2020\-04)
 .SS "\s-1DIFFERENCES BETWEEN\s0 papply \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN papply AND GNU Parallel"
 Summary (see legend above):
-\&\- \- \- I4 \- \- \-
-M1 \- M3 \- \- M6
-\&\- \- O3 \- O5 \- \- N/A N/A O10
-E1 \- \- E4 \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "\- \- \- I4 \- \- \-" 4
+.IX Item "- - - I4 - - -"
+.PD 0
+.IP "M1 \- M3 \- \- M6" 4
+.IX Item "M1 - M3 - - M6"
+.IP "\- \- O3 \- O5 \- \- N/A N/A O10" 4
+.IX Item "- - O3 - O5 - - N/A N/A O10"
+.IP "E1 \- \- E4 \- \- \-" 4
+.IX Item "E1 - - E4 - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBpapply\fR does not print the output if the command fails:
 .PP
@@ -2944,12 +3092,19 @@ https://pypi.org/project/papply/ (Last checked: 2020\-04)
 .SS "\s-1DIFFERENCES BETWEEN\s0 async \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN async AND GNU Parallel"
 Summary (see legend above):
-\&\- \- \- I4 \- \- I7
-\&\- \- \- \- \- M6
-\&\- O2 O3 \- O5 O6 \- N/A N/A O10
-E1 \- \- E4 \- E6 \-
-\&\- \- \- \- \- \- \- \- \-
-S1 S2
+.IP "\- \- \- I4 \- \- I7" 4
+.IX Item "- - - I4 - - I7"
+.PD 0
+.IP "\- \- \- \- \- M6" 4
+.IX Item "- - - - - M6"
+.IP "\- O2 O3 \- O5 O6 \- N/A N/A O10" 4
+.IX Item "- O2 O3 - O5 O6 - N/A N/A O10"
+.IP "E1 \- \- E4 \- E6 \-" 4
+.IX Item "E1 - - E4 - E6 -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "S1 S2" 4
+.IX Item "S1 S2"
+.PD
 .PP
 \&\fBasync\fR is very similary to \s-1GNU\s0 \fBparallel\fR's \fB\-\-semaphore\fR mode
 (aka \fBsem\fR). \fBasync\fR requires the user to start a server process.
@@ -3021,12 +3176,18 @@ https://github.com/ctbur/async/ (Last checked: 2020\-11)
 .SS "\s-1DIFFERENCES BETWEEN\s0 pardi \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN pardi AND GNU Parallel"
 Summary (see legend above):
-I1 I2 \- \- \- \- I7
-M1 \- \- \- \- M6
-O1 O2 O3 O4 O5 \- O7 \- \- O10
-E1 \- \- E4 \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "I1 I2 \- \- \- \- I7" 4
+.IX Item "I1 I2 - - - - I7"
+.PD 0
+.IP "M1 \- \- \- \- M6" 4
+.IX Item "M1 - - - - M6"
+.IP "O1 O2 O3 O4 O5 \- O7 \- \- O10" 4
+.IX Item "O1 O2 O3 O4 O5 - O7 - - O10"
+.IP "E1 \- \- E4 \- \- \-" 4
+.IX Item "E1 - - E4 - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBpardi\fR is very similar to \fBparallel \-\-pipe \-\-cat\fR: It reads blocks
 of data and not arguments. So it cannot insert an argument in the
@@ -3080,12 +3241,18 @@ https://github.com/UnixJunkie/pardi (Last checked: 2021\-01)
 .SS "\s-1DIFFERENCES BETWEEN\s0 bthread \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN bthread AND GNU Parallel"
 Summary (see legend above):
-\&\- \- \- I4 \-  \- \-
-\&\- \- \- \- \- M6
-O1 \- O3 \- \- \- O7 O8 \- \-
-E1 \- \- \- \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "\- \- \- I4 \-  \- \-" 4
+.IX Item "- - - I4 - - -"
+.PD 0
+.IP "\- \- \- \- \- M6" 4
+.IX Item "- - - - - M6"
+.IP "O1 \- O3 \- \- \- O7 O8 \- \-" 4
+.IX Item "O1 - O3 - - - O7 O8 - -"
+.IP "E1 \- \- \- \- \- \-" 4
+.IX Item "E1 - - - - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 \&\fBbthread\fR takes around 1 sec per \s-1MB\s0 of output. The maximal output
 line length is 1073741759.
@@ -3097,12 +3264,18 @@ https://gitlab.com/netikras/bthread (Last checked: 2021\-01)
 .SS "\s-1DIFFERENCES BETWEEN\s0 simple_gpu_scheduler \s-1AND GNU\s0 Parallel"
 .IX Subsection "DIFFERENCES BETWEEN simple_gpu_scheduler AND GNU Parallel"
 Summary (see legend above):
-I1 \- \- \- \- \- I7
-M1 \- \- \- \- M6
-\&\- O2 O3 \- \- O6 \- N/A N/A O10
-E1 \- \- \- \- \- \-
-\&\- \- \- \- \- \- \- \- \-
-\&\- \-
+.IP "I1 \- \- \- \- \- I7" 4
+.IX Item "I1 - - - - - I7"
+.PD 0
+.IP "M1 \- \- \- \- M6" 4
+.IX Item "M1 - - - - M6"
+.IP "\- O2 O3 \- \- O6 \- x x O10" 4
+.IX Item "- O2 O3 - - O6 - x x O10"
+.IP "E1 \- \- \- \- \- \-" 4
+.IX Item "E1 - - - - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
 .PP
 \fI\s-1EXAMPLES FROM\s0 simple_gpu_scheduler \s-1MANUAL\s0\fR
 .IX Subsection "EXAMPLES FROM simple_gpu_scheduler MANUAL"
@@ -3186,11 +3359,8 @@ Instead of calling the jobs directly, \fBparasweep\fR can use Python's
 Distributed Resource Management Application \s-1API\s0 to make jobs run with
 different cluster software.
 .PP
-\fIFuture support in \s-1GNU\s0 Parallel\fR
-.IX Subsection "Future support in GNU Parallel"
-.PP
-\&\fBFuture\fR versions of \s-1GNU\s0 \fBparallel\fR may support templates
-with replacement strings. Such as:
+\&\s-1GNU\s0 \fBparallel\fR \fB\-\-tmpl\fR supports templates with replacement
+strings. Such as:
 .PP
 .Vb 7
 \&  Xval: {x}
@@ -3199,46 +3369,109 @@ with replacement strings. Such as:
 \&  # x with 2 decimals
 \&  DecimalX: {=x $_=sprintf("%.2f",$_) =}
 \&  TenX: {=x $_=$_*10 =}
-\&  RandomVal: {= $_=rand() =}
+\&  RandomVal: {=1 $_=rand() =}
 .Ve
 .PP
 that can be used like:
 .PP
 .Vb 2
-\&  parallel \-\-header : \-\-tmpl my.tmpl {#}.t myprog {#}.t \e
+\&  parallel \-\-header : \-\-tmpl my.tmpl={#}.t myprog {#}.t \e
 \&    ::: x 1 2 3 ::: y 1 2 3
 .Ve
 .PP
-Filtering may also be supported as:
+Filtering is supported as:
 .PP
 .Vb 1
 \&  parallel \-\-filter \*(Aq{1} > {2}\*(Aq echo ::: 1 2 3 ::: 1 2 3
 .Ve
 .PP
-which will basically do:
+https://github.com/eviatarbach/parasweep (Last checked: 2021\-01)
+.SS "\s-1DIFFERENCES BETWEEN\s0 parallel-bash \s-1AND GNU\s0 Parallel"
+.IX Subsection "DIFFERENCES BETWEEN parallel-bash AND GNU Parallel"
+Summary (see legend above):
+.IP "I1 I2 \- \- \- \- \-" 4
+.IX Item "I1 I2 - - - - -"
+.PD 0
+.IP "\- \- M3 \- \- M6" 4
+.IX Item "- - M3 - - M6"
+.IP "\- O2 O3 \- O5 O6 \- O8 x O10" 4
+.IX Item "- O2 O3 - O5 O6 - O8 x O10"
+.IP "E1 \- \- \- \- \- \-" 4
+.IX Item "E1 - - - - - -"
+.IP "\- \- \- \- \- \- \- \- \-" 4
+.IP "\- \-" 4
+.PD
+.PP
+\&\fBparallel-bash\fR is written in pure bash. It is really fast (overhead
+of ~0.05 ms/job compared to \s-1GNU\s0 \fBparallel\fR's ~3 ms/job). So if your
+jobs are extremely short lived, and you can live with the quite
+limited command, this may be useful.
+.PP
+\&\fBparallel-bash\fR will not start the first job, until it has read all
+input. The input can at most be 20935 lines and the lines cannot be
+all be empty.
+.PP
+Ctrl-C does not stop spawning new jobs. Ctrl-Z does not suspend
+running jobs.
+.PP
+\fI\s-1EXAMPLES FROM\s0 parallel-bash\fR
+.IX Subsection "EXAMPLES FROM parallel-bash"
 .PP
 .Vb 1
-\&  parallel echo \*(Aq{= $arg[1] > $arg[2] and skip() =}\*(Aq ::: 1 2 3 ::: 1 2 3
+\&  1$ some_input | parallel\-bash \-p 5 \-c echo
+\&
+\&  1$ some_input | parallel \-j 5 echo
+\&
+\&  2$ parallel\-bash \-p 5 \-c echo < some_file
+\&
+\&  2$ parallel \-j 5 echo < some_file
+\&
+\&  3$ parallel\-bash \-p 5 \-c echo <<< \*(Aqsome string\*(Aq
+\&
+\&  3$ parallel \-j 5 \-c echo <<< \*(Aqsome string\*(Aq
+\&
+\&  4$ something | parallel\-bash \-p 5 \-c echo {} {}
+\&
+\&  4$ something | parallel \-j 5 echo {} {}
 .Ve
 .PP
-https://github.com/eviatarbach/parasweep (Last checked: 2021\-01)
+https://reposhub.com/python/command\-line\-tools/Akianonymus\-parallel\-bash.html
+(Last checked: 2021\-02)
+.SS "\s-1DIFFERENCES BETWEEN\s0 bash-concurrent \s-1AND GNU\s0 Parallel"
+.IX Subsection "DIFFERENCES BETWEEN bash-concurrent AND GNU Parallel"
+\&\fBbash-concurrent\fR is more an alternative to \fBmake\fR than to \s-1GNU\s0
+\&\fBparallel\fR. Its input is very similar to a Makefile, where jobs
+depend on other jobs.
+.PP
+It has a nice progress indicator where you can see which jobs
+completed successfully, which jobs are currently running, which jobs
+failed, and which jobs were skipped due to a depending job failed.
+The indicator does not deal well with resizing the window.
+.PP
+Output is cached in tempfiles on disk, but is only shown if there is
+an error, so it is not meant to be part of a \s-1UNIX\s0 pipeline. If
+\&\fBbash-concurrent\fR crashes these tempfiles are not removed.
+.PP
+It uses an O(n*n) algorithm, so if you have 1000 independent jobs it
+takes 22 seconds to start it.
+.PP
+https://github.com/themattrix/bash\-concurrent
+(Last checked: 2021\-02)
 .SS "Todo"
 .IX Subsection "Todo"
-https://reposhub.com/python/command\-line\-tools/Akianonymus\-parallel\-bash.html
+https://github.com/mylanconnolly/parallel
+.PP
+https://github.com/krashanoff/parallel
 .PP
 https://github.com/Nukesor/pueue
 .PP
-\&\s-1PASH:\s0 Light-touch Data-Parallel Shell Processing
-.PP
 https://arxiv.org/pdf/2012.15443.pdf KumQuat
 .PP
-https://arxiv.org/pdf/2007.09436.pdf
+https://arxiv.org/pdf/2007.09436.pdf PaSH: Light-touch Data-Parallel Shell Processing
 .PP
 https://github.com/JeiKeiLim/simple_distribute_job
 .PP
-https://github.com/Akianonymus/parallel\-bash
-.PP
-https://github.com/reggi/pkgrun
+https://github.com/reggi/pkgrun \- not obvious how to use
 .PP
 https://github.com/benoror/better\-npm\-run \- not obvious how to use
 .PP
@@ -3249,6 +3482,39 @@ https://github.com/xuchenCN/go\-pssh
 https://github.com/flesler/parallel
 .PP
 https://github.com/Julian/Verge
+.PP
+http://manpages.ubuntu.com/manpages/xenial/man1/tsp.1.html
+.PP
+http://vicerveza.homeunix.net/~viric/soft/ts/
+.PP
+https://github.com/chapmanjacobd/que
+.PP
+https://github.com/ExpectationMax/simple_gpu_scheduler
+    simple_gpu_scheduler \-\-gpus 0 1 2 < gpu_commands.txt
+    parallel \-j3 \-\-shuf CUDA_VISIBLE_DEVICES='{=1 \f(CW$_\fR=\fBslot()\fR\-1 =} {=uq;=}' < gpu_commands.txt
+.PP
+.Vb 2
+\&    simple_hypersearch "python3 train_dnn.py \-\-lr {lr} \-\-batch_size {bs}" \-p lr 0.001 0.0005 0.0001 \-p bs 32 64 128 | simple_gpu_scheduler \-\-gpus 0,1,2
+\&    parallel \-\-header : \-\-shuf \-j3 \-v CUDA_VISIBLE_DEVICES=\*(Aq{=1 $_=slot()\-1 =}\*(Aq python3 train_dnn.py \-\-lr {lr} \-\-batch_size {bs} ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
+\&
+\&    simple_hypersearch "python3 train_dnn.py \-\-lr {lr} \-\-batch_size {bs}" \-\-n\-samples 5 \-p lr 0.001 0.0005 0.0001 \-p bs 32 64 128 | simple_gpu_scheduler \-\-gpus 0,1,2
+\&    parallel \-\-header : \-\-shuf CUDA_VISIBLE_DEVICES=\*(Aq{=1 $_=slot()\-1; seq() > 5 and skip() =}\*(Aq python3 train_dnn.py \-\-lr {lr} \-\-batch_size {bs} ::: lr 0.001 0.0005 0.0001 ::: bs 32 64 128
+\&
+\&    touch gpu.queue
+\&    tail \-f \-n 0 gpu.queue | simple_gpu_scheduler \-\-gpus 0,1,2 &
+\&    echo "my_command_with | and stuff > logfile" >> gpu.queue
+\&
+\&    touch gpu.queue
+\&    tail \-f \-n 0 gpu.queue | parallel \-j3 CUDA_VISIBLE_DEVICES=\*(Aq{=1 $_=slot()\-1 =} {=uq;=}\*(Aq &
+\&    # Needed to fill job slots once
+\&    seq 3 | parallel echo true >> gpu.queue
+\&    # Add jobs
+\&    echo "my_command_with | and stuff > logfile" >> gpu.queue
+\&    # Needed to flush output from completed jobs
+\&    seq 3 | parallel echo true >> gpu.queue
+.Ve
+.PP
+https://github.com/Overv/outrun#outrun
 .SH "TESTING OTHER TOOLS"
 .IX Header "TESTING OTHER TOOLS"
 There are certain issues that are very common on parallelizing
@@ -3515,11 +3781,12 @@ You should have received a copy of the \s-1GNU\s0 General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 .SS "Documentation license I"
 .IX Subsection "Documentation license I"
-Permission is granted to copy, distribute and/or modify this documentation
-under the terms of the \s-1GNU\s0 Free Documentation License, Version 1.3 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the file fdl.txt.
+Permission is granted to copy, distribute and/or modify this
+documentation under the terms of the \s-1GNU\s0 Free Documentation License,
+Version 1.3 or any later version published by the Free Software
+Foundation; with no Invariant Sections, with no Front-Cover Texts, and
+with no Back-Cover Texts.  A copy of the license is included in the
+file \s-1LICENSES/GFDL\-1\s0.3\-or\-later.txt.
 .SS "Documentation license \s-1II\s0"
 .IX Subsection "Documentation license II"
 You are free:
@@ -3571,7 +3838,8 @@ how the work is used, such as publicity or privacy rights.
 For any reuse or distribution, you must make clear to others the
 license terms of this work.
 .PP
-A copy of the full license is included in the file as cc\-by\-sa.txt.
+A copy of the full license is included in the file as
+\&\s-1LICENCES/CC\-BY\-SA\-4.0\s0.txt
 .SH "DEPENDENCIES"
 .IX Header "DEPENDENCIES"
 \&\s-1GNU\s0 \fBparallel\fR uses Perl, and the Perl modules Getopt::Long,

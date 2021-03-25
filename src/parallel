@@ -17,6 +17,9 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 # or write to the Free Software Foundation, Inc., 51 Franklin St,
 # Fifth Floor, Boston, MA 02110-1301 USA
+#
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # open3 used in Job::start
 use IPC::Open3;
@@ -56,7 +59,9 @@ sub set_input_source_header($$) {
 		# Replace {colname} with {2}
 		for(@$command_ref, @Global::ret_files,
 		    @Global::transfer_files, $opt::tagstring,
-		    $opt::workdir, $opt::results, $opt::retries) {
+		    $opt::workdir, $opt::results, $opt::retries,
+		    @Global::template_contents, @Global::template_names,
+		    @opt::filter) {
 		    # Skip if undefined
 		    $_ or next;
 		  s:\{$s(|/|//|\.|/\.)\}:\{$id$1\}:g;
@@ -1550,6 +1555,7 @@ sub options_hash() {
 	 "transfer" => \$opt::transfer,
 	 "cleanup" => \$opt::cleanup,
 	 "basefile|bf=s" => \@opt::basefile,
+	 "template|tmpl=s" => \%opt::template,
 	 "B=s" => \$opt::retired,
 	 "ctrlc|ctrl-c" => \$opt::retired,
 	 "noctrlc|no-ctrlc|no-ctrl-c" => \$opt::retired,
@@ -1577,15 +1583,6 @@ sub options_hash() {
 	 "session" => \$opt::session,
 	 "plain" => \$opt::plain,
 	 "profile|J=s" => \@opt::profile,
-	 "pipe|spreadstdin" => \$opt::pipe,
-	 "robin|round-robin|roundrobin" => \$opt::roundrobin,
-	 "recstart=s" => \$opt::recstart,
-	 "recend=s" => \$opt::recend,
-	 "regexp|regex" => \$opt::regexp,
-	 "remove-rec-sep|removerecsep|rrs" => \$opt::remove_rec_sep,
-	 "files|output-as-files|outputasfiles" => \$opt::files,
-	 "block|block-size|blocksize=s" => \$opt::blocksize,
-	 "blocktimeout|block-timeout|bt=s" => \$opt::blocktimeout,
 	 "tollef" => \$opt::tollef,
 	 "gnu" => \$opt::gnu,
 	 "link|xapply" => \$opt::link,
@@ -1639,6 +1636,16 @@ sub options_hash() {
 	 "Y" => \$opt::retired,
          "skip-first-line" => \$opt::skip_first_line,
 	 "bug" => \$opt::bug,
+	 # --pipe
+	 "pipe|spreadstdin" => \$opt::pipe,
+	 "robin|round-robin|roundrobin" => \$opt::roundrobin,
+	 "recstart=s" => \$opt::recstart,
+	 "recend=s" => \$opt::recend,
+	 "regexp|regex" => \$opt::regexp,
+	 "remove-rec-sep|removerecsep|rrs" => \$opt::remove_rec_sep,
+	 "files|output-as-files|outputasfiles" => \$opt::files,
+	 "block|block-size|blocksize=s" => \$opt::blocksize,
+	 "blocktimeout|block-timeout|bt=s" => \$opt::blocktimeout,
 	 "header=s" => \$opt::header,
 	 "cat" => \$opt::cat,
 	 "fifo" => \$opt::fifo,
@@ -1647,8 +1654,10 @@ sub options_hash() {
 	 "shard=s" => \$opt::shard,
 	 "bin=s" => \$opt::bin,
 	 "groupby|group-by=s" => \$opt::groupby,
+	 #
 	 "hgrp|hostgrp|hostgroup|hostgroups" => \$opt::hostgroups,
 	 "embed" => \$opt::embed,
+	 "filter=s" => \@opt::filter,
 	);
 }
 
@@ -1807,6 +1816,20 @@ sub parse_options(@) {
 	push @Global::transfer_files, $opt::i || $opt::I || "{}";
     }
     push @Global::transfer_files, @opt::transfer_files;
+    if(%opt::template) {
+	while (my ($source, $template_name) = each %opt::template) {
+	    if(open(my $tmpl, "<", $source)) {
+		local $/; # $/ = undef => slurp whole file
+		my $content = <$tmpl>;
+		push @Global::template_names, $template_name;
+		push @Global::template_contents, $content;
+		::debug("tmpl","Name: $template_name\n$content\n");
+	    } else {
+		::error("Cannot open '$source'.");
+		wait_and_exit(255);
+	    }
+	}
+    }
     if(not defined $opt::recstart and
        not defined $opt::recend) { $opt::recend = "\n"; }
     $Global::blocksize = multiply_binary_prefix($opt::blocksize || "1M");
@@ -2076,7 +2099,6 @@ sub parse_options(@) {
     if($opt::sqlworker) { $Global::membuffer ||= 1; }
     # The sqlmaster groups the arguments, so the should just read one
     if($opt::sqlworker and not $opt::sqlmaster) { $Global::max_number_of_args = 1; }
-
 }
 
 sub check_invalid_option_combinations() {
@@ -2151,7 +2173,7 @@ sub check_invalid_option_combinations() {
 
 sub init_globals() {
     # Defaults:
-    $Global::version = 20210122;
+    $Global::version = 20210322;
     $Global::progname = 'parallel';
     $::name = "GNU Parallel";
     $Global::infinity = 2**31;
@@ -2190,9 +2212,16 @@ sub init_globals() {
 	 '{...}' => 's:\.[^/.]+$::; s:\.[^/.]+$::; s:\.[^/.]+$::',
 	 '{/..}' => 's:.*/::; s:\.[^/.]+$::; s:\.[^/.]+$::',
 	 '{/...}' => 's:.*/::; s:\.[^/.]+$::; s:\.[^/.]+$::; s:\.[^/.]+$::',
+	 # n choose k = Binomial coefficient
 	 '{choose_k}' => 'for $t (2..$#arg){ if($arg[$t-1] ge $arg[$t]) { skip() } }',
 	 # {##} = number of jobs
-	 '{##}' => '$_=total_jobs()',
+	 '{##}' => '1 $_=total_jobs()',
+	 # {0%} = 0-padded jobslot
+	 '{0%}' => '1 $f=1+int((log($Global::max_jobs_running||1)/log(10))); $_=sprintf("%0${f}d",slot())',
+	 # {0%} = 0-padded seq
+	 '{0#}' => '1 $f=1+int((log(total_jobs())/log(10))); $_=sprintf("%0${f}d",seq())',
+	 
+	 ## Bash inspired replacement strings
 	 # Bash ${a:-myval}
 	 '{:-([^}]+?)}' => '$_ ||= $$1',
 	 # Bash ${a:2}
@@ -2213,6 +2242,7 @@ sub init_globals() {
 	 '{,([^}]+?)}' => 's/^($$1)/lc($1)/e;',
 	 # Bash ${a,,A}
 	 '{,,([^}]+?)}' => 's/($$1)/lc($1)/eg;',
+
 	 # {slot} = $PARALLEL_JOBSLOT
 	 '{slot}' => '1 $_="\${PARALLEL_JOBSLOT}";uq()',
 	 # {host} = ssh host
@@ -3460,7 +3490,9 @@ sub init_run_jobs() {
 		    ::usleep(rand()*300);
 		    ::warning("No more processes: ".
 			      "Decreasing number of running jobs to $max.",
-			      "Raising ulimit -u or /etc/security/limits.conf may help.");
+			      "Try increasing 'ulimit -u' (try: ulimit -u `ulimit -Hu`)",
+			      "or increasing 'nproc' in /etc/security/limits.conf",
+			      "or increasing /proc/sys/kernel/pid_max");
 		    return 0;
 		}
 	    }
@@ -3468,7 +3500,10 @@ sub init_run_jobs() {
 	    # No more file handles
 	    $no_more_file_handles_warned++ or
 		::warning("No more file handles. ",
-			  "Raising ulimit -n or /etc/security/limits.conf may help.");
+			  "Try running 'parallel -j0 -N 100 --pipe parallel -j0'",
+			  "or increasing 'ulimit -n' (try: ulimit -n `ulimit -Hn`)",
+			  "or increasing 'nofile' in /etc/security/limits.conf",
+			  "or increasing /proc/sys/fs/file-max");
 	    debug("start", "No more file handles. ");
 	    return 0;
 	}
@@ -4075,7 +4110,7 @@ sub parse_sshlogin() {
 		::warning("--transferfile ignored as there are no remote --sshlogin.");
             } elsif (@opt::return) {
                 ::warning("--return ignored as there are no remote --sshlogin.");
-            } elsif (defined $opt::cleanup) {
+            } elsif (defined $opt::cleanup and not %opt::template) {
 		::warning("--cleanup ignored as there are no remote --sshlogin.");
             } elsif (@opt::basefile) {
                 ::warning("--basefile ignored as there are no remote --sshlogin.");
@@ -4111,7 +4146,7 @@ sub setup_basefile() {
 	  ::wait_and_exit(255);
 	}
 	if(not $workdir) {
-	    my $dummycmdline = CommandLine->new(1,["true"],{},0,0,[],[],{},{},{});
+	    my $dummycmdline = CommandLine->new(1,["true"],{},0,0,[],[],[],[],{},{});
 	    my $dummyjob = Job->new($dummycmdline);
 	    $workdir = $dummyjob->workdir();
 	}
@@ -4138,7 +4173,7 @@ sub cleanup_basefile() {
     my @cmd;
     my $workdir;
     if(not $workdir) {
-	my $dummycmdline = CommandLine->new(1,"true",0,0,0,0,0,{},{},{});
+	my $dummycmdline = CommandLine->new(1,["true"],{},0,0,[],[],[],[],{},{});
 	my $dummyjob = Job->new($dummycmdline);
 	$workdir = $dummyjob->workdir();
     }
@@ -4341,7 +4376,7 @@ sub parse_host_filtering() {
 		$maxlen{$col[0]} = $col[1];
 	    } elsif(not $echo{$col[0]}) {
 		$echo{$col[0]} = $col[1];
-	    } elsif(m/perl: warning:|LANGUAGE =|LC_ALL =|LANG =|are supported and installed/) {
+	    } elsif(m/perl: warning:|LANGUAGE =|LC_ALL =|LANG =|are supported and installed|Disconnected from|Received disconnect from/) {
 		# Skip these:
 		# perl: warning: Setting locale failed.
 		# perl: warning: Please check that your locale settings:
@@ -4350,6 +4385,7 @@ sub parse_host_filtering() {
 		#         LANG = "en_US.UTF-8"
 		#     are supported and installed on your system.
 		# perl: warning: Falling back to the standard locale ("C").
+		# Disconnected from 127.0.0.1 port 22
 	    } else {
 		::die_bug("host check too many col0: $_");
 	    }
@@ -4384,7 +4420,7 @@ sub parallelized_host_filtering() {
 	#   perl -e '$a=`$command`; print $? ? "$default_value" : $a'
 	my $wcmd = q(perl -e '$a=`).$command.q(`;).
 	    q(print $? ? ").::pQ($default_value).q(" : $a');
-	my $commandline = CommandLine->new(1,[$wcmd],{},0,0,[],[],{},{},{});
+	my $commandline = CommandLine->new(1,[$wcmd],{},0,0,[],[],[],[],{},{});
 	my $job = Job->new($commandline);
 	$job->set_sshlogin($sshlogin);
 	$job->wrapped();
@@ -4692,7 +4728,6 @@ sub start_no_new_jobs() {
     #    %Global::unlink
     #    $Global::start_no_new_jobs
     # Returns: N/A
-#    $SIG{TERM} = $Global::original_sig{TERM};
     unlink keys %Global::unlink;
     ::status
         ("$Global::progname: SIGHUP received. No new jobs will be started.",
@@ -4933,8 +4968,8 @@ sub usage() {
 	 "If you use programs that use GNU Parallel to process data for an article in a",
 	 "scientific publication, please cite:",
 	 "",
-         "  Tange, O. (2021, January 22). GNU Parallel 20210122 ('Capitol Riots').",
-	 "  Zenodo. https://doi.org/10.5281/zenodo.4454976",
+         "  Tange, O. (2021, March 22). GNU Parallel 20210322 ('2002-01-06').",
+	 "  Zenodo. https://doi.org/10.5281/zenodo.4628277",
 	 "",
 	 # Before changing this line,  please read
          # https://www.gnu.org/software/parallel/parallel_design.html#Citation-notice
@@ -4964,8 +4999,8 @@ sub citation_notice() {
 	     "If you use programs that use GNU Parallel to process data for an article in a",
 	     "scientific publication, please cite:",
 	     "",
-	     "  Tange, O. (2021, January 22). GNU Parallel 20210122 ('Capitol Riots').",
-	     "  Zenodo. https://doi.org/10.5281/zenodo.4454976",
+	     "  Tange, O. (2021, March 22). GNU Parallel 20210322 ('2002-01-06').",
+	     "  Zenodo. https://doi.org/10.5281/zenodo.4628277",
 	     "",
 	     # Before changing this line,  please read
 	     # https://www.gnu.org/software/parallel/parallel_design.html#Citation-notice and
@@ -5020,6 +5055,16 @@ sub warning(@) {
     my @w = @_;
     my $prog = $Global::progname || "parallel";
     status_no_nl(map { ($prog, ": Warning: ", $_, "\n"); } @w);
+}
+
+{
+    my %warnings;
+    sub warning_once(@) {
+	my @w = @_;
+	my $prog = $Global::progname || "parallel";
+	$warnings{@w}++ or
+	    status_no_nl(map { ($prog, ": Warning: ", $_, "\n"); } @w);
+    }
 }
 
 sub error(@) {
@@ -5078,20 +5123,20 @@ sub citation() {
 	"If you use programs that use GNU Parallel to process data for an article in a",
 	"scientific publication, please cite:",
 	"",
-	"\@software{tange_2021_4454976,",
+	"\@software{tange_2021_4628277,",
 	"      author       = {Tange, Ole},",
-	"      title        = {GNU Parallel 20210122 ('Capitol Riots')},",
-	"      month        = Jan,",
+	"      title        = {GNU Parallel 20210322 ('2002-01-06')},",
+	"      month        = Mar,",
 	"      year         = 2020,",
 	"      note         = {{GNU Parallel is a general parallelizer to run",
         "                       multiple serial command line programs in parallel",
 	"                       without changing them.}},",
 	"      publisher    = {Zenodo},",
-	"      doi          = {10.5281/zenodo.4454976},",
-	"      url          = {https://doi.org/10.5281/zenodo.4454976}",
+	"      doi          = {10.5281/zenodo.4628277},",
+	"      url          = {https://doi.org/10.5281/zenodo.4628277}",
 	"}",
 	"",
-	"(Feel free to use \\nocite{tange_2021_4454976})",
+	"(Feel free to use \\nocite{tange_2021_4628277})",
 	"",
 	# Before changing this line, please read
 	# https://www.gnu.org/software/parallel/parallel_design.html#Citation-notice and
@@ -6275,6 +6320,7 @@ sub set_max_jobs_running($$) {
         $Global::max_jobs_running -= $self->{'max_jobs_running'};
     }
     $self->{'max_jobs_running'} = shift;
+
     if(defined $self->{'max_jobs_running'}) {
         # max_jobs_running could be resat if -j is a changed file
         $Global::max_jobs_running += $self->{'max_jobs_running'};
@@ -7046,7 +7092,7 @@ sub compute_number_of_processes($) {
 	    delete $Global::unkilled_children{$pid};
 	}
 	# Cleanup: Unget the command_lines or the @args
-	$Global::JobQueue->{'commandlinequeue'}->{'arg_queue'}->unget(@args);
+	$Global::JobQueue->{'commandlinequeue'}{'arg_queue'}->unget(@args);
 	@args = ();
 	$Global::JobQueue->unget(@jobs);
 	@jobs = ();
@@ -7104,14 +7150,13 @@ sub compute_number_of_processes($) {
 		    " (processes so far: ", $system_limit,")\n");
 	    if($system_limit > 10 and
 	       $forktime > 1 and
-	       $forktime > $system_limit * 0.01
-	       and not $slow_spawning_warning_printed) {
+	       $forktime > $system_limit * 0.01) {
 		# It took more than 0.01 second to fork a processes on avg.
 		# Give the user a warning. He can press Ctrl-C if this
 		# sucks.
-		::warning("Starting $system_limit processes took > $forktime sec.",
-			  "Consider adjusting -j. Press CTRL-C to stop.");
-		$slow_spawning_warning_printed = 1;
+		::warning_once(
+		      "Starting $system_limit processes took > $forktime sec.",
+		      "Consider adjusting -j. Press CTRL-C to stop.");
 	    }
 	}
 	cleanup();
@@ -8009,9 +8054,11 @@ sub new($) {
     my $max_number_of_args = shift;
     my $transfer_files = shift;
     my $return_files = shift;
+    my $template_names = shift;
+    my $template_contents = shift;
     my $commandlinequeue = CommandLineQueue->new
 	($commandref, $read_from, $context_replace, $max_number_of_args,
-	 $transfer_files, $return_files);
+	 $transfer_files, $return_files, $template_names, $template_contents);
     my @unget = ();
     return bless {
         'unget' => \@unget,
@@ -8026,7 +8073,10 @@ sub get($) {
 
     $self->{'this_job_no'}++;
     if(@{$self->{'unget'}}) {
-        return shift @{$self->{'unget'}};
+	my $job = shift @{$self->{'unget'}};
+	# {%} may have changed, so flush computed values
+	$job && $job->flush_cache();
+	return $job;
     } else {
         my $commandline = $self->{'commandlinequeue'}->get();
         if(defined $commandline) {
@@ -8153,6 +8203,11 @@ sub new($) {
 	'output' => { 1 => [], 2 => [] },
 	'halfline' => { 1 => [], 2 => [] },
     }, ref($class) || $class;
+}
+
+sub flush_cache($) {
+    my $self = shift;
+    $self->{'commandline'}->flush_cache();
 }
 
 sub replaced($) {
@@ -8288,6 +8343,7 @@ sub openoutputfiles($) {
 	# Return immediately because we do not need setting filenames
 	return;
     } elsif($opt::results and not $Global::csvsep) {
+	# If --results, but not --results *.csv/*.tsv
 	my $out = $self->{'commandline'}->results_out();
 	my $seqname;
 	if($out eq $opt::results or $out =~ m:/$:) {
@@ -9411,6 +9467,44 @@ sub sshlogin_wrap($) {
     return $self->{'sshlogin_wrap'}{$command};
 }
 
+sub fill_templates($) {
+    # Replace replacement strings in template(s)
+    # Returns:
+    #   @templates - File names of replaced templates
+    my $self = shift;
+    
+    if(%opt::template) {
+	my @template_name =
+	    map { $self->{'commandline'}->replace_placeholders([$_],0,0) }
+	@{$self->{'commandline'}{'template_names'}};
+	::debug("tmpl","Names: @template_name\n");
+	for(my $i = 0; $i <= $#template_name; $i++) {
+	    open(my $fh, ">", $template_name[$i]) || die;
+	    print $fh $self->{'commandline'}->
+		replace_placeholders([$self->{'commandline'}{'template_contents'}[$i]],0,0);
+	    close $fh;
+	}
+	if($opt::cleanup) {
+	    $self->add_rm(@template_name);
+	}
+    }
+}
+
+sub filter($) {
+    # Replace replacement strings in filter(s) and evaluate them
+    # Returns:
+    #   $run - 1=yes, undef=no
+    my $self = shift;
+    my $run = 1;
+    if(@opt::filter) {
+	for my $eval ($self->{'commandline'}->
+		      replace_placeholders(\@opt::filter,0,0)) {
+	    $run &&= eval $eval;
+	}
+    }
+    return $run;
+}
+
 sub transfer($) {
     # Files to transfer
     # Non-quoted and with {...} substituted
@@ -9787,8 +9881,10 @@ sub start($) {
     }
     # Must be run after $job->interactive_start():
     # $job->interactive_start() may call $job->skip()
-    if($job->{'commandline'}{'skip'}) {
-	# $job->skip() was called
+    if($job->{'commandline'}{'skip'}
+       or
+       not $job->filter()) {
+	# $job->skip() was called or job filtered
 	$command = "true";
     }
     $job->openoutputfiles();
@@ -9800,6 +9896,7 @@ sub start($) {
     $ENV{'PARALLEL_JOBSLOT'} = $job->slot();
     $ENV{'PARALLEL_TMP'} = ::tmpname("par");
     $job->add_rm($ENV{'PARALLEL_TMP'});
+    $job->fill_templates();
     ::debug("run", $Global::total_running, " processes . Starting (",
 	    $job->seq(), "): $command\n");
     if($opt::pipe) {
@@ -9979,6 +10076,17 @@ sub is_already_in_results($) {
     # Returns:
     #   $job_already_run = bool whether there is output for this or not
     my $job = $_[0];
+    if($Global::csvsep) {
+	if($opt::joblog) {
+	    # OK: You can look for job run in joblog
+	    return 0
+	} else {
+	    ::warning_once(
+		  "--resume --results .csv/.tsv/.json is not supported yet\n");
+	    # TODO read and parse the file
+	    return 0
+	}
+    }
     my $out = $job->{'commandline'}->results_out();
     ::debug("run", "Test ${out}stdout", -e "${out}stdout", "\n");
     return(-e $out."stdout" or -f $out);
@@ -10603,7 +10711,6 @@ sub set_exitsignal($$) {
 }
 
 {
-    my $status_printed;
     my $total_jobs;
 
     sub should_we_halt {
@@ -10703,6 +10810,8 @@ sub new($) {
     my $max_number_of_args = shift; # for -N and normal (-n1)
     my $transfer_files = shift;
     my $return_files = shift;
+    my $template_names = shift;
+    my $template_contents = shift;
     my $replacecount_ref = shift;
     my $len_ref = shift;
     my %replacecount = %$replacecount_ref;
@@ -10724,8 +10833,21 @@ sub new($) {
 	'context_replace' => $context_replace,
 	'transfer_files' => $transfer_files,
 	'return_files' => $return_files,
+	'template_names' => $template_names,
+	'template_contents' => $template_contents,
 	'replaced' => undef,
     }, ref($class) || $class;
+}
+
+sub flush_cache() {
+    my $self = shift;
+    for my $arglist (@{$self->{'arg_list'}}) {
+	for my $arg (@$arglist) {
+	    $arg->flush_cache();
+	}
+    }
+    $self->{'arg_queue'}->flush_cache();
+    $self->{'replaced'} = undef;
 }
 
 sub seq($) {
@@ -11413,6 +11535,8 @@ sub new($) {
     my $max_number_of_args = shift;
     my $transfer_files = shift;
     my $return_files = shift;
+    my $template_names = shift;
+    my $template_contents = shift;
     my @unget = ();
     my $posrpl;
     my ($replacecount_ref, $len_ref);
@@ -11428,7 +11552,9 @@ sub new($) {
     # @command, --transferfile, --return,
     # --tagstring, --workdir, --results
     for(@command, @$transfer_files, @$return_files,
-	$opt::tagstring, $opt::workdir, $opt::results, $opt::retries) {
+	@$template_names, @$template_contents,
+	$opt::tagstring, $opt::workdir, $opt::results, $opt::retries,
+	@opt::filter) {
 	# Skip if undefined
 	$_ or next;
 	# Escape \257 => \257\256
@@ -11530,10 +11656,11 @@ sub new($) {
 	    }
 	}
     }
-
     # Add {} if no replacement strings in @command
     ($replacecount_ref, $len_ref, @command) =
-	replacement_counts_and_lengths($transfer_files,$return_files,@command);
+	replacement_counts_and_lengths($transfer_files, $return_files,
+				       $template_names, $template_contents,
+				       @command);
     if("@command" =~ /^[^ \t\n=]*\257</) {
 	# Replacement string is (part of) the command (and not just
 	# argument or variable definition V1={})
@@ -11547,17 +11674,20 @@ sub new($) {
     }
 
     return bless {
-	'unget' => \@unget,
-	'command' => \@command,
-	'replacecount' => $replacecount_ref,
-	'arg_queue' => RecordQueue->new($read_from,$opt::colsep),
-	'context_replace' => $context_replace,
-	'len' => $len_ref,
-	'max_number_of_args' => $max_number_of_args,
-	'size' => undef,
-	'transfer_files' => $transfer_files,
-	'return_files' => $return_files,
-	'seq' => $seq,
+	('unget' => \@unget,
+	 'command' => \@command,
+	 'replacecount' => $replacecount_ref,
+	 'arg_queue' => RecordQueue->new($read_from,$opt::colsep),
+	 'context_replace' => $context_replace,
+	 'len' => $len_ref,
+	 'max_number_of_args' => $max_number_of_args,
+	 'size' => undef,
+	 'transfer_files' => $transfer_files,
+	 'return_files' => $return_files,
+	 'template_names' => $template_names,
+	 'template_contents' => $template_contents,
+	 'seq' => $seq,
+	 )
     }, ref($class) || $class;
 }
 
@@ -11605,11 +11735,15 @@ sub replacement_counts_and_lengths($$@) {
     # Input:
     #   \@transfer_files = array of filenames to transfer
     #   \@return_files = array of filenames to return
+    #   \@template_names = array of names to copy to
+    #   \@template_contents = array of contents to write
     #   @command = command template
     # Output:
     #   \%replacecount, \%len, @command
     my $transfer_files = shift;
     my $return_files = shift;
+    my $template_names = shift;
+    my $template_contents = shift;
     my @command = @_;
     my (%replacecount,%len);
     my $sum = 0;
@@ -11639,6 +11773,8 @@ sub replacement_counts_and_lengths($$@) {
 	    $noncontextlen += length $c;
 	}
 	for(@$transfer_files, @$return_files,
+	    @$template_names, @$template_contents,
+	    @opt::filter,
 	    $opt::tagstring, $opt::workdir, $opt::results, $opt::retries) {
 	    # Options that can contain replacement strings
 	    $_ or next;
@@ -11697,6 +11833,8 @@ sub get($) {
 	     $self->{'len'}, @command) =
 		replacement_counts_and_lengths($self->{'transfer_files'},
 					       $self->{'return_files'},
+					       $self->{'template_name'},
+					       $self->{'template_contents'},
 					       @$SQL::command_ref);
 	    if("@command" =~ /^[^ \t\n=]*\257</) {
 		# Replacement string is (part of) the command (and not just
@@ -11714,6 +11852,8 @@ sub get($) {
 					$self->{'max_number_of_args'},
 					$self->{'transfer_files'},
 					$self->{'return_files'},
+					$self->{'template_names'},
+					$self->{'template_contents'},
 					$self->{'replacecount'},
 					$self->{'len'},
 	    );
@@ -11817,7 +11957,8 @@ sub find_max($) {
     my $string = shift;
     # This is slow on Cygwin, so give Cygwin users a warning
     if($^O eq "cygwin") {
-	::warning("Finding the maximal command line length. This may take up to 30 seconds.")
+	::warning("Finding the maximal command line length. ".
+		  "This may take up to 30 seconds.")
     }
     # Use an upper bound of 100 MB if the shell allows for infinite long lengths
     my $upper = 100_000_000;
@@ -11996,6 +12137,16 @@ sub empty($) {
     return $empty;
 }
 
+sub flush_cache($) {
+    my $self = shift;
+    for my $record (@{$self->{'unget'}}) {
+	for my $arg (@$record) {
+	    $arg->flush_cache();
+	}
+    }
+    $self->{'arg_sub_queue'}->flush_cache();
+}
+
 sub arg_number($) {
     my $self = shift;
     return $self->{'arg_number'};
@@ -12022,7 +12173,6 @@ sub get($) {
     if(@{$self->{'unget'}}) {
 	return shift @{$self->{'unget'}};
     }
-    my $unget_ref = $self->{'unget'};
     if($self->{'arg_sub_queue'}->empty()) {
 	return undef;
     }
@@ -12035,7 +12185,7 @@ sub get($) {
 	    ::debug("run", "line='$line'\n");
 	    if($line ne "") {
 		if($opt::csv) {
-		    # Parse CSV
+		    # Parse CSV and put it into a record
 		    chomp $line;
 		    if(not $Global::csv->parse($line)) {
 			die "CSV has unexpected format: ^$line^";
@@ -12044,6 +12194,7 @@ sub get($) {
 			push @out_record, Arg->new($_);
 		    }
 		} else {
+		    # Split --colsep into record
 		    for my $s (split /$opt::colsep/o, $line, -1) {
 			push @out_record, Arg->new($s);
 		    }
@@ -12070,6 +12221,14 @@ sub empty($) {
 	$self->{'arg_sub_queue'}->empty();
     ::debug("run", "RecordColQueue->empty $empty");
     return $empty;
+}
+
+sub flush_cache($) {
+    my $self = shift;
+    for my $arg (@{$self->{'unget'}}) {
+	$arg->flush_cache();
+    }
+    $self->{'arg_sub_queue'}->flush_cache();
 }
 
 
@@ -12111,6 +12270,15 @@ sub empty($) {
     return $empty;
 }
 
+sub flush_cache($) {
+    my $self = shift;
+    for my $record (@{$self->{'unget'}}) {
+	for my $arg (@$record) {
+	    $arg->flush_cache();
+	}
+    }
+}
+
 
 package MultifileQueue;
 
@@ -12121,11 +12289,12 @@ sub new($$) {
     my $fhs = shift;
     for my $fh (@$fhs) {
 	if(-t $fh and -t ($Global::status_fd || *STDERR)) {
-	    ::warning("Input is read from the terminal. You are either an expert",
-		      "(in which case: YOU ARE AWESOME!) or maybe you forgot",
-		      "::: or :::: or -a or to pipe data into parallel. If so",
-		      "consider going through the tutorial: man parallel_tutorial",
-		      "Press CTRL-D to exit.");
+	    ::warning(
+		  "Input is read from the terminal. You are either an expert",
+		  "(in which case: YOU ARE AWESOME!) or maybe you forgot",
+		  "::: or :::: or -a or to pipe data into parallel. If so",
+		  "consider going through the tutorial: man parallel_tutorial",
+		  "Press CTRL-D to exit.");
 	}
     }
     return bless {
@@ -12161,6 +12330,15 @@ sub empty($) {
     return $empty;
 }
 
+sub flush_cache($) {
+    my $self = shift;
+    for my $record (@{$self->{'unget'}}, @{$self->{'arg_matrix'}}) {
+	for my $arg (@$record) {
+	    $arg->flush_cache();
+	}
+    }
+}
+
 sub link_get($) {
     my $self = shift;
     if(@{$self->{'unget'}}) {
@@ -12169,19 +12347,20 @@ sub link_get($) {
     my @record = ();
     my $prepend;
     my $empty = 1;
-    for my $fh (@{$self->{'fhs'}}) {
+    for my $i (0..$#{$self->{'fhs'}}) {
+	my $fh = $self->{'fhs'}[$i];
 	my $arg = read_arg_from_fh($fh);
 	if(defined $arg) {
 	    # Record $arg for recycling at end of file
-	    push @{$self->{'arg_matrix'}{$fh}}, $arg;
+	    push @{$self->{'arg_matrix'}[$i]}, $arg;
 	    push @record, $arg;
 	    $empty = 0;
 	} else {
 	    ::debug("run", "EOA ");
 	    # End of file: Recycle arguments
-	    push @{$self->{'arg_matrix'}{$fh}}, shift @{$self->{'arg_matrix'}{$fh}};
+	    push @{$self->{'arg_matrix'}[$i]}, shift @{$self->{'arg_matrix'}[$i]};
 	    # return last @{$args->{'args'}{$fh}};
-	    push @record, @{$self->{'arg_matrix'}{$fh}}[-1];
+	    push @record, @{$self->{'arg_matrix'}[$i]}[-1];
 	}
     }
     if($empty) {
@@ -12273,76 +12452,97 @@ sub nest_get($) {
     return shift @{$self->{'unget'}};
 }
 
-sub read_arg_from_fh($) {
-    # Read one Arg from filehandle
-    # Returns:
-    #   Arg-object with one read line
-    #   undef if end of file
-    my $fh = shift;
-    my $prepend;
-    my $arg;
-    my $half_record = 0;
-    do {{
-	# This makes 10% faster
-	if(not defined ($arg = <$fh>)) {
+{
+    my $cr_count = 0;
+    my $nl_count = 0;
+    my $dos_crnl_determined;
+    sub read_arg_from_fh($) {
+	# Read one Arg from filehandle
+	# Returns:
+	#   Arg-object with one read line
+	#   undef if end of file
+	my $fh = shift;
+	my $prepend;
+	my $arg;
+	my $half_record = 0;
+	do {{
+	    # This makes 10% faster
+	    if(not defined ($arg = <$fh>)) {
+		if(defined $prepend) {
+		    return Arg->new($prepend);
+		} else {
+		    return undef;
+		}
+	    }
+	    if(not $dos_crnl_determined and not $opt::d) {
+		# Warn if input has CR-NL and -d is not set
+		if($arg =~ /\r$/) {
+		    $cr_count++;
+		} else {
+		    $nl_count++;
+		}
+		if($cr_count == 3 or $nl_count == 3) {
+		    $dos_crnl_determined = 1;
+		    if($nl_count == 0 and $cr_count == 3) {
+			::warning('The first three values end in CR-NL. '.
+				  'Consider using -d "\r\n"');
+		    }
+		}
+	    }
+	    if($opt::csv) {
+		# We need to read a full CSV line.
+		if(($arg =~ y/"/"/) % 2 ) {
+		    # The number of " on the line is uneven:
+		    # If we were in a half_record => we have a full record now
+		    # If we were outside a half_record =>
+		    #    we are in a half record now
+		    $half_record = not $half_record;
+		}
+		if($half_record) {
+		    # CSV half-record with quoting:
+		    #   col1,"col2 2""x3"" board newline  <-this one
+		    #   cont",col3
+		    $prepend .= $arg;
+		    redo;
+		} else {
+		    # Now we have a full CSV record
+		}
+	    }
+	    # Remove delimiter
+	    chomp $arg;
+	    if($Global::end_of_file_string and
+	       $arg eq $Global::end_of_file_string) {
+		# Ignore the rest of input file
+		close $fh;
+		::debug("run", "EOF-string ($arg) met\n");
+		if(defined $prepend) {
+		    return Arg->new($prepend);
+		} else {
+		    return undef;
+		}
+	    }
 	    if(defined $prepend) {
-		return Arg->new($prepend);
-	    } else {
-		return undef;
+		$arg = $prepend.$arg; # For line continuation
+		undef $prepend;
 	    }
-	}
-	if($opt::csv) {
-	    # We need to read a full CSV line.
-	    if(($arg =~ y/"/"/) % 2 ) {
-		# The number of " on the line is uneven:
-		# If we were in a half_record => we have a full record now
-		# If we were ouside a half_record => we are in a half record now
-		$half_record = not $half_record;
+	    if($Global::ignore_empty) {
+		if($arg =~ /^\s*$/) {
+		    redo; # Try the next line
+		}
 	    }
-	    if($half_record) {
-		# CSV half-record with quoting:
-		#   col1,"col2 2""x3"" board newline  <-this one
-		#   cont",col3
-		$prepend .= $arg;
-		redo;
-	    } else {
-		# Now we have a full CSV record
+	    if($Global::max_lines) {
+		if($arg =~ /\s$/) {
+		    # Trailing space => continued on next line
+		    $prepend = $arg;
+		    redo;
+		}
 	    }
+	    }} while (1 == 0); # Dummy loop {{}} for redo
+	if(defined $arg) {
+	    return Arg->new($arg);
+	} else {
+	    ::die_bug("multiread arg undefined");
 	}
-	# Remove delimiter
-	chomp $arg;
-	if($Global::end_of_file_string and
-	   $arg eq $Global::end_of_file_string) {
-	    # Ignore the rest of input file
-	    close $fh;
-	    ::debug("run", "EOF-string ($arg) met\n");
-	    if(defined $prepend) {
-		return Arg->new($prepend);
-	    } else {
-		return undef;
-	    }
-	}
-	if(defined $prepend) {
-	    $arg = $prepend.$arg; # For line continuation
-	    undef $prepend;
-	}
-	if($Global::ignore_empty) {
-	    if($arg =~ /^\s*$/) {
-		redo; # Try the next line
-	    }
-	}
-	if($Global::max_lines) {
-	    if($arg =~ /\s$/) {
-		# Trailing space => continued on next line
-		$prepend = $arg;
-		redo;
-	    }
-	}
-    }} while (1 == 0); # Dummy loop {{}} for redo
-    if(defined $arg) {
-	return Arg->new($arg);
-    } else {
-	::die_bug("multiread arg undefined");
     }
 }
 
@@ -12486,7 +12686,8 @@ sub total_jobs() {
 	# This is actually a CommandLine-object,
 	# but it looks nice to be able to say {= $job->slot() =}
 	$job = shift;
-	$perlexpr =~ s/^(-?\d+)? *//; # Positional replace treated as normal replace
+	# Positional replace treated as normal replace
+	$perlexpr =~ s/^(-?\d+)? *//;
 	if(not $Global::cache_replacement_eval
 	   or
 	   not $self->{'cache'}{$perlexpr}) {
@@ -12656,7 +12857,7 @@ sub process_timeouts($) {
 	    # because kill calls usleep that calls process_timeouts
 	    shift @{$self->{'queue'}};
 	    ::warning("This job was killed because it timed out:",
-		$job->replaced());
+		      $job->replaced());
 	    $job->kill();
 	} else {
 	    # Because they are sorted by start time the rest are later
@@ -13451,8 +13652,10 @@ sub main() {
     }
 
     $Global::JobQueue = JobQueue->new(
-	\@command,\@input_source_fh,$Global::ContextReplace,
-	$number_of_args,\@Global::transfer_files,\@Global::ret_files);
+	\@command, \@input_source_fh, $Global::ContextReplace,
+	$number_of_args, \@Global::transfer_files, \@Global::ret_files,
+	\@Global::template_names, \@Global::template_contents
+	);
 
     if($opt::sqlmaster) {
 	# Create SQL table to hold joblog + output
@@ -13490,6 +13693,7 @@ sub main() {
     # Compute $Global::max_jobs_running
     # Must be done after ungetting any --pipepart jobs.
     max_jobs_running();
+
     init_run_jobs();
     my $sem;
     if($Global::semaphore) {
@@ -13521,7 +13725,7 @@ sub main() {
 	while(start_more_jobs()) {}
 	spreadstdin();
     } else {
-	# Reap the finished jobs - start more
+	# Reap the finished jobs and start more
 	while(reapers() + start_more_jobs()) {}
     }
     ::debug("init", "Start draining\n");

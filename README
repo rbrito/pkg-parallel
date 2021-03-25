@@ -57,11 +57,11 @@ document.
 
 Full installation of GNU Parallel is as simple as:
 
-    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2
-    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2.sig
-    gpg parallel-20210122.tar.bz2.sig
-    bzip2 -dc parallel-20210122.tar.bz2 | tar xvf -
-    cd parallel-20210122
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210322.tar.bz2
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210322.tar.bz2.sig
+    gpg parallel-20210322.tar.bz2.sig
+    bzip2 -dc parallel-20210322.tar.bz2 | tar xvf -
+    cd parallel-20210322
     ./configure && make && sudo make install
 
 
@@ -70,11 +70,11 @@ Full installation of GNU Parallel is as simple as:
 If you are not root you can add ~/bin to your path and install in
 ~/bin and ~/share:
 
-    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2
-    wget https://ftpmirror.gnu.org/parallel/parallel-20210122.tar.bz2.sig
-    gpg parallel-20210122.tar.bz2.sig
-    bzip2 -dc parallel-20210122.tar.bz2 | tar xvf -
-    cd parallel-20210122
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210322.tar.bz2
+    wget https://ftpmirror.gnu.org/parallel/parallel-20210322.tar.bz2.sig
+    gpg parallel-20210322.tar.bz2.sig
+    bzip2 -dc parallel-20210322.tar.bz2 | tar xvf -
+    cd parallel-20210322
     ./configure --prefix=$HOME && make && make install
 
 Or if your system lacks 'make' you can simply copy src/parallel
@@ -96,7 +96,7 @@ system is old or Microsoft Windows):
 
 If you are developing your script to run on a remote server, that does
 not have GNU Parallel installed, but you have it installed on you
-development machine, the use can use `parallel --embed`.
+development machine, then you can use `parallel --embed`.
 
     parallel --embed > newscript.sh
 
@@ -122,12 +122,12 @@ will love you for it.
 When using programs that use GNU Parallel to process data for
 publication please cite:
 
-    Tange, O. (2021, January 22). GNU Parallel 20210122 ('Capitol Riots').
-    Zenodo. https://doi.org/10.5281/zenodo.4454976
+    Tange, O. (2021, March 22). GNU Parallel 20210322 ('2002-01-06').
+    Zenodo. https://doi.org/10.5281/zenodo.4628277
 
 Copyright (C) 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
-2016, 2017, 2018, 2019, 2020 Ole Tange, http://ole.tange.dk and Free
-Software Foundation, Inc.
+2016, 2017, 2018, 2019, 2020, 2021 Ole Tange, http://ole.tange.dk and
+Free Software Foundation, Inc.
 
 
 = New versions =

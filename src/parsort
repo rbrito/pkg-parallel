@@ -1,5 +1,8 @@
 #!/usr/bin/perl
 
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 =pod
 
 =head1 NAME
@@ -118,7 +121,7 @@ GetOptions(
     "help" => \$opt::dummy,
     ) || exit(255);
 $Global::progname = ($0 =~ m:(^|/)([^/]+)$:)[1];
-$Global::version = 20210122;
+$Global::version = 20210322;
 if($opt::version) { version(); exit 0; }
 @Global::sortoptions =
     shell_quote(@ARGV_before[0..($#ARGV_before-$#ARGV-1)]);
