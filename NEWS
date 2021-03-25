@@ -1,3 +1,85 @@
+20210322
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* The very first version of Parallel dated 2002-01-06 was found in an
+  old backup:
+
+  #!/usr/bin/perl
+
+  $processes=shift;
+
+  chomp(@jobs=<>);
+  for (@jobs) {
+      $jobnr++;
+      push @makefile,
+      (".PHONY : job$jobnr\n",
+       "job$jobnr :\n",
+       "\t$_\n");
+  }
+  unshift @makefile, "all : ",(map { "job$_ " } 1 .. $jobnr),"\n";
+  
+  open (MAKE, "| make -k -f - -j $processes") || die;
+  print MAKE @makefile;
+  close MAKE;
+
+* Introduction to GNU Parallel
+  https://www.youtube.com/watch?v=Kj-6JkAqw-8
+
+* Using GNU Parallel with GooseSLURM
+  https://readthedocs.org/projects/gooseslurm/downloads/pdf/latest/#chapter.7
+
+* Why GNU-parallel?
+  https://github.com/lijingbu/omics/blob/main/why_gnu_parallel.md
+
+
+20210222
+
+* --filter only run jobs where the filter is true. The filter can
+  contain replacement strings and Perl code such as: '{1} < {2}+1'
+
+* --template takes a text file as a template with replacement
+  strings. Then it replaces the replacement strings and saves it
+  under a new filename.
+
+* --plus implements {0%} {0#} replacement string for zero padded slot
+  and sequence.
+
+* Warn that you probably mean -d '\r\n' if the first 3 values end in
+  \r\n (DOS newline).
+
+* {= perlexpression =} must return the same value, if run twice on the
+  same input.
+
+* Man pages available as .rst-format.
+
+* Bug fixes and man page updates.
+
+News about GNU Parallel:
+
+* A short tutorial on Gnu Parallel
+  https://www.polarmicrobes.org/a-short-tutorial-on-gnu-parallel/
+
+* 5 reasons why I love coding on Linux
+  https://opensource.com/article/21/2/linux-programming
+
+* Simple Tutorial to install & use GNU Parallel
+  https://medium.com/analytics-vidhya/simple-tutorial-to-install-use-gnu-parallel-79251120d618
+
+* LiDO3 - first contact
+  https://www.lido.tu-dortmund.de/cms/de/LiDO3/LiDO3_first_contact_handout.pdf
+
+* Rill Stage 2-1: Ways of command-line data analysis
+  https://blog.jastix.biz/post/rill-stage-2-1-cli-data-analysis/
+
+* Introduction to GNU Parallel
+  https://blog.knoldus.com/introduction-to-gnu-parallel/
+
+* GNU Parallel https://www.hahwul.com/cullinan/parallel/
+
+
 20210122
 
 * --memsuspend suspends jobs when there is little memory free. This

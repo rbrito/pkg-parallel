@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2002-2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 SUBDIRS = src
 
 test:
@@ -119,6 +123,22 @@ monitorman:
 # If man page changed: open new pdfman
 	inotifywait -qmre MOVED_TO -e CLOSE_WRITE --format %w%f . | parallel -uj1 'echo {=/\.pod$$/ or skip()=};make -j && sudo make install; pdfman {/.} &'
 
+reuse:
+	rm -rf /tmp/reuse
+	mkdir /tmp/reuse
+	git commit -a -m dummy
+	(wd=`pwd`; \
+	cd /tmp/reuse; \
+	git clone "$$wd"; \
+	reuse lint || \
+	(echo Use; \
+	echo '  reuse addheader --copyright="Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc." --license="GPL-3.0-or-later" source-files'; \
+	echo or; \
+	echo '  reuse addheader --copyright="Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc." --license="GPL-3.0-or-later" --explicit-license bin-files' \
+	) )
+	git reset HEAD~ >/dev/null
+	git commit -c ORIG_HEAD >/dev/null
+
 testurls:
 	mkdir -p urls
 	cd urls && grep -v '(dead)' ../src/* | grep -h -Po 'https?://[^ $$<>")}]+' | perl -pe 's/(&gt|\{).*//;s/\\-/-/g;s/\\n//g;s/&amp;/&/g;s/&#.*//;'"s/'.*//" | grep -Ev 'parallel-(20)?$$|coolwebsite.biz' | sort -u | egrep -v 'example.com|##|\*\(' | parallel -j0 --timeout 33 --bar --tag --joblog joblog --retries 3 neno wget -m -l1 -Q1 '{=$$_=Q($$_)=}'
@@ -144,4 +164,4 @@ pack_unpack_and_test_build:
 	./configure && make -j && sudo make -j install
 
 
-EXTRA_DIST = CITATION CREDITS cc-by-sa.txt fdl.txt
+EXTRA_DIST = CITATION CREDITS LICENSES/CC-BY-SA-4.0.txt LICENSES/GFDL-1.3-or-later.txt LICENSES/GPL-3.0-or-later.txt

@@ -13,6 +13,10 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+# SPDX-FileCopyrightText: 2002-2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -155,8 +159,8 @@ ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
 DIST_SUBDIRS = $(SUBDIRS)
-am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in COPYING \
-	NEWS README install-sh missing
+am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in NEWS \
+	README install-sh missing
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -275,7 +279,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = src
-EXTRA_DIST = CITATION CREDITS cc-by-sa.txt fdl.txt
+EXTRA_DIST = CITATION CREDITS LICENSES/CC-BY-SA-4.0.txt LICENSES/GFDL-1.3-or-later.txt LICENSES/GPL-3.0-or-later.txt
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
@@ -869,6 +873,22 @@ alphaupload:
 monitorman:
 # If man page changed: open new pdfman
 	inotifywait -qmre MOVED_TO -e CLOSE_WRITE --format %w%f . | parallel -uj1 'echo {=/\.pod$$/ or skip()=};make -j && sudo make install; pdfman {/.} &'
+
+reuse:
+	rm -rf /tmp/reuse
+	mkdir /tmp/reuse
+	git commit -a -m dummy
+	(wd=`pwd`; \
+	cd /tmp/reuse; \
+	git clone "$$wd"; \
+	reuse lint || \
+	(echo Use; \
+	echo '  reuse addheader --copyright="Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc." --license="GPL-3.0-or-later" source-files'; \
+	echo or; \
+	echo '  reuse addheader --copyright="Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc." --license="GPL-3.0-or-later" --explicit-license bin-files' \
+	) )
+	git reset HEAD~ >/dev/null
+	git commit -c ORIG_HEAD >/dev/null
 
 testurls:
 	mkdir -p urls

@@ -24,6 +24,9 @@
 # along with this program; if not, see <http://www.gnu.org/licenses/>
 # or write to the Free Software Foundation, Inc., 51 Franklin St,
 # Fifth Floor, Boston, MA 02110-1301 USA
+#
+# SPDX-FileCopyrightText: 2021 Ole Tange, http://ole.tange.dk and Free Software and Foundation, Inc.
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 set _parallel_exit_CODE=0
 if ("`alias env_parallel`" == '' || ! $?PARALLEL_CSH) then
