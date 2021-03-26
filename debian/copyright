@@ -5,6 +5,7 @@ Source: https://ftpmirror.gnu.org/parallel/
 Files-Excluded: src/*.{1,7}
  src/*.html
  src/*.pdf
+ src/*.rst
  src/*.texi
 Comment: The files excluded are automatically generated from the source files.
 
